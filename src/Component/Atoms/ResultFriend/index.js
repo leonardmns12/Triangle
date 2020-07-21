@@ -1,0 +1,43 @@
+import React from 'react';
+import { View , Text, StyleSheet} from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+
+const ResultFriend = ({navigation, name, onpress}) => {
+    return(
+        <View style={[{alignItems:'center',justifyContent:'center', paddingTop:48}]}>
+        <View style={[styles.profileImg,{}]}></View>
+        <Text style={[styles.profileName,{}]}>{name}</Text>
+        <TouchableOpacity onPress={onpress} style={{paddingTop:16}}>
+            <View style={[styles.addButton,{}]}>
+                    <Text style={{color:'#FFFFFF'}}>Add</Text>
+            </View>
+        </TouchableOpacity>
+        </View>
+    )
+}
+
+const styles = StyleSheet.create({
+    profileImg : {
+        height:130, 
+        width:130, 
+        borderRadius:100, 
+        backgroundColor: '#FFFFFF', 
+        borderWidth:1, 
+        borderColor:'#707070'
+    },
+    profileName : {
+        paddingTop:15,
+        fontSize:18
+    },
+    addButton : {
+        height:32,
+        width:130,
+        borderWidth:1,
+        justifyContent:'center', 
+        alignItems:'center',
+        backgroundColor:'#1BB0DF', 
+        borderColor:'#FFFFFF'
+    }
+})
+
+export default ResultFriend;
