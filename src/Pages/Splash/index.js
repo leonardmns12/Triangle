@@ -16,7 +16,7 @@ const Splash = ({navigation}) => {
         const res = await onAuthUser();
         if(res){
             dispatch({type:'SET_USERID' , value: res.uid})
-            navigation.replace('FindFriend');
+            navigation.replace('Home');
         }else{
             navigation.replace('Login');
         }
