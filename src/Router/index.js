@@ -6,7 +6,12 @@ const Stack = createStackNavigator();
 
 const Router = () => {
     return(
-        <Stack.Navigator>
+        <Stack.Navigator
+        screenOptions = {{
+            gestureEnabled : true,
+            gestureDirection : "horizontal"
+        }}
+        >
             <Stack.Screen name="Splash" component={Splash} 
             options={{
                 headerShown: false,
