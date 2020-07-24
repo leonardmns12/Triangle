@@ -52,10 +52,12 @@ const Home = ({navigation}) => {
         <View style={{flex:1 , position:'relative'}}>
             <View style={{flex:1, backgroundColor:'rgba(0,94,97,0.5)' , borderBottomLeftRadius:41, borderBottomRightRadius:41, position:'relative'}}>
               <View style={{position:'relative'}}>
-                  <View  style={{position:'relative'}}>
-                  <View  style={{width:40 , height:40, position:'absolute', right:3, top:3}}>
-                      <AddFriend onPress={addfriend} width={40} height={38} />
-                  </View>
+
+                  <View style={[style.addfriend,{width: 40, height: 38}]}>
+                      <View style={[,{}]}>
+                      <AddFriend onPress={search} width={40} height={38} />
+                      </View>
+
                   </View>
                 <View style={{flexDirection:'row', marginTop: 43, marginBottom:7}}>
                     <View style={[style.profileimg ,{}]}></View>
@@ -120,6 +122,13 @@ const style = StyleSheet.create({
     bio: {
         marginLeft: 12,
         color: '#FFFFFF',
+    },
+
+
+
+    addfriend : {
+        position: 'absolute',
+        right: 0,
     },
 
     homeinfo : {
