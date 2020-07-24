@@ -36,11 +36,11 @@ const Home = ({navigation}) => {
         <View style={{flex:1 , position:'relative'}}>
             <View style={{flex:1, backgroundColor:'rgba(0,94,97,0.5)' , borderBottomLeftRadius:41, borderBottomRightRadius:41, position:'relative'}}>
               <View style={{position:'relative'}}>
-                  <TouchableOpacity style={[style.addfriend,{}]}>
+                  <View style={[style.addfriend,{width: 40, height: 38}]}>
                       <View style={[,{}]}>
-                      <AddFriend width={40} height={38} />
+                      <AddFriend onPress={search} width={40} height={38} />
                       </View>
-                  </TouchableOpacity>
+                  </View>
                 <View style={{flexDirection:'row', marginTop: 43, marginBottom:7}}>
                     <View style={[style.profileimg ,{}]}></View>
                     <Text style={[style.profilename, {}]}>Leonard Monosa</Text>
@@ -106,7 +106,8 @@ const style = StyleSheet.create({
         color: '#FFFFFF',
     },
     addfriend : {
-        position: 'absolute'
+        position: 'absolute',
+        right: 0,
     },
     homeinfo : {
         paddingTop : 14,
