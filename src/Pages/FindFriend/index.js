@@ -8,6 +8,7 @@ import {ResultFriend} from '../../Component/';
 import firebase from '../../Config/Firebase/';
 import { useDispatch, useSelector } from 'react-redux';
 
+
 const FindFriend = ({navigation}) => {
     const gtchat = (screen) => {
         navigation.replace(screen);

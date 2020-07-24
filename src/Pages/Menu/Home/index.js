@@ -45,7 +45,7 @@ const Home = ({navigation}) => {
     }
 
     const addfriend = () => {
-        navigation.navigate('FindFriend')
+        navigation.navigate('FindFriend');
     }
 
     return(
