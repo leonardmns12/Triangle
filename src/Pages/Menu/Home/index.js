@@ -138,5 +138,5 @@ const style = StyleSheet.create({
         fontSize : 18
     }
 })
-
+//gasal
 export default Home;
