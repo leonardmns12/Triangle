@@ -1,19 +1,31 @@
 import React , { useEffect } from 'react';
-import { View , Text, ScrollView, StyleSheet } from 'react-native';
+import { View , Text, ScrollView, StyleSheet, AsyncStorage } from 'react-native';
 import NavigationMenu from '../../../Component/Molekuls/NavigationMenu/';
 import Friendlist from '../../../Component/Molekuls/Friendlist/';
 import { Button } from '../../../Component/';
-import { signOutUser } from '../../../Config/Redux/restApi/';
+import { signOutUser , getUsername } from '../../../Config/Redux/restApi/';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import AddFriend from '../../../../assets/Home/addfriend.svg';
 import Magnifier from '../../../../assets/Home/magnifier.svg';
-//GAMBAR ADDFRIEND LOKASI BLM BENER
+
 
 
 const Home = ({navigation}) => {
 
     useEffect(()=>{
+        _retrieveUsername();
     })
+
+    const _retrieveUsername = async () => {
+        try {
+          const value = await AsyncStorage.getItem('username');
+          if (value !== null) {
+
+            alert(value);
+          }
+        } catch (error) {
+        }
+      };
 
     const onClickLogout = async () => {
         const res = await signOutUser();
@@ -32,15 +44,19 @@ const Home = ({navigation}) => {
         alert('search');
     }
 
+    const addfriend = () => {
+        navigation.navigate('FindFriend')
+    }
+
     return(
         <View style={{flex:1 , position:'relative'}}>
             <View style={{flex:1, backgroundColor:'rgba(0,94,97,0.5)' , borderBottomLeftRadius:41, borderBottomRightRadius:41, position:'relative'}}>
               <View style={{position:'relative'}}>
-                  <TouchableOpacity style={[style.addfriend,{}]}>
-                      <View style={[,{}]}>
-                      <AddFriend width={40} height={38} />
-                      </View>
-                  </TouchableOpacity>
+                  <View  style={{position:'relative'}}>
+                  <View  style={{width:40 , height:40, position:'absolute', right:3, top:3}}>
+                      <AddFriend onPress={addfriend} width={40} height={38} />
+                  </View>
+                  </View>
                 <View style={{flexDirection:'row', marginTop: 43, marginBottom:7}}>
                     <View style={[style.profileimg ,{}]}></View>
                     <Text style={[style.profilename, {}]}>Leonard Monosa</Text>
@@ -105,9 +121,7 @@ const style = StyleSheet.create({
         marginLeft: 12,
         color: '#FFFFFF',
     },
-    addfriend : {
-        position: 'absolute'
-    },
+
     homeinfo : {
         paddingTop : 14,
         paddingHorizontal : 30

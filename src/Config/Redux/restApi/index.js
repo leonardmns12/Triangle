@@ -18,6 +18,8 @@ export const createNewUser = (data) => {
     })
   }
 
+
+
   export const signInUser = (email ,password) => {
     return new Promise((resolve,reject) => {
       firebase.auth().signInWithEmailAndPassword(email, password)
@@ -57,6 +59,38 @@ export const createNewUser = (data) => {
           resolve(false);
         }
     })
+    });
+  }
+
+  export const updateUser = (data) =>{
+    var user = firebase.auth().currentUser;
+
+      user.updateProfile({
+        displayName: data.username,
+      }).then(function() {
+        // Update successful.
+      }).catch(function(error) {
+        // An error happened.
+      });
+  } 
+  
+  export const getUsername = () => {
+    return new Promise((resolve,reject) => {
+      var user = firebase.auth().currentUser;
+      var username;
+  
+      if (user != null) {
+        username = user.displayName;
+        resolve(username);
+      }
+      reject(false);
+    })
+  }
+
+
+  export const addFriend = (data,userId) => {
+    firebase.database().ref('users/' +data.username +'/friend').push({
+      friend: data.friend
     });
   }
 

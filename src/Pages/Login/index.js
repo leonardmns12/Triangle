@@ -1,4 +1,4 @@
-import React , { Component } from 'react';
+import React , { Component , useEffect } from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -6,20 +6,31 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Image
+  Image,
+  AsyncStorage 
 } from 'react-native';
-import { signInUser } from '../../Config/Redux/restApi';
+import { signInUser, getUsername } from '../../Config/Redux/restApi';
 import {Button} from '../../Component';
 import { useSelector, useDispatch } from 'react-redux';
 
 const Login = ({navigation}) => {
   const loginReducer = useSelector(state => state.loginReducer);
   const dispatch = useDispatch();
+  
   const onClickLogin = async () => {
     const res = await signInUser(loginReducer.email , loginReducer.password).catch(err => alert(err));
     if(res){
+      const username = await getUsername();
+        try {
+          await AsyncStorage.setItem(
+            'username',username
+          );
+        } catch (error) {
+          // Error saving data
+        }
       navigation.navigate('Home');
     }
+    
     dispatch({type:'CLEAR_PASSWORD'})
   }
   const onClickRegister = () => {
