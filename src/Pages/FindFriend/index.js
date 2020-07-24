@@ -5,22 +5,62 @@ import NavigationMenu from '../../Component/Molekuls/NavigationMenu';
 import LeftLogo from '../../../assets/chatWindow/left.svg';
 import Search from '../../../assets/search.svg';
 import {ResultFriend} from '../../Component/';
+import firebase from '../../Config/Firebase/';
+import { useDispatch, useSelector } from 'react-redux';
+
 const FindFriend = ({navigation}) => {
     const gtchat = (screen) => {
         navigation.replace(screen);
     }
+    const [name , cname] = useState('');
 
+    const findUser = (username) => {
+        const finduser = firebase.database().ref('users/' + username)
+        finduser.on('value' , function(snapshot){
+          const data = []
+          // Object.keys(snapshot.val());
+            if(snapshot.val() === null){
+                cname(false);
+            }else{
+                Object.keys(snapshot.val()).map(key => {
+                    data.push({
+                        id: key,
+                        data: snapshot.val()[key]
+                    })
+                })
+                cname(data[0].data.username)
+            }
+      })
+    } 
+    const findfriend = useSelector(state => state.findFriendReducer);
+    const dispatch = useDispatch();
     const [id , setid] = useState('');
-
+    const [data , setdata] = useState('');
+    const onChange = async (e) => {
+       await setid(e)
+    }  
     const onClickSearch = async () => {
+    
         if ( id == ''){
             alert('id cannot be null')
-        }
+        }else{
+           await findUser(id);
+
+        }     
     }
 
-    const onChange = (e) => {
-        setid(e)
-    }   
+    const findingFriend = (names) => {
+        if (names === ''){
+
+        }else if(names === false){
+            return  <View style={{alignItems: 'center', justifyContent: 'center', flex:1}}>
+            <Text>User not found.</Text>
+            </View>
+        }else{
+            return  <ResultFriend name={name} />
+        }
+    }
+     
 
     return(
         <Fragment>
@@ -42,7 +82,9 @@ const FindFriend = ({navigation}) => {
                     <Search height={25} width={25}></Search>
                     </TouchableOpacity>
                     </View>
-                    <ResultFriend name={"Leonard Monosa"} />
+                    {
+                        findingFriend(name)
+                    }
                 </View>
             </View>
             <View>

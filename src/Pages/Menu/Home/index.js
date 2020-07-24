@@ -21,7 +21,7 @@ const Home = ({navigation}) => {
           const value = await AsyncStorage.getItem('username');
           if (value !== null) {
 
-            alert(value);
+            // alert(value);
           }
         } catch (error) {
         }
@@ -55,7 +55,7 @@ const Home = ({navigation}) => {
 
                   <View style={[style.addfriend,{width: 40, height: 38}]}>
                       <View style={[,{}]}>
-                      <AddFriend onPress={search} width={40} height={38} />
+                      <AddFriend onPress={addfriend} width={40} height={38} />
                       </View>
 
                   </View>
@@ -123,9 +123,6 @@ const style = StyleSheet.create({
         marginLeft: 12,
         color: '#FFFFFF',
     },
-
-
-
     addfriend : {
         position: 'absolute',
         right: 0,

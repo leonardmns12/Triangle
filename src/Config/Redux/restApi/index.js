@@ -1,5 +1,6 @@
 import firebase from '../../Firebase/';
 import { database } from '../../Firebase/';
+import { useDispatch, useSelector } from 'react-redux';
 
 export const createNewUser = (data) => {
     return new Promise((resolve,reject) => {
@@ -17,8 +18,6 @@ export const createNewUser = (data) => {
       });
     })
   }
-
-
 
   export const signInUser = (email ,password) => {
     return new Promise((resolve,reject) => {
@@ -86,6 +85,7 @@ export const createNewUser = (data) => {
       reject(false);
     })
   }
+
 
 
   export const addFriend = (data,userId) => {

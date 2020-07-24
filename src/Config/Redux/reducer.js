@@ -1,4 +1,5 @@
 import { combineReducers } from "redux";
+import { ActivityIndicatorComponent } from "react-native";
 
 
 const loginState = {
@@ -24,6 +25,10 @@ const chatWindowState = {
     }
 }
 
+const findfriend = {
+    name : '',
+}
+
 const registerReducer = (state = registerState , action) => {
     if(action.type === 'SET_FORM'){
         return{
@@ -43,6 +48,16 @@ const registerReducer = (state = registerState , action) => {
                 password : '',
                 password_confirm : ''
             }
+        }
+    }
+    return state;
+}
+
+const findFriendReducer = (state = findfriend , action) => {
+    if(action.type === 'SET_FINDFRIEND'){
+        return{
+            ...state,
+            name : action.value
         }
     }
     return state;
@@ -86,7 +101,8 @@ const chatReducer = (state = chatWindowState, action) => {
 const reducer = combineReducers({
     registerReducer ,
     loginReducer,
-    chatReducer
+    chatReducer,
+    findFriendReducer
 })
 
 export default reducer;
