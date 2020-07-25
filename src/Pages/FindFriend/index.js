@@ -20,6 +20,7 @@ const FindFriend = ({navigation}) => {
     }
     const [name , cname] = useState('');
     const [isadded , cissadded] = useState(true);
+    const [onclick, conclick] = useState(false);
     const findUser = (username) => {
         const finduser = firebase.database().ref('users/' + username)
         finduser.on('value' , async function(snapshot){
@@ -52,6 +53,7 @@ const FindFriend = ({navigation}) => {
         }else{
            await checkpending();
            await findUser(id);
+           conclick(true);
         }     
     }
 
@@ -64,9 +66,9 @@ const FindFriend = ({navigation}) => {
             <Text>User not found.</Text>
             </View>
         }else{
-         if(isadded == true){
+         if(isadded == true && onclick == true){
             return  <ResultFriend name={names}  status={'Already Added'} bgcolor={'#707070'} />
-         }else{
+         }else if(isadded == false && onclick == true){
              return  <ResultFriend name={names} onpress={adding} status={'Adds'} bgcolor={'#1BB0DF'} />
          }
         }
@@ -97,7 +99,8 @@ const FindFriend = ({navigation}) => {
             receiver : name,
         }
         addFriend(data);
-       
+            const res = checkpending(cname)
+
         
         // if(res == true){
         //     alert('already added!')
