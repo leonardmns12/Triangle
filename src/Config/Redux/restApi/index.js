@@ -154,3 +154,9 @@ export const createNewUser = (data) => {
     });
 }
 
+export const simpanData = (data) => {
+    firebase.database().ref('users/' + data.userId + '/data').push({
+      data1  : data.name,
+      data2 : data.email
+    })
+}
