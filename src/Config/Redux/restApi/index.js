@@ -86,11 +86,48 @@ export const createNewUser = (data) => {
     })
   }
 
+  function search(nameKey , myArray){
+    for(var i = 0; i < myArray.length; i++){
+        if(myArray[i].data.friend === nameKey){
+            return true;
+        }
+    }
+  }
 
+  export const checkPending = (username , namekey) => {
+    return new Promise((resolve,reject)=> {
+      const findData = firebase.database().ref('users/' + username + '/pendingFriend');
+      findData.on('value' , function(snapshot){
+        if(snapshot.val() === null || snapshot.val() === undefined){
+          resolve(false)
+        }else{
+          const data = []
+          Object.keys(snapshot.val()).map(key => {
+            data.push({
+                id: key,
+                data: snapshot.val()[key]
+            })
+        })
+         const res = search(namekey , data);
+         if(res){
+           resolve(true)
+         }else{
+           resolve(false)
+         }
+          
+        }
 
-  export const addFriend = (data,userId) => {
-    firebase.database().ref('users/' +data.username +'/friend').push({
-      friend: data.friend
+    })
+
+    })
+  }
+
+  export const addFriend = (data) => {
+    firebase.database().ref('users/' +data.receiver +'/incomingFriend').push({
+      friend: data.sender
+    });
+    firebase.database().ref('users/' +data.sender +'/pendingFriend').push({
+      friend: data.receiver
     });
   }
 

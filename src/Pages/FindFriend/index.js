@@ -1,23 +1,28 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { TouchableOpacity, TextInput, ScrollView } from 'react-native-gesture-handler';
-import { View , Text, StyleSheet } from 'react-native';
+import { View , Text, StyleSheet, AsyncStorage} from 'react-native';
 import NavigationMenu from '../../Component/Molekuls/NavigationMenu';
 import LeftLogo from '../../../assets/chatWindow/left.svg';
 import Search from '../../../assets/search.svg';
 import {ResultFriend} from '../../Component/';
 import firebase from '../../Config/Firebase/';
 import { useDispatch, useSelector } from 'react-redux';
+import { addFriend , checkPending } from '../../Config/Redux/restApi/';
 
 
 const FindFriend = ({navigation}) => {
+    useEffect( () => {
+        const res = checkpending(cname)
+    })
+
     const gtchat = (screen) => {
         navigation.replace(screen);
     }
     const [name , cname] = useState('');
-
+    const [isadded , cissadded] = useState(true);
     const findUser = (username) => {
         const finduser = firebase.database().ref('users/' + username)
-        finduser.on('value' , function(snapshot){
+        finduser.on('value' , async function(snapshot){
           const data = []
           // Object.keys(snapshot.val());
             if(snapshot.val() === null){
@@ -29,7 +34,7 @@ const FindFriend = ({navigation}) => {
                         data: snapshot.val()[key]
                     })
                 })
-                cname(data[0].data.username)
+                const res = await checkpending(data[0].data.username);
             }
       })
     } 
@@ -45,21 +50,60 @@ const FindFriend = ({navigation}) => {
         if ( id == ''){
             alert('id cannot be null')
         }else{
+           await checkpending();
            await findUser(id);
-
         }     
     }
 
-    const findingFriend = (names) => {
-        if (names === ''){
+    const findingFriend =  (names ,isadded) => {
 
+        if (names === ''){
+ 
         }else if(names === false){
             return  <View style={{alignItems: 'center', justifyContent: 'center', flex:1}}>
             <Text>User not found.</Text>
             </View>
         }else{
-            return  <ResultFriend name={name} />
+         if(isadded == true){
+            return  <ResultFriend name={names}  status={'Already Added'} bgcolor={'#707070'} />
+         }else{
+             return  <ResultFriend name={names} onpress={adding} status={'Adds'} bgcolor={'#1BB0DF'} />
+         }
         }
+    
+    }
+
+
+    const checkpending = async (setname) => {
+        const sender = await AsyncStorage.getItem('username')
+        const data = {
+            sender : sender ,
+            receiver : name,
+        }
+        const res = await checkPending(sender,name)
+        if(res == true){
+            cissadded(true)
+            cname(setname)
+        }else{
+            cissadded(false)
+            cname(setname)
+        }
+    }
+
+    const adding = async () => {
+        const sender = await AsyncStorage.getItem('username')
+        const data = {
+            sender : sender ,
+            receiver : name,
+        }
+        addFriend(data);
+       
+        
+        // if(res == true){
+        //     alert('already added!')
+        // }else{
+        //     addFriend(data);
+        // }
     }
      
 
@@ -84,7 +128,7 @@ const FindFriend = ({navigation}) => {
                     </TouchableOpacity>
                     </View>
                     {
-                        findingFriend(name)
+                        findingFriend(name,isadded)
                     }
                 </View>
             </View>

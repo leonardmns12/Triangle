@@ -2,14 +2,16 @@ import React from 'react';
 import { View , Text, StyleSheet} from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
-const ResultFriend = ({navigation, name, onpress}) => {
+
+
+const ResultFriend = ({navigation, name, onpress ,status , bgcolor}) => {
     return(
         <View style={[{alignItems:'center',justifyContent:'center', paddingTop:48}]}>
         <View style={[styles.profileImg,{}]}></View>
         <Text style={[styles.profileName,{}]}>{name}</Text>
         <TouchableOpacity onPress={onpress} style={{paddingTop:16}}>
-            <View style={[styles.addButton,{}]}>
-                    <Text style={{color:'#FFFFFF'}}>Add</Text>
+            <View style={[styles.addButton,{backgroundColor : bgcolor}]}>
+    <Text style={{color:'#FFFFFF'}}>{status}</Text>
             </View>
         </TouchableOpacity>
         </View>
@@ -35,7 +37,6 @@ const styles = StyleSheet.create({
         borderWidth:1,
         justifyContent:'center', 
         alignItems:'center',
-        backgroundColor:'#1BB0DF', 
         borderColor:'#FFFFFF'
     }
 })
