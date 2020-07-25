@@ -1,5 +1,5 @@
 import React from 'react';
-import { Login, Splash, Register, Home, Profile, Chat, Timeline, ChatWindow, FindFriend } from '../Pages/';
+import { Login, Splash, Register, Home, Profile, Chat, Timeline, ChatWindow, FindFriend , Invitation } from '../Pages/';
 import {createStackNavigator} from '@react-navigation/stack';
 
 const Stack = createStackNavigator();
@@ -58,6 +58,11 @@ const Router = () => {
             }}
             />
             <Stack.Screen name="FindFriend" component={FindFriend}
+            options={{
+                headerShown: false,
+            }}
+            />
+            <Stack.Screen name="Invitation" component={Invitation}
             options={{
                 headerShown: false,
             }}

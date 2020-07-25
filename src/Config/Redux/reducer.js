@@ -29,6 +29,20 @@ const findfriend = {
     name : '',
 }
 
+const invitatioState = []
+
+const invitationReducer = (state = invitatioState, action) => {
+    if(action.type === 'SET_LIST'){
+        return{
+            ...state ,
+            form : {
+                ...state.form,
+                [action.inputType]: action.inputValue 
+            }
+        }
+    }
+}
+
 const registerReducer = (state = registerState , action) => {
     if(action.type === 'SET_FORM'){
         return{

@@ -8,7 +8,7 @@ import {ResultFriend} from '../../Component/';
 import firebase from '../../Config/Firebase/';
 import { useDispatch, useSelector } from 'react-redux';
 import { addFriend , checkPending } from '../../Config/Redux/restApi/';
-
+import Contact from '../../../assets/invite/contact.svg';
 
 const FindFriend = ({navigation}) => {
     useEffect( () => {
@@ -38,27 +38,30 @@ const FindFriend = ({navigation}) => {
                 const res = await checkpending(data[0].data.username);
             }
       })
-    } 
+    }
+    //state and redux
     const findfriend = useSelector(state => state.findFriendReducer);
     const dispatch = useDispatch();
     const [id , setid] = useState('');
     const [data , setdata] = useState('');
+    //state and redux
     const onChange = async (e) => {
        await setid(e)
     }  
     const onClickSearch = async () => {
-    
-        if ( id == ''){
-            alert('id cannot be null')
-        }else{
-           await checkpending();
-           await findUser(id);
-           conclick(true);
-        }     
+
+            if ( id == ''){
+                alert('id cannot be null')
+            }else{
+            //    await checkpending();
+               await findUser(id);
+               conclick(true);
+            }     
+
+        cname('');
     }
-
     const findingFriend =  (names ,isadded) => {
-
+        console.log('isadded ' +isadded)
         if (names === ''){
  
         }else if(names === false){
@@ -69,13 +72,10 @@ const FindFriend = ({navigation}) => {
          if(isadded == true && onclick == true){
             return  <ResultFriend name={names}  status={'Already Added'} bgcolor={'#707070'} />
          }else if(isadded == false && onclick == true){
-             return  <ResultFriend name={names} onpress={adding} status={'Adds'} bgcolor={'#1BB0DF'} />
+             return  <ResultFriend name={names} onpress={adding} status={'Add'} bgcolor={'#1BB0DF'} />
          }
         }
-    
     }
-
-
     const checkpending = async (setname) => {
         const sender = await AsyncStorage.getItem('username')
         const data = {
@@ -91,8 +91,7 @@ const FindFriend = ({navigation}) => {
             cname(setname)
         }
     }
-
-    const adding = async () => {
+    const adding = async (names) => {
         const sender = await AsyncStorage.getItem('username')
         const data = {
             sender : sender ,
@@ -100,7 +99,7 @@ const FindFriend = ({navigation}) => {
         }
         addFriend(data);
             const res = checkpending(cname)
-
+            findingFriend(names,isadded)
         
         // if(res == true){
         //     alert('already added!')
@@ -108,7 +107,9 @@ const FindFriend = ({navigation}) => {
         //     addFriend(data);
         // }
     }
-     
+    const gotoinvitation = () => {
+        navigation.navigate('Invitation')
+    }
 
     return(
         <Fragment>
@@ -118,6 +119,9 @@ const FindFriend = ({navigation}) => {
                     <LeftLogo height={33} width={33}></LeftLogo>
                     </TouchableOpacity>
                     <Text style={[styles.headerText,{}]}>Find Friend</Text>
+                    <View  style={{position : 'absolute' , right:'5%', top:'25%'}}>
+                        <Contact  onPress={gotoinvitation} width={25} height={22} />
+                    </View>
                 </View>
                 <View style={{flex:1}}>
                     <View style={{marginTop:10, marginHorizontal:18, marginBottom: 10, flexDirection:'row'}}>

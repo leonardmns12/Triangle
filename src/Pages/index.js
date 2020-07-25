@@ -7,6 +7,7 @@ import Timeline from './Menu/Timeline/';
 import Profile from './Menu/Profile/';
 import ChatWindow from './ChatWindow/';
 import FindFriend from './FindFriend/';
+import Invitation from './Invitation/';
 
 export {ChatWindow};
 export {Home};
@@ -17,3 +18,4 @@ export {Register};
 export {Login};
 export {Splash};
 export {FindFriend};
+export {Invitation};
