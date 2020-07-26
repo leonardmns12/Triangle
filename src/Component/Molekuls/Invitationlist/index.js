@@ -1,7 +1,10 @@
 import React from 'react';
 import { View , Text , TouchableOpacity , StyleSheet , name} from 'react-native';
 
+
+
 const Invitationlist = ({navigation , name , visible, funct}) => {
+ 
     const checkvisible = (visible) => {
         if(visible === 'none'){
         }else{

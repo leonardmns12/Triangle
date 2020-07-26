@@ -72,7 +72,7 @@ const Home = ({navigation}) => {
             Edit Profile
             </Text>
             </TouchableOpacity>
-            {/* <Button title="Logout" funct={onClickLogout} /> */}
+            <Button title="Logout" funct={onClickLogout} />
             </View>
             <View style={{flex:1}}>
                 <View style={[style.homeinfo,{flexDirection : 'row'}]}>

@@ -1,41 +1,99 @@
 import React , { useEffect, useState } from 'react';
-import { View , StyleSheet , TouchableOpacity , Text } from 'react-native';
+import { View , StyleSheet , TouchableOpacity , Text, AsyncStorage } from 'react-native';
 import LeftLogo from '../../../assets/chatWindow/left.svg';
 import { ScrollView } from 'react-native-gesture-handler';
 import Invitationlist from '../../Component/Molekuls/Invitationlist/';
 import firebase from '../../Config/Firebase/';
+import { useDispatch , useSelector } from 'react-redux'
+import { addtofriend , addtofriend1 } from '../../Config/Redux/restApi/';
+
+
 const Invitation = ({navigation}) => {
-    
+    const InvitationState = useSelector(state => state.invitationReducer)
+    const dispatch = useDispatch()
     useEffect(() => {
         // getpendinglist('leonardganteng')
-          cpendinglist(getpendinglist('leonardganteng'))
-    },{})
-    
-    const [pendinglist , cpendinglist] = useState([])
-    
+       starter()
+    },[]) 
 
+    const starter = async () => {
+        try{
+            const getSender = await AsyncStorage.getItem('username');
+            getpendinglist(getSender)
+            getincominglist(getSender)
+        }catch{
+            console.log('error')
+        }
+    }
     const getpendinglist = (userId) => {
+    const datapendinglist = firebase.database().ref('users/' + userId + '/pendingFriend');
+    datapendinglist.on('value', function(snapshot){
         const data = []
-        const datapendinglist = firebase.database().ref('users/' + userId + '/pendingFriend');
-        datapendinglist.on('value', function(snapshot){
-            if(snapshot.val() === null || snapshot.val() === undefined){
-                
-            }else{
-                Object.keys(snapshot.val()).map(key => {
-                    data.push({
-                        id: key,
-                        data: snapshot.val()[key]
-                    })
+        if(snapshot.val() === null || snapshot.val() === undefined){
+            dispatch({type:'SET_LIST',  value: data});
+        }else{
+            Object.keys(snapshot.val()).map(key => {
+                data.push({
+                    id: key,
+                    data: snapshot.val()[key]
                 })
-                
-                // cpendinglist(getpendinglist('leonardganteng'))
+            })
+        dispatch({type:'SET_LIST',  value: data});
             }
         })
-
-        return data;
     }
-    const accept = () => {
-        console.log(pendinglist)
+    const getincominglist = (userId) => {
+    const dataincoming = firebase.database().ref('users/' + userId + '/incomingFriend')
+    dataincoming.on('value', function(snapshot){
+        const data1 = []
+        if(snapshot.val() === null || snapshot.val() === undefined){
+            dispatch({type:'SET_INCOMING',  value: data1});
+        }else{
+            Object.keys(snapshot.val()).map(key => {
+                data1.push({
+                    id: key,
+                    data: snapshot.val()[key]
+                })
+            })
+        dispatch({type:'SET_INCOMING',  value: data1});
+        }
+    })
+}
+    const [rid, crid] = useState('')
+    const [sid, csid] = useState('')
+    function search(nameKey , myArray){
+        for(var i = 0; i < myArray.length; i++){
+            if(myArray[i].data.friend === nameKey){
+                return myArray[i].id;
+            }
+        }
+    }
+    const getId = (username , from , key, types ) => {
+        // console.log('users/' + username + '/' + from + '/' + key)
+        const getdata =  firebase.database().ref('users/' + username + '/' + from).once('value').then(async function(snapshot){
+            const data1 = []
+            Object.keys(snapshot.val()).map(key => {
+                data1.push({
+                    id: key,
+                    data: snapshot.val()[key]
+                })
+            })
+            if(types === 'receiverid'){
+                crid(await search(key,data1))
+            }else{
+                csid(await search(key,data1))
+            }
+            console.log(types)
+        })
+        
+    }
+
+    const accept = async (e) => {
+        
+        const getSender = await AsyncStorage.getItem('username');
+        await getId(getSender , 'incomingFriend' , e , 'receiverid')
+        await addtofriend(getSender, e ,  sid, rid)
+        await addtofriend1('leonardganteng', e ,  sid, rid)
     }
     
     const fetchpending = () => {
@@ -54,19 +112,24 @@ const Invitation = ({navigation}) => {
             <Text style={[styles.titletext,{}]}>Incoming Invitation</Text>
             <View style={{flex : 1, alignItems:'center', justifyContent:'center'}}>
             <ScrollView style={{flex:1 }}>
-            <Invitationlist name={"Kenny ongko"} visible={"block"} />
-            <Invitationlist name={"Kenny ongko"} visible={"block"}/>
-            <Invitationlist name={"Kenny ongko"} visible={"block"}/>
+            {
+                InvitationState.listincoming.map((id,key) => {
+                    key = {key}
+                    return(
+                        <Invitationlist name={id.data.friend} visible={"block"} funct={()=>{accept(id.data.friend)}}/>
+                    )
+                }) 
+            }
             </ScrollView>
             </View>
             <Text style={[styles.titletext,{}]}>Pending Invitation</Text>
             <View style={{flex:1 , alignItems:'center', justifyContent:'center'}}>
             <ScrollView style={{flex:1}}> 
-            <Invitationlist name={"Kenny ongko"} visible={"none"} />
-            <Invitationlist name={"Kenny ongko"} visible={"none"}/>
             {
-              pendinglist.map((id,key) => {
+              InvitationState.listpending.map((id,key) => {
+                key={key}
                 return(
+               
                  <Invitationlist name={id.data.friend} visible={"none"}/>
                 )
             }) 

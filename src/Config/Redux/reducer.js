@@ -29,18 +29,33 @@ const findfriend = {
     name : '',
 }
 
-const invitatioState = []
+const invitationState = {
+    listpending : [],
+    listincoming : [],
+    senderid : '',
+    receiverid : ''
+}
 
-const invitationReducer = (state = invitatioState, action) => {
+const invitationReducer = (state = invitationState, action) => {
     if(action.type === 'SET_LIST'){
         return{
             ...state ,
-            form : {
-                ...state.form,
-                [action.inputType]: action.inputValue 
-            }
+            listpending : action.value
         }
     }
+    if(action.type === 'SET_INCOMING'){
+        return{
+            ...state ,
+            listincoming : action.value
+        }
+    }
+    if(action.type === 'SET_SENDER'){
+        return{
+            ...state ,
+            [action.intype] : action.value
+        }
+    }
+    return state;
 }
 
 const registerReducer = (state = registerState , action) => {
@@ -116,7 +131,8 @@ const reducer = combineReducers({
     registerReducer ,
     loginReducer,
     chatReducer,
-    findFriendReducer
+    findFriendReducer,
+    invitationReducer
 })
 
 export default reducer;

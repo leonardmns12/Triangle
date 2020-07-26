@@ -1,6 +1,6 @@
 import firebase from '../../Firebase/';
 import { database } from '../../Firebase/';
-import { useDispatch, useSelector } from 'react-redux';
+
 
 export const createNewUser = (data) => {
     return new Promise((resolve,reject) => {
@@ -94,6 +94,22 @@ export const createNewUser = (data) => {
     }
   }
 
+  
+
+  export const addtofriend = (receiver , sender , receiverid, senderid ) => {
+    firebase.database().ref('users/' + receiver + '/friend').push({
+      friend : sender
+    })
+    firebase.database().ref('users/' + sender + '/friend').push({
+      friend : receiver
+    })
+  }
+
+  export const addtofriend1 = (receiver , sender ,receiverid ,senderid ) => {
+    firebase.database().ref('users/' + receiver + '/incomingFriend/' + senderid).remove()
+    firebase.database().ref('users/' + sender + '/pendingFriend/' + receiverid).remove()
+  }
+
   export const checkPending = (username , namekey) => {
     return new Promise((resolve,reject)=> {
       const findData = firebase.database().ref('users/' + username + '/pendingFriend');
@@ -121,7 +137,6 @@ export const createNewUser = (data) => {
 
     })
   }
-
   export const addFriend = (data) => {
     firebase.database().ref('users/' +data.receiver +'/incomingFriend').push({
       friend: data.sender
