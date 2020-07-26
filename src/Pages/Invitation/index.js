@@ -6,6 +6,7 @@ import Invitationlist from '../../Component/Molekuls/Invitationlist/';
 import firebase from '../../Config/Firebase/';
 import { useDispatch , useSelector } from 'react-redux'
 import { addtofriend , addtofriend1 } from '../../Config/Redux/restApi/';
+import { SvgCss } from 'react-native-svg';
 
 
 const Invitation = ({navigation}) => {
@@ -19,6 +20,7 @@ const Invitation = ({navigation}) => {
     const starter = async () => {
         try{
             const getSender = await AsyncStorage.getItem('username');
+            alert(getSender)
             getpendinglist(getSender)
             getincominglist(getSender)
         }catch{
@@ -69,21 +71,30 @@ const Invitation = ({navigation}) => {
         }
     }
     const getId = (username , from , key, types ) => {
-        // console.log('users/' + username + '/' + from + '/' + key)
+         console.log('users/' + username + '/' + from + '/' + key)
         const getdata =  firebase.database().ref('users/' + username + '/' + from).once('value').then(async function(snapshot){
             const data1 = []
-            Object.keys(snapshot.val()).map(key => {
-                data1.push({
-                    id: key,
-                    data: snapshot.val()[key]
-                })
-            })
-            if(types === 'receiverid'){
-                crid(await search(key,data1))
-            }else{
-                csid(await search(key,data1))
+            if(snapshot.val() === undefined || snapshot.val() === null){
+              // crid('')
+              // csid('')
+              console.log("1111")
             }
-            console.log(types)
+            else{
+                Object.keys(snapshot.val()).map(key => {
+                    data1.push({
+                        id: key,
+                        data: snapshot.val()[key]
+                    })
+                })
+                if(types == 'receiverid'){
+                    crid(await search(key,data1))
+                   
+    
+                }else{
+                    csid(await search(key,data1))                
+                }
+                console.log(types)
+            }
         })
         
     }
@@ -92,8 +103,12 @@ const Invitation = ({navigation}) => {
         
         const getSender = await AsyncStorage.getItem('username');
         await getId(getSender , 'incomingFriend' , e , 'receiverid')
+        await getId( e , 'pendingFriend' , getSender , 'senderid')
         await addtofriend(getSender, e ,  sid, rid)
-        await addtofriend1('leonardganteng', e ,  sid, rid)
+        await addtofriend1(getSender, e ,  sid, rid)  
+      
+        console.log(e)
+    
     }
     
     const fetchpending = () => {
