@@ -61,8 +61,6 @@ const Invitation = ({navigation}) => {
         }
     })
 }
-    const [rid, crid] = useState('')
-    const [sid, csid] = useState('')
     function search(nameKey , myArray){
         for(var i = 0; i < myArray.length; i++){
             if(myArray[i].data.friend === nameKey){
@@ -77,7 +75,7 @@ const Invitation = ({navigation}) => {
             if(snapshot.val() === undefined || snapshot.val() === null){
               // crid('')
               // csid('')
-              console.log("1111")
+              console.log('kosong ' +from)
             }
             else{
                 Object.keys(snapshot.val()).map(key => {
@@ -86,28 +84,22 @@ const Invitation = ({navigation}) => {
                         data: snapshot.val()[key]
                     })
                 })
-                if(types == 'receiverid'){
-                    crid(await search(key,data1))
-                   
-    
-                }else{
-                    csid(await search(key,data1))                
-                }
-                console.log(types)
+                    return search(key,data1)
             }
         })
+        return getdata;
         
     }
 
     const accept = async (e) => {
         
         const getSender = await AsyncStorage.getItem('username');
-        await getId(getSender , 'incomingFriend' , e , 'receiverid')
-        await getId( e , 'pendingFriend' , getSender , 'senderid')
-        await addtofriend(getSender, e ,  sid, rid)
-        await addtofriend1(getSender, e ,  sid, rid)  
+        const rid = await getId(getSender , 'incomingFriend' , e , 'receiverid') 
+        const sid = await getId( e , 'pendingFriend' , getSender , 'senderid')
+        // )
+        addtofriend(getSender, e ,  sid, rid)
+        addtofriend1(getSender, e ,  sid, rid)  
       
-        console.log(e)
     
     }
     

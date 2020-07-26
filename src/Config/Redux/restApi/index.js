@@ -106,7 +106,7 @@ export const createNewUser = (data) => {
   }
 
   export const addtofriend1 = (receiver , sender ,receiverid ,senderid ) => {
-    console.log('users/' + receiver + '/incomingFriend/' + senderid)
+    console.log('users/' + sender + '/pendingFriend/' + receiverid)
     firebase.database().ref('users/' + receiver + '/incomingFriend/' + senderid).remove()
     firebase.database().ref('users/' + sender + '/pendingFriend/' + receiverid).remove()
   }
