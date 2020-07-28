@@ -20,7 +20,7 @@ const Invitation = ({navigation}) => {
     const starter = async () => {
         try{
             const getSender = await AsyncStorage.getItem('username');
-            alert(getSender)
+            
             getpendinglist(getSender)
             getincominglist(getSender)
         }catch{
