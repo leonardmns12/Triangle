@@ -1,5 +1,5 @@
 import React , { useEffect, useState } from 'react';
-import { View , Text, ScrollView, StyleSheet, AsyncStorage , ActivityIndicator } from 'react-native';
+import { View , Text, ScrollView, StyleSheet, AsyncStorage , ActivityIndicator, BackHandler } from 'react-native';
 import NavigationMenu from '../../../Component/Molekuls/NavigationMenu/';
 import Friendlist from '../../../Component/Molekuls/Friendlist/';
 import { Button } from '../../../Component/';
@@ -13,8 +13,10 @@ import { useSelector , useDispatch } from 'react-redux';
 
 const Home = ({navigation}) => {
     useEffect(()=>{
+        BackHandler.addEventListener('hardwareBackPress', cleardispatch);
         _retrieveUsername();
         cleardispatch()
+        
     },[])
     const cleardispatch = () => {
         const data = []

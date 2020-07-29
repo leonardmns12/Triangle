@@ -31,6 +31,8 @@ const ChatWindow = ({navigation}) => {
         dispatch({type:'SET_MESSAGE', inputType: 'timestamp', inputValue: new Date().getTime()});
         if( chatState.form.message.length > 0){
             sendMessage(data,res);
+            addChatDatabase(data.sender, data.receiver)
+            dispatch({type:'SET_MESSAGE', inputType: 'message', inputValue: ''});
         }
         // await getMessage(chatState.userId);
         
@@ -87,6 +89,7 @@ const ChatWindow = ({navigation}) => {
         }
         });
     }
+    const [code ,setcode] = useState('')
     return(
         <View style={{flex:1}}>
             <View style={{flex:1}}>
@@ -94,16 +97,16 @@ const ChatWindow = ({navigation}) => {
                 <TouchableOpacity onPress={onClickBack}>
                     <LeftLogo width={33} height={33} />
                 </TouchableOpacity>
-                <Text style={[styles.headerText,{}]}>Leonard M</Text>
+                <Text style={[styles.headerText,{}]}>{chatState.receiver}</Text>
             </View>
             <ScrollView showsVerticalScrollIndicator={false} style={{flex:1 , backgroundColor:'#FFFFFF', paddingTop: 10, paddingHorizontal:10}}>
             {
                 chatState.message.map((id,key) => {
                     key = {key}
                     if( id.data.sender === chatState.sender){
-                    return <Sender chatMessage={id.data.message} timestamp={id.data.timestamp}/>
-                    }else{
                     return <Receiver chatMessage={id.data.message} timestamp={id.data.timestamp}/>
+                    }else{
+                    return <Sender chatMessage={id.data.message} timestamp={id.data.timestamp}/>
                     }
                     
                 }) 
@@ -114,7 +117,7 @@ const ChatWindow = ({navigation}) => {
                 <TouchableOpacity style={{marginLeft:15, marginRight:10}}>
                     <ImagesLogo height={25} width={25}/>
                 </TouchableOpacity>
-                <TextInput onChangeText={(e)=>{onChangeInput(e,'message')}} style={[styles.input,{}]} placeholder="Type here . . ."></TextInput>
+                <TextInput value={chatState.form.message} onChangeText={(e)=>{onChangeInput(e,'message')}} style={[styles.input,{}]} placeholder="Type here . . ."></TextInput>
                 <TouchableOpacity onPress={sendMessages} style={{marginLeft:5}}>
                     <PaperPlaneLogo height={25} width={25}/>
                 </TouchableOpacity>

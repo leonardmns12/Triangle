@@ -1,6 +1,7 @@
 import firebase from '../../Firebase/';
 import { database } from '../../Firebase/';
 import { useDispatch , useSelector } from 'react-redux';
+import { Receiver } from '../../../Component';
 
 export const createNewUser = (data) => {
     return new Promise((resolve,reject) => {
@@ -181,7 +182,10 @@ export const checkMessage = (sender) => {
 }
 
 export const addChatDatabase = (sender , receiver) => {
-  firebase.database().ref('users/' + sender + '/chat').push({
+  firebase.database().ref('users/' + sender + '/chat').set({
     friend : receiver
+  })
+  firebase.database().ref('users/' + receiver + '/chat').set({
+    friend : sender
   })
 }
