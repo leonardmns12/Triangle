@@ -1,4 +1,4 @@
-import React , { useEffect } from 'react';
+import React , { useEffect , useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { TouchableOpacity, TextInput, ScrollView } from 'react-native-gesture-handler';
 import PaperPlaneLogo from '../../../assets/chatWindow/paper-plane.svg';
@@ -7,26 +7,86 @@ import LeftLogo from '../../../assets/chatWindow/left.svg';
 import { Sender, Receiver } from '../../Component';
 import { useDispatch, useSelector } from 'react-redux';
 import { onChange } from 'react-native-reanimated';
-import { sendMessage , getMessage } from '../../Config/Redux/restApi/';
+import { sendMessage , checkMessage , addChatDatabase} from '../../Config/Redux/restApi/';
+import firebase from '../../Config/Firebase/';
 const ChatWindow = ({navigation}) => {
+    useEffect(()=>{
+        starter()   
+},[])
     const chatState = useSelector(state => state.chatReducer);
     const dispatch = useDispatch();
     const onChangeInput = (e , type) => {
         dispatch({type:'SET_MESSAGE', inputType: type, inputValue: e});
     }
     const sendMessages = async () => {
-        dispatch({type:'SET_MESSAGE', inputType: 'sender', inputValue: 'leo'});
-        dispatch({type:'SET_MESSAGE', inputType: 'receiver', inputValue: 'abel'});
-        if( chatState.form.message.length > 0){
-            await sendMessage(chatState.form,chatState.userId);
+        const res = await getmsgid()
+        const data = {
+            message : chatState.form.message,
+            sender : chatState.sender,
+            receiver : chatState.receiver,
+            timestamp : new Date().getTime()
         }
-        await getMessage(chatState.userId);
+        dispatch({type:'SET_MESSAGE', inputType: 'sender', inputValue: chatState.sender});
+        dispatch({type:'SET_MESSAGE', inputType: 'receiver', inputValue: chatState.receiver});
+        dispatch({type:'SET_MESSAGE', inputType: 'timestamp', inputValue: new Date().getTime()});
+        if( chatState.form.message.length > 0){
+            sendMessage(data,res);
+        }
+        // await getMessage(chatState.userId);
         
     }
     const onClickBack = () => {
         navigation.replace('Chat');
     }
+    const starter = async () => {
+        try{         
+        const res = await getmsgid()
+        getMessage(res)
+        }catch{
+            console.log('error')
+        }
+    }
+    const loadChat = async () => {
+        const res = checkMessage(chatState.sender, chatState.receiver)
+        if(res){
+            alert('data null')
+        }else{
+            alert('data found')
+        }
+    }
+    function getHash(input){
+        var hash = 0, len = input.length;
+        for (var i = 0; i < len; i++) {
+          hash  = ((hash << 5) - hash) + input.charCodeAt(i);
+          hash |= 0; // to 32bit integer
+        }
+        return hash;
+      }
+    const [msgid , setmsgid] = useState('')
+    const getmsgid = () => {
+        if(getHash(chatState.sender) > getHash(chatState.receiver)){
+            return chatState.sender.concat(chatState.receiver)
+        }else{
+            return chatState.receiver.concat(chatState.sender)
+        }
+    }
+    const getMessage = async (messageId) => {
+        const getDataPost = firebase.database().ref('messages/' + messageId);
+        getDataPost.on('value', function(snapshot) {
+        const data = []
+        if(snapshot.val() === null || snapshot.val() === undefined){
 
+        }else{
+            Object.keys(snapshot.val()).map(key => {
+                data.push({
+                    id: key,
+                    data: snapshot.val()[key]
+                    })
+                })
+            dispatch({type:'SET_LISTMSG' , value:data})
+        }
+        });
+    }
     return(
         <View style={{flex:1}}>
             <View style={{flex:1}}>
@@ -37,9 +97,17 @@ const ChatWindow = ({navigation}) => {
                 <Text style={[styles.headerText,{}]}>Leonard M</Text>
             </View>
             <ScrollView showsVerticalScrollIndicator={false} style={{flex:1 , backgroundColor:'#FFFFFF', paddingTop: 10, paddingHorizontal:10}}>
-            <Sender chatMessage="halo" timestamp="08.00 AM"/>
-            <Receiver chatMessage={chatState.form.message} timestamp="08.01 AM"/>
-
+            {
+                chatState.message.map((id,key) => {
+                    key = {key}
+                    if( id.data.sender === chatState.sender){
+                    return <Sender chatMessage={id.data.message} timestamp={id.data.timestamp}/>
+                    }else{
+                    return <Receiver chatMessage={id.data.message} timestamp={id.data.timestamp}/>
+                    }
+                    
+                }) 
+            }
             </ScrollView>
             </View>
             <View style={{backgroundColor:'#FFFFFF', borderTopWidth:0.9 , height:60, alignItems: 'center', flexDirection: 'row'}}>

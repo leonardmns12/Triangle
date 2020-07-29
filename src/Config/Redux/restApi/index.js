@@ -1,6 +1,6 @@
 import firebase from '../../Firebase/';
 import { database } from '../../Firebase/';
-
+import { useDispatch , useSelector } from 'react-redux';
 
 export const createNewUser = (data) => {
     return new Promise((resolve,reject) => {
@@ -133,9 +133,7 @@ export const createNewUser = (data) => {
          }
           
         }
-
     })
-
     })
   }
   export const addFriend = (data) => {
@@ -147,11 +145,12 @@ export const createNewUser = (data) => {
     });
   }
 
-  export const sendMessage = (data,userId) => {
-        firebase.database().ref('messages/' + userId).push({
+  export const sendMessage = (data,msgid) => {
+        firebase.database().ref('messages/' + msgid).push({
           sender: data.sender,
           receiver: data.receiver,
-          message : data.message
+          message : data.message,
+          timestamp : data.timestamp
         });
   }
 
@@ -162,17 +161,27 @@ export const createNewUser = (data) => {
     });
   }
 
-  export const getMessage = (userId) => {
-    const getDataPost = database.ref('messages/' + userId);
-    getDataPost.on('value', function(snapshot) {
-//   updateStarCount(postElement, snapshot.val());
-    console.log('data :',snapshot.val())
-    });
-}
 
 export const simpanData = (data) => {
     firebase.database().ref('users/' + data.userId + '/data').push({
       data1  : data.name,
       data2 : data.email
     })
+}
+
+export const checkMessage = (sender) => {
+  return new Promise((resolve, reject)=>{
+    const checkmsg = firebase.database().ref('users/' + sender + '/chat')
+    checkmsg.on('value' , function(snapshot){
+      if(snapshot.val() === null || snapshot.val() === undefined){
+        resolve(true)
+      }
+    })
+  })
+}
+
+export const addChatDatabase = (sender , receiver) => {
+  firebase.database().ref('users/' + sender + '/chat').push({
+    friend : receiver
+  })
 }

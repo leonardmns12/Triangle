@@ -4,7 +4,7 @@ import LeftLogo from '../../../assets/chatWindow/left.svg';
 import { ScrollView } from 'react-native-gesture-handler';
 import Invitationlist from '../../Component/Molekuls/Invitationlist/';
 import firebase from '../../Config/Firebase/';
-import { useDispatch , useSelector } from 'react-redux'
+import { useDispatch , useSelector } from 'react-redux';
 import { addtofriend , addtofriend1 } from '../../Config/Redux/restApi/';
 import { SvgCss } from 'react-native-svg';
 

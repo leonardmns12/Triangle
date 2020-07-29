@@ -2,14 +2,10 @@ import React , { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
-const friendlist = ({navigation , name}) => {
-
-    const friendProfile = () => {
-        alert('friend profile');
-    }
+const friendlist = ({navigation , name, funct}) => {
 
     return(
-        <TouchableOpacity onPress={friendProfile}>
+        <TouchableOpacity onPress={funct}>
         <View style={[style.borderlist,{}]}>
             <View style={[style.friendprofile,{}]}></View>
             <Text style={[style.profilename,{}]}>{name}</Text>

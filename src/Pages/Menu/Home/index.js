@@ -1,5 +1,5 @@
-import React , { useEffect } from 'react';
-import { View , Text, ScrollView, StyleSheet, AsyncStorage } from 'react-native';
+import React , { useEffect, useState } from 'react';
+import { View , Text, ScrollView, StyleSheet, AsyncStorage , ActivityIndicator } from 'react-native';
 import NavigationMenu from '../../../Component/Molekuls/NavigationMenu/';
 import Friendlist from '../../../Component/Molekuls/Friendlist/';
 import { Button } from '../../../Component/';
@@ -7,47 +7,88 @@ import { signOutUser , getUsername } from '../../../Config/Redux/restApi/';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import AddFriend from '../../../../assets/Home/addfriend.svg';
 import Magnifier from '../../../../assets/Home/magnifier.svg';
-
+import firebase from '../../../Config/Firebase/';
+import { useSelector , useDispatch } from 'react-redux';
 
 
 const Home = ({navigation}) => {
-
     useEffect(()=>{
         _retrieveUsername();
-    })
-
-    const _retrieveUsername = async () => {
-        try {
-          const value = await AsyncStorage.getItem('username');
-          if (value !== null) {
-
-            // alert(value);
-          }
-        } catch (error) {
+        cleardispatch()
+    },[])
+    const cleardispatch = () => {
+        const data = []
+        dispatch({type:'SET_LISTMSG' , value:data})
+    }
+    const HomeState = useSelector(state => state.homeReducer)
+    const dispatch = useDispatch()
+    const getAllFriend = (username) => { 
+    const dataFriend = firebase.database().ref('users/' + username + '/friend');
+    dataFriend.on('value', function(snapshot){
+      const data = []
+      if(snapshot.val() === null || snapshot.val() === undefined){
+        resolve(true)
+      }else{
+          Object.keys(snapshot.val()).map(key => {
+            data.push({
+                id: key,
+                data: snapshot.val()[key]
+                })
+            })
+            // console.log(data)
+            dispatch({type:'SET_HOMEFRIEND',  value: data});
         }
+    })
+    }
+    const _retrieveUsername = async () => {
+      
+            const value = await AsyncStorage.getItem('username');
+            if (value !== null) {
+            //   alert(value)
+              setUsername(value)
+              const res = await getAllFriend(value)
+              if(res){
+                  console.log('data null')
+              }
+              console.log(HomeState.friendlist)
+            // alert(value);
+            }
       };
-
     const onClickLogout = async () => {
         const res = await signOutUser();
         navigation.replace('Login');
     }
-
     const gtchat = (screen) => {
         navigation.replace(screen);
     }
+    const editProfile = async () => {
+        if(loading == true){
+            return
+        }else{
+            setLoading(true)
+            setTimeout(()=>{
+                setLoading(false);
+            },3000)
+           
+            alert('edit profile');
+        }
+       
 
-    const editProfile = () => {
-        alert('edit profile');
     }
-
     const search = () => {
         alert('search');
     }
-
     const addfriend = () => {
         navigation.navigate('FindFriend');
     }
-
+    const gotochatroom = async (friend) => {
+        
+        dispatch({type: 'SET_RECEIVER' , value:friend})
+        dispatch({type: 'SET_SENDER' , value:username})
+        navigation.navigate('ChatWindow')
+    }
+    const [loading , setLoading] = useState(false);
+    const [username , setUsername] = useState('');
     return(
         <View style={{flex:1 , position:'relative'}}>
             <View style={{flex:1, backgroundColor:'rgba(0,94,97,0.5)' , borderBottomLeftRadius:41, borderBottomRightRadius:41, position:'relative'}}>
@@ -57,7 +98,6 @@ const Home = ({navigation}) => {
                       <View style={[,{}]}>
                       <AddFriend onPress={addfriend} width={40} height={38} />
                       </View>
-
                   </View>
                 <View style={{flexDirection:'row', marginTop: 43, marginBottom:7}}>
                     <View style={[style.profileimg ,{}]}></View>
@@ -87,12 +127,19 @@ const Home = ({navigation}) => {
                 </View> 
             <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={{height:22}}></View>
-                <Friendlist name={"Kenny Ongko"} />
-                <Friendlist name={"Kent Anderson"} />
-                <Friendlist name={"Nico Fernando"} />
-                <Friendlist name={"Nico Fernando"} />
-                <Friendlist name={"Nico Fernando"} />
-    
+
+               <View style={{display:'flex' , alignItems:'center'}}>
+               <ActivityIndicator animating={loading} />
+               </View>
+                {
+                    HomeState.friendlist.map((id,key) => {
+                        key={key}
+                        return(
+                    
+                            <Friendlist name={id.data.friend} funct={()=>{gotochatroom(id.data.friend)}} />
+                        )
+                    }) 
+                }
             </ScrollView>
             </View>
             <NavigationMenu home="active" gotoChat={()=>{gtchat('Chat')}}

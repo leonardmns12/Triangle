@@ -7,6 +7,10 @@ const loginState = {
     password : '',
 };
 
+const homeState = {
+    friendlist : []
+}
+
 const registerState = {
     form : {
         username : '',
@@ -21,8 +25,12 @@ const chatWindowState = {
     form : {
         sender : '',
         receiver : '',
-        message : ''
-    }
+        message : '',
+        timestamp : ''
+    },
+    sender : '',
+    receiver : '',
+    message : []
 }
 
 const findfriend = {
@@ -53,6 +61,16 @@ const invitationReducer = (state = invitationState, action) => {
         return{
             ...state ,
             [action.intype] : action.value
+        }
+    }
+    return state;
+}
+
+const homeReducer = (state = homeState , action) => {
+    if(action.type === 'SET_HOMEFRIEND'){
+        return{
+            ...state,
+            friendlist : action.value
         }
     }
     return state;
@@ -124,6 +142,24 @@ const chatReducer = (state = chatWindowState, action) => {
             userId : action.value
         }
     }
+    if(action.type === 'SET_SENDER'){
+        return{
+            ...state,
+            sender : action.value
+        }
+    }
+    if(action.type === 'SET_RECEIVER'){
+        return{
+            ...state,
+            receiver : action.value
+        }
+    }
+    if(action.type === 'SET_LISTMSG'){
+        return{
+            ...state , 
+            message : action.value
+        }
+    }
     return state;
 }
 
@@ -132,7 +168,8 @@ const reducer = combineReducers({
     loginReducer,
     chatReducer,
     findFriendReducer,
-    invitationReducer
+    invitationReducer,
+    homeReducer
 })
 
 export default reducer;
