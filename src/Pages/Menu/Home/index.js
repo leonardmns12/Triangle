@@ -58,10 +58,10 @@ const Home = ({navigation}) => {
             // alert(value);
             }
       };
-    const onClickLogout = async () => {
-        const res = await signOutUser();
-        navigation.replace('Login');
-    }
+    // const onClickLogout = async () => {
+    //     const res = await signOutUser();
+    //     navigation.replace('Login');
+    // }
     const gtchat = (screen) => {
         navigation.replace(screen);
     }
@@ -104,7 +104,7 @@ const Home = ({navigation}) => {
             Edit Profile
             </Text>
             </TouchableOpacity>
-            <Button title="Logout" funct={onClickLogout} />
+            {/* <Button title="Logout" funct={onClickLogout} /> */}
             </View>
             <View style={{flex:1}}>
                 <View style={[style.homeinfo,{flexDirection : 'row'}]}>
