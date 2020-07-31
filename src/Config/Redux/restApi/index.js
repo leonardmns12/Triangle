@@ -1,11 +1,15 @@
-import firebase from '../../Firebase/';
-import { database } from '../../Firebase/';
+// import firebase from '../../Firebase/index.js';
+import database from '@react-native-firebase/database';
+// import { database } from '../../Firebase/';
 import { useDispatch , useSelector } from 'react-redux';
 import { Receiver } from '../../../Component';
+import messaging from '@react-native-firebase/messaging';
+import auth from '@react-native-firebase/auth';
+import { AsyncStorage } from 'react-native';
 
 export const createNewUser = (data) => {
     return new Promise((resolve,reject) => {
-      firebase.auth().createUserWithEmailAndPassword(data.email,data.password)
+      auth().createUserWithEmailAndPassword(data.email,data.password)
       .then(res => {
         const msg = "Register Success!"
         resolve(msg);
@@ -22,7 +26,7 @@ export const createNewUser = (data) => {
 
   export const signInUser = (email ,password) => {
     return new Promise((resolve,reject) => {
-      firebase.auth().signInWithEmailAndPassword(email, password)
+      auth().signInWithEmailAndPassword(email, password)
       .then(res => {
           resolve(true);
         }
@@ -38,7 +42,7 @@ export const createNewUser = (data) => {
 
   export const signOutUser = () => {
     return new Promise((resolve, reject) => {
-      firebase.auth().signOut().then(function() {
+      auth().signOut().then(function() {
         resolve(true);
       }).catch(function(error) {
         reject(false);
@@ -48,7 +52,7 @@ export const createNewUser = (data) => {
 
   export const onAuthUser = () => {
     return new Promise((resolve, reject) => {
-      firebase.auth().onAuthStateChanged(function(user) {
+      auth().onAuthStateChanged(function(user) {
         if (user) {
           // User is signed in.
           resolve(user);
@@ -63,7 +67,7 @@ export const createNewUser = (data) => {
   }
 
   export const updateUser = (data) =>{
-    var user = firebase.auth().currentUser;
+    var user = auth().currentUser;
 
       user.updateProfile({
         displayName: data.username,
@@ -76,7 +80,7 @@ export const createNewUser = (data) => {
   
   export const getUsername = () => {
     return new Promise((resolve,reject) => {
-      var user = firebase.auth().currentUser;
+      var user = auth().currentUser;
       var username;
   
       if (user != null) {
@@ -94,27 +98,24 @@ export const createNewUser = (data) => {
         }
     }
   }
-
-  
-
   export const addtofriend = (receiver , sender , receiverid, senderid ) => {
-    firebase.database().ref('users/' + receiver + '/friend').push({
+    database().ref('users/' + receiver + '/friend').push({
       friend : sender
     })
-    firebase.database().ref('users/' + sender + '/friend').push({
+    database().ref('users/' + sender + '/friend').push({
       friend : receiver
     })
   }
 
   export const addtofriend1 = (receiver , sender ,receiverid ,senderid ) => {
     console.log('users/' + sender + '/pendingFriend/' + receiverid)
-    firebase.database().ref('users/' + receiver + '/incomingFriend/' + senderid).remove()
-    firebase.database().ref('users/' + sender + '/pendingFriend/' + receiverid).remove()
+    database().ref('users/' + receiver + '/incomingFriend/' + senderid).remove()
+    database().ref('users/' + sender + '/pendingFriend/' + receiverid).remove()
   }
 
   export const checkPending = (username , namekey) => {
     return new Promise((resolve,reject)=> {
-      const findData = firebase.database().ref('users/' + username + '/pendingFriend');
+      const findData = database().ref('users/' + username + '/pendingFriend');
       findData.on('value' , function(snapshot){
         if(snapshot.val() === null || snapshot.val() === undefined){
           resolve(false)
@@ -138,25 +139,26 @@ export const createNewUser = (data) => {
     })
   }
   export const addFriend = (data) => {
-    firebase.database().ref('users/' +data.receiver +'/incomingFriend').push({
+    database().ref('users/' +data.receiver +'/incomingFriend').push({
       friend: data.sender
     });
-    firebase.database().ref('users/' +data.sender +'/pendingFriend').push({
+    database().ref('users/' +data.sender +'/pendingFriend').push({
       friend: data.receiver
     });
   }
 
   export const sendMessage = (data,msgid) => {
-        firebase.database().ref('messages/' + msgid).push({
+        database().ref('messages/' + msgid).push({
           sender: data.sender,
           receiver: data.receiver,
           message : data.message,
-          timestamp : data.timestamp
+          timestamp : data.timestamp,
+          token : data.token
         });
   }
 
   export const createUser = (data) => {
-    firebase.database().ref('users/' +data.username).push({
+    database().ref('users/' +data.username).push({
       username : data.username,
       email : data.email
     });
@@ -164,7 +166,7 @@ export const createNewUser = (data) => {
 
 
 export const simpanData = (data) => {
-    firebase.database().ref('users/' + data.userId + '/data').push({
+    database().ref('users/' + data.userId + '/data').push({
       data1  : data.name,
       data2 : data.email
     })
@@ -172,7 +174,7 @@ export const simpanData = (data) => {
 
 export const checkMessage = (sender) => {
   return new Promise((resolve, reject)=>{
-    const checkmsg = firebase.database().ref('users/' + sender + '/chat')
+    const checkmsg = database().ref('users/' + sender + '/chat')
     checkmsg.on('value' , function(snapshot){
       if(snapshot.val() === null || snapshot.val() === undefined){
         resolve(true)
@@ -182,10 +184,26 @@ export const checkMessage = (sender) => {
 }
 
 export const addChatDatabase = (sender , receiver) => {
-  firebase.database().ref('users/' + sender + '/chat').set({
+  database().ref('users/' + sender + '/chat').set({
     friend : receiver
   })
-  firebase.database().ref('users/' + receiver + '/chat').set({
+  database().ref('users/' + receiver + '/chat').set({
     friend : sender
   })
 }
+
+export const checkPermission = () => {
+  const data = ''
+  messaging().getToken()
+  .then(async(token) => {
+    if (token){
+      const username = await AsyncStorage.getItem('username');
+      database().ref('users/' + username + '/token').set({
+        key : token
+      })
+    }else{
+      alert('token not found!')
+    }
+  })
+}
+

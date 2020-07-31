@@ -28,9 +28,8 @@ const Login = ({navigation}) => {
         } catch (error) {
           // Error saving data
         }
-      navigation.navigate('Home');
+      navigation.replace('Home');
     }
-    
     dispatch({type:'CLEAR_PASSWORD'})
   }
   const onClickRegister = () => {

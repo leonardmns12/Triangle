@@ -3,16 +3,16 @@ import { View , Text, ScrollView, StyleSheet, AsyncStorage , ActivityIndicator, 
 import NavigationMenu from '../../../Component/Molekuls/NavigationMenu/';
 import Friendlist from '../../../Component/Molekuls/Friendlist/';
 import { Button } from '../../../Component/';
-import { signOutUser , getUsername } from '../../../Config/Redux/restApi/';
+import { signOutUser , getUsername , checkPermission } from '../../../Config/Redux/restApi/';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import AddFriend from '../../../../assets/Home/addfriend.svg';
 import Magnifier from '../../../../assets/Home/magnifier.svg';
-import firebase from '../../../Config/Firebase/';
+import database from '@react-native-firebase/database';
 import { useSelector , useDispatch } from 'react-redux';
-
 
 const Home = ({navigation}) => {
     useEffect(()=>{
+        checkPermission()
         BackHandler.addEventListener('hardwareBackPress', cleardispatch);
         _retrieveUsername();
         cleardispatch()
@@ -25,11 +25,11 @@ const Home = ({navigation}) => {
     const HomeState = useSelector(state => state.homeReducer)
     const dispatch = useDispatch()
     const getAllFriend = (username) => { 
-    const dataFriend = firebase.database().ref('users/' + username + '/friend');
+    const dataFriend = database().ref('users/' + username + '/friend');
     dataFriend.on('value', function(snapshot){
       const data = []
       if(snapshot.val() === null || snapshot.val() === undefined){
-        resolve(true)
+        
       }else{
           Object.keys(snapshot.val()).map(key => {
             data.push({
@@ -64,18 +64,7 @@ const Home = ({navigation}) => {
         navigation.replace(screen);
     }
     const editProfile = async () => {
-        if(loading == true){
-            return
-        }else{
-            setLoading(true)
-            setTimeout(()=>{
-                setLoading(false);
-            },3000)
-           
-            alert('edit profile');
-        }
-       
-
+        
     }
     const search = () => {
         alert('search');
@@ -135,10 +124,9 @@ const Home = ({navigation}) => {
                </View>
                 {
                     HomeState.friendlist.map((id,key) => {
-                        key={key}
                         return(
                     
-                            <Friendlist name={id.data.friend} funct={()=>{gotochatroom(id.data.friend)}} />
+                            <Friendlist key={key} name={id.data.friend} funct={()=>{gotochatroom(id.data.friend)}} />
                         )
                     }) 
                 }

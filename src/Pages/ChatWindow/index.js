@@ -9,22 +9,39 @@ import { useDispatch, useSelector } from 'react-redux';
 import { onChange } from 'react-native-reanimated';
 import { sendMessage , checkMessage , addChatDatabase} from '../../Config/Redux/restApi/';
 import firebase from '../../Config/Firebase/';
+import database from '@react-native-firebase/database'
 const ChatWindow = ({navigation}) => {
     useEffect(()=>{
         starter()   
 },[])
     const chatState = useSelector(state => state.chatReducer);
     const dispatch = useDispatch();
+    const getReceiverToken = (username) => {
+        const getToken = database().ref('users/' +username  + '/token').once('value').then(async function(snapshot){
+            const data = []
+            Object.keys(snapshot.val()).map(key => {
+                data.push({
+                    id: key,
+                    data: snapshot.val()[key]
+                    })
+                })
+            return data[0].data
+        })
+        return getToken;
+      }
     const onChangeInput = (e , type) => {
         dispatch({type:'SET_MESSAGE', inputType: type, inputValue: e});
     }
     const sendMessages = async () => {
         const res = await getmsgid()
+        const token = await getReceiverToken(chatState.receiver)
+        
         const data = {
             message : chatState.form.message,
             sender : chatState.sender,
             receiver : chatState.receiver,
-            timestamp : new Date().getTime()
+            timestamp : new Date().getTime(),
+            token : token
         }
         dispatch({type:'SET_MESSAGE', inputType: 'sender', inputValue: chatState.sender});
         dispatch({type:'SET_MESSAGE', inputType: 'receiver', inputValue: chatState.receiver});
@@ -102,11 +119,10 @@ const ChatWindow = ({navigation}) => {
             <ScrollView showsVerticalScrollIndicator={false} style={{flex:1 , backgroundColor:'#FFFFFF', paddingTop: 10, paddingHorizontal:10}}>
             {
                 chatState.message.map((id,key) => {
-                    key = {key}
                     if( id.data.sender === chatState.sender){
-                    return <Receiver chatMessage={id.data.message} timestamp={id.data.timestamp}/>
+                    return <Receiver key={key} chatMessage={id.data.message} timestamp={id.data.timestamp}/>
                     }else{
-                    return <Sender chatMessage={id.data.message} timestamp={id.data.timestamp}/>
+                    return <Sender key={key} chatMessage={id.data.message} timestamp={id.data.timestamp}/>
                     }
                     
                 }) 

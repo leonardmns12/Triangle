@@ -1,8 +1,6 @@
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
-
-
 var firebaseConfig = {
     apiKey: "AIzaSyCB7_bDbW6YCfj_o24d5OxpnS_KjgM7rQ8",
     authDomain: "triangle-chat-apps.firebaseapp.com",

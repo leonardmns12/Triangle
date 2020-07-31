@@ -3,12 +3,9 @@ import { View , StyleSheet , TouchableOpacity , Text, AsyncStorage } from 'react
 import LeftLogo from '../../../assets/chatWindow/left.svg';
 import { ScrollView } from 'react-native-gesture-handler';
 import Invitationlist from '../../Component/Molekuls/Invitationlist/';
-import firebase from '../../Config/Firebase/';
+import database from '@react-native-firebase/database';
 import { useDispatch , useSelector } from 'react-redux';
 import { addtofriend , addtofriend1 } from '../../Config/Redux/restApi/';
-import { SvgCss } from 'react-native-svg';
-
-
 const Invitation = ({navigation}) => {
     const InvitationState = useSelector(state => state.invitationReducer)
     const dispatch = useDispatch()
@@ -28,7 +25,7 @@ const Invitation = ({navigation}) => {
         }
     }
     const getpendinglist = (userId) => {
-    const datapendinglist = firebase.database().ref('users/' + userId + '/pendingFriend');
+    const datapendinglist = database().ref('users/' + userId + '/pendingFriend');
     datapendinglist.on('value', function(snapshot){
         const data = []
         if(snapshot.val() === null || snapshot.val() === undefined){
@@ -45,7 +42,7 @@ const Invitation = ({navigation}) => {
         })
     }
     const getincominglist = (userId) => {
-    const dataincoming = firebase.database().ref('users/' + userId + '/incomingFriend')
+    const dataincoming = database().ref('users/' + userId + '/incomingFriend')
     dataincoming.on('value', function(snapshot){
         const data1 = []
         if(snapshot.val() === null || snapshot.val() === undefined){
@@ -70,7 +67,7 @@ const Invitation = ({navigation}) => {
     }
     const getId = (username , from , key, types ) => {
          console.log('users/' + username + '/' + from + '/' + key)
-        const getdata =  firebase.database().ref('users/' + username + '/' + from).once('value').then(async function(snapshot){
+        const getdata =  database().ref('users/' + username + '/' + from).once('value').then(async function(snapshot){
             const data1 = []
             if(snapshot.val() === undefined || snapshot.val() === null){
               // crid('')
@@ -87,6 +84,7 @@ const Invitation = ({navigation}) => {
                     return search(key,data1)
             }
         })
+        console.log('getdata = '+getdata)
         return getdata;
         
     }
@@ -97,6 +95,7 @@ const Invitation = ({navigation}) => {
         const rid = await getId(getSender , 'incomingFriend' , e , 'receiverid') 
         const sid = await getId( e , 'pendingFriend' , getSender , 'senderid')
         // )
+        console.log('rid = '+rid)
         addtofriend(getSender, e ,  sid, rid)
         addtofriend1(getSender, e ,  sid, rid)  
       
@@ -121,9 +120,8 @@ const Invitation = ({navigation}) => {
             <ScrollView style={{flex:1 }}>
             {
                 InvitationState.listincoming.map((id,key) => {
-                    key = {key}
                     return(
-                        <Invitationlist name={id.data.friend} visible={"block"} funct={()=>{accept(id.data.friend)}}/>
+                        <Invitationlist key={key} name={id.data.friend} visible={"block"} funct={()=>{accept(id.data.friend)}}/>
                     )
                 }) 
             }
@@ -134,10 +132,9 @@ const Invitation = ({navigation}) => {
             <ScrollView style={{flex:1}}> 
             {
               InvitationState.listpending.map((id,key) => {
-                key={key}
                 return(
                
-                 <Invitationlist name={id.data.friend} visible={"none"}/>
+                 <Invitationlist key={key} name={id.data.friend} visible={"none"}/>
                 )
             }) 
             }

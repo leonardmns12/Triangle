@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "142077199441",
+    "firebase_url": "https://triangle-chat-apps.firebaseio.com",
+    "project_id": "triangle-chat-apps",
+    "storage_bucket": "triangle-chat-apps.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:142077199441:android:2397f35f0c4542a902a470",
+        "android_client_info": {
+          "package_name": "com.chat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "142077199441-6u5v88jasg3hlcetjmhncndfobu7n5kg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3Gmwu5_kn7i9faQcCGhhXwshPhS5cSBc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "142077199441-6u5v88jasg3hlcetjmhncndfobu7n5kg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

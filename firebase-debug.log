@@ -1,0 +1,13 @@
+[debug] [2020-07-31T02:48:07.521Z] ----------------------------------------------------------------------
+[debug] [2020-07-31T02:48:07.524Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Jonz PC\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js functions:delete
+[debug] [2020-07-31T02:48:07.524Z] CLI Version:   8.2.0
+[debug] [2020-07-31T02:48:07.525Z] Platform:      win32
+[debug] [2020-07-31T02:48:07.525Z] Node Version:  v12.9.1
+[debug] [2020-07-31T02:48:07.527Z] Time:          Fri Jul 31 2020 09:48:07 GMT+0700 (Indochina Time)
+[debug] [2020-07-31T02:48:07.527Z] ----------------------------------------------------------------------
+[debug] [2020-07-31T02:48:07.527Z] 
+[debug] [2020-07-31T02:48:07.538Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2020-07-31T02:48:07.539Z] > authorizing via signed-in user
+[debug] [2020-07-31T02:48:07.541Z] [iam] checking project triangle-chat-apps for permissions ["cloudfunctions.functions.delete","cloudfunctions.functions.list","firebase.projects.get"]
+[debug] [2020-07-31T02:48:07.546Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/triangle-chat-apps:testIamPermissions  
+ {"permissions":["cloudfunctions.functions.delete","cloudfunctions.functions.list","firebase.projects.get"]}

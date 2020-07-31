@@ -1,6 +1,4 @@
 import { combineReducers } from "redux";
-import { ActivityIndicatorComponent } from "react-native";
-
 
 const loginState = {
     email : '',
@@ -21,12 +19,13 @@ const registerState = {
 }
 
 const chatWindowState = {
-    userId : 'ab',
+    userId : '',
     form : {
         sender : '',
         receiver : '',
         message : '',
-        timestamp : ''
+        timestamp : '',
+        token : ''
     },
     sender : '',
     receiver : '',

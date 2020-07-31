@@ -33,15 +33,15 @@ const Chat = ({navigation}) => {
                 <TextInput placeholder="Search Friends" style={[styles.input ,{}]}></TextInput>
                 </View>
             <ScrollView style={{flex: 1, backgroundColor:'#FFFFFF'}}>
-                <Friendchat name={"Kenny Ongko"} timestamp={"19:00"} textmsg={"Some Peoples."} />
-                <Friendchat name={"Kenny Ongko"} timestamp={"19:00"} textmsg={"Some Peoples."} />
-                <Friendchat name={"Kenny Ongko"} timestamp={"19:00"} textmsg={"Some Peoples."} />
-                <Friendchat name={"Kenny Ongko"} timestamp={"19:00"} textmsg={"Some Peoples."} />
-                <Friendchat name={"Kenny Ongko"} timestamp={"19:00"} textmsg={"Some Peoples."} />
-                <Friendchat name={"Kenny Ongko"} timestamp={"19:00"} textmsg={"Some Peoples."} />
-                <Friendchat name={"Kenny Ongko"} timestamp={"19:00"} textmsg={"Some Peoples."} />
-                <Friendchat name={"Kenny Ongko"} timestamp={"19:00"} textmsg={"Some Peoples."} />
-                <Friendchat name={"Kenny Ongko"} timestamp={"19:00"} textmsg={"Some Peoples."} />
+                <Friendchat name={"Leonard"} timestamp={"19:00"} textmsg={"Some Peoples."} />
+                <Friendchat name={"Bukan lele"} timestamp={"19:00"} textmsg={"Some Peoples."} />
+                <Friendchat name={"Masih lele"} timestamp={"19:00"} textmsg={"Some Peoples."} />
+                <Friendchat name={"Tetap lele"} timestamp={"19:00"} textmsg={"Some Peoples."} />
+                <Friendchat name={"Selamanya lele"} timestamp={"19:00"} textmsg={"Some Peoples."} />
+                <Friendchat name={"ini dummy"} timestamp={"19:00"} textmsg={"Some Peoples."} />
+                <Friendchat name={"ini juga"} timestamp={"19:00"} textmsg={"Some Peoples."} />
+                <Friendchat name={"yang ini bukan"} timestamp={"19:00"} textmsg={"Some Peoples."} />
+                <Friendchat name={"bukan salah lagi"} timestamp={"19:00"} textmsg={"Some Peoples."} />
             </ScrollView>
             <View style={{}}>
             <NavigationMenu chat="active" gotoHome={()=>{gtchat('Home')}}
