@@ -22,6 +22,7 @@ const Home = ({navigation}) => {
         const data = []
         dispatch({type:'SET_LISTMSG' , value:data})
     }
+    const [loading , setLoading] = useState(true);
     const HomeState = useSelector(state => state.homeReducer)
     const dispatch = useDispatch()
     const getAllFriend = (username) => { 
@@ -52,7 +53,8 @@ const Home = ({navigation}) => {
               if(res){
                   console.log('data null')
               }
-              console.log(HomeState.friendlist)
+        
+              
             // alert(value);
             }
       };
@@ -78,7 +80,6 @@ const Home = ({navigation}) => {
         dispatch({type: 'SET_SENDER' , value:username})
         navigation.navigate('ChatWindow')
     }
-    const [loading , setLoading] = useState(false);
     const [username , setUsername] = useState('');
     return(
         <View style={{flex:1 , position:'relative'}}>
@@ -120,15 +121,19 @@ const Home = ({navigation}) => {
                 <View style={{height:22}}></View>
 
                <View style={{display:'flex' , alignItems:'center'}}>
-               <ActivityIndicator animating={loading} />
                </View>
+                <ActivityIndicator animating={loading} />
                 {
-                    HomeState.friendlist.map((id,key) => {
+                       HomeState.friendlist.map((id,key) => {
+                        if(key === HomeState.friendlist.length - 1 && loading === true){
+                            setLoading(false)
+                        }
                         return(
-                    
+                            
                             <Friendlist key={key} name={id.data.friend} funct={()=>{gotochatroom(id.data.friend)}} />
                         )
                     }) 
+                        // setLoading(false)
                 }
             </ScrollView>
             </View>

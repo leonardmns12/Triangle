@@ -116,7 +116,7 @@ export const createNewUser = (data) => {
   export const checkPending = (username , namekey) => {
     return new Promise((resolve,reject)=> {
       const findData = database().ref('users/' + username + '/pendingFriend');
-      findData.on('value' , function(snapshot){
+      findData.on('value' ,async function(snapshot){
         if(snapshot.val() === null || snapshot.val() === undefined){
           resolve(false)
         }else{
@@ -127,7 +127,8 @@ export const createNewUser = (data) => {
                 data: snapshot.val()[key]
             })
         })
-         const res = search(namekey , data);
+         const res = await search(namekey , data);
+         console.log('namekey = '+namekey)
          if(res){
            resolve(true)
          }else{

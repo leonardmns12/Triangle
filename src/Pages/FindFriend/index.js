@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { TouchableOpacity, TextInput, ScrollView } from 'react-native-gesture-handler';
-import { View , Text, StyleSheet, AsyncStorage} from 'react-native';
+import { View , Text, StyleSheet, AsyncStorage , ActivityIndicator } from 'react-native';
 import NavigationMenu from '../../Component/Molekuls/NavigationMenu';
 import LeftLogo from '../../../assets/chatWindow/left.svg';
 import Search from '../../../assets/search.svg';
@@ -13,6 +13,7 @@ import Contact from '../../../assets/invite/contact.svg';
 const FindFriend = ({navigation}) => {
     useEffect( () => {
         const res = checkpending(cname)
+        
     })
 
     const gtchat = (screen) => {
@@ -20,14 +21,15 @@ const FindFriend = ({navigation}) => {
     }
     const [name , cname] = useState('');
     const [isadded , cissadded] = useState(true);
-    const [onclick, conclick] = useState(false);
+    const [onclick, conclick] = useState(false)
     const findUser = (username) => {
         const finduser = firebase.database().ref('users/' + username)
         finduser.on('value' , async function(snapshot){
           const data = []
           // Object.keys(snapshot.val());
             if(snapshot.val() === null){
-                cname(false);
+                setLoading(false)
+                cname(false)
             }else{
                 Object.keys(snapshot.val()).map(key => {
                     data.push({
@@ -36,6 +38,7 @@ const FindFriend = ({navigation}) => {
                     })
                 })
                 const res = await checkpending(data[0].data.username);
+                setLoading(false)
             }
       })
     }
@@ -44,18 +47,28 @@ const FindFriend = ({navigation}) => {
     const dispatch = useDispatch();
     const [id , setid] = useState('');
     const [data , setdata] = useState('');
-    //state and redux
+    const [loading , setLoading] = useState(false);
+    //state and redux 
     const onChange = async (e) => {
        await setid(e)
     }  
+    async function cb(){
+        if(loading == true){
+            console.log('loading = '+loading)
+        }else{
+            console.log('loading = '+loading)
+        }
+    }
     const onClickSearch = async () => {
-
+            
+ 
             if ( id == ''){
+
                 alert('id cannot be null')
             }else{
-            //    await checkpending();
+                await setLoading(true)
+            //    await checkpending(); 
                await findUser(id);
-               conclick(true);
             }     
 
         cname('');
@@ -69,10 +82,10 @@ const FindFriend = ({navigation}) => {
             <Text>User not found.</Text>
             </View>
         }else{
-         if(isadded == true && onclick == true){
+         if(isadded == true && onclick == true && loading == false){
             return  <ResultFriend name={names}  status={'Already Added'} bgcolor={'#707070'} />
-         }else if(isadded == false && onclick == true){
-             return  <ResultFriend name={names} onpress={adding} status={'Add'} bgcolor={'#1BB0DF'} />
+         }else if(isadded == false && onclick == true && loading == false){
+                return  <ResultFriend name={names} onpress={adding} status={'Add'} bgcolor={'#1BB0DF'} />
          }
         }
     }
@@ -82,14 +95,18 @@ const FindFriend = ({navigation}) => {
             sender : sender ,
             receiver : name,
         }
+        console.log('name = '+name)
         const res = await checkPending(sender,name)
         if(res == true){
+            conclick(true);
             cissadded(true)
             cname(setname)
         }else{
+            conclick(true);
             cissadded(false)
             cname(setname)
         }
+        console.log(isadded)
     }
     const adding = async (names) => {
         const sender = await AsyncStorage.getItem('username')
@@ -134,8 +151,10 @@ const FindFriend = ({navigation}) => {
                     <Search height={25} width={25}></Search>
                     </TouchableOpacity>
                     </View>
+                    <ActivityIndicator size={'large'} animating={loading} />
                     {
                         findingFriend(name,isadded)
+                        
                     }
                 </View>
             </View>
