@@ -1,4 +1,4 @@
-import React , { useEffect , useState } from 'react';
+import React , { useEffect , useState , Fragment } from 'react';
 import { View, Text , StyleSheet , AsyncStorage, Image } from 'react-native';
 import { TouchableOpacity, TextInput } from 'react-native-gesture-handler';
 import LeftLogo from '../../../assets/chatWindow/left.svg';
@@ -8,8 +8,9 @@ import ImagePicker from 'react-native-image-picker';
 import Checked from '../../../assets/Home/tick.svg';
 import database from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
+import Camera from '../../../assets/editprofile/ar-camera.svg'
 
-const EditProfile = () => {
+const EditProfile = ({navigation}) => {
     const [mounting , setMounting] = useState(false);
     useEffect(()=>{
         starter();
@@ -34,7 +35,7 @@ const EditProfile = () => {
       
     }
     const [currentImg , setCurrentImg] = useState('')
-    const [filePath , setFilePath] = useState('');
+    const [filePath , setFilePath] = useState('default');
     const getDisplayName = (username) => {
       const displaydata = database().ref('users/' + username + '/displayname/displayname')
       .once('value').then(async function(snapshot){
@@ -116,15 +117,19 @@ const EditProfile = () => {
         style={{ width: 95, height: 95 , borderRadius: 100 }}
       />
       }else{
-        return  <Image source={currentImg} style = {{width: 95, height: 95 , borderRadius: 100}} />
+        return   <Fragment><Image source={currentImg} style = {{width: 95, height: 95 , borderRadius: 100}} />
+       <View style={{position:'absolute', justifyContent:'center' ,alignItems:'center',  bottom: 10, right:0, width : 29 , height : 29, borderRadius : 20,backgroundColor : 'rgba(255,255,255,0.4)'}}><Camera width={17} height={17}/></View></Fragment>
       }
+    }
+    const gotohome = () => {
+      navigation.replace('Home')
     }
     return(
         <View style={{flex:1}}>
              <View style={{flex:2, backgroundColor:'rgba(0,94,97,0.5)' , borderBottomLeftRadius:41, borderBottomRightRadius:41, position:'relative'}}>
              <View style={{position:'relative'}}>
                 <View style={{flexDirection : 'row', alignItems: 'center', padding: 16, justifyContent : 'space-between'}}>
-                    <TouchableOpacity style={{}}>
+                    <TouchableOpacity onPress={gotohome} style={{}}>
                         <LeftLogo width={30} height={30}/>
                     </TouchableOpacity>
                     <Text style={[style.profileHeader , {}]}>Profile</Text>
@@ -132,14 +137,15 @@ const EditProfile = () => {
                       <Checked width={30} height={30}/>
                     </TouchableOpacity>
                 </View>
-                <View style={{justifyContent:'center', alignItems:'center'}}>
+                <View style={{justifyContent:'center', alignItems:'center', position:'relative'}}>
                     <TouchableOpacity onPress={chooseFile} style={{borderWidth:1, height : 95, width: 95, borderRadius: 100, backgroundColor:'#FFFFFF',borderColor:'#707070'}}>
                       {
                         isAvailable()
                       }
+                      
                     </TouchableOpacity>
-                    
                 </View>
+                
                    
                 </View>
              </View>
@@ -167,6 +173,10 @@ const style = StyleSheet.create({
         fontFamily : 'ITCKRISTEN',
         textAlign : 'center',
         padding : 16,
+    },
+    camerapicture : {
+      width : 25,
+      height : 25
     }
 })
 

@@ -3,7 +3,7 @@ import { View , Text, ScrollView, StyleSheet, AsyncStorage , ActivityIndicator, 
 import NavigationMenu from '../../../Component/Molekuls/NavigationMenu/';
 import Friendlist from '../../../Component/Molekuls/Friendlist/';
 import { Button } from '../../../Component/';
-import { signOutUser , getUsername , checkPermission } from '../../../Config/Redux/restApi/';
+import { signOutUser , getUsername , checkPermission, getDisplayName } from '../../../Config/Redux/restApi/';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import AddFriend from '../../../../assets/Home/addfriend.svg';
 import Magnifier from '../../../../assets/Home/magnifier.svg';
@@ -13,6 +13,7 @@ import storage from '@react-native-firebase/storage';
 
 const Home = ({navigation}) => {
     useEffect(()=>{
+        ShowProfile();
         checkPermission()
         BackHandler.addEventListener('hardwareBackPress', cleardispatch);
         _retrieveUsername();
@@ -22,6 +23,13 @@ const Home = ({navigation}) => {
     const cleardispatch = () => {
         const data = []
         dispatch({type:'SET_LISTMSG' , value:data})
+    }
+    const ShowProfile = async () => {
+        const username = await AsyncStorage.getItem('username');
+        const dn = await getDisplayName(username, 'displayname')
+        const sm = await getDisplayName(username , 'statusmessage')
+        dispatch({type:'SET_SHOWPROFILE' , tipe:'displayname', value: dn})
+        dispatch({type:'SET_SHOWPROFILE' , tipe:'statusmessage', value: sm})
     }
     const [profileImg , setProfileImg] = useState('')
     const [loading , setLoading] = useState(false);
@@ -43,10 +51,11 @@ const Home = ({navigation}) => {
             })
             for(let i = 0; i < data.length; i++){
                 const uri = await getProfileUri(data[i].data)
-                console.log(uri)
+                const displayname = await getDisplayName(data[i].data.friend , 'displayname')
                 data[i] = {
                     ...data[i],
-                    profileImg : uri
+                    profileImg : uri,
+                    displayname : displayname
                 }
             }
             dispatch({type:'SET_HOMEFRIEND',  value: data});
@@ -109,10 +118,10 @@ const Home = ({navigation}) => {
                   </View>
                 <View style={{flexDirection:'row', marginTop: 43, marginBottom:7}}>
                     <View style={[style.profileimg ,{}]}></View>
-                    <Text style={[style.profilename, {}]}>Leonard Monosa</Text>
+                    <Text style={[style.profilename, {}]}>{HomeState.displayname}</Text>
                 </View>
                 <View style={{width:220, marginBottom: 50}}>
-                    <Text style={[style.bio , {}]}>Some people being wise by adding more friends.</Text>
+                    <Text style={[style.bio , {}]}>{HomeState.statusmessage}</Text>
                 </View>
                </View>
             <TouchableOpacity onPress={editProfile} style={{backgroundColor:'rgb(0,191,166)',width:339, height:27, marginHorizontal:10, borderWidth:1 , borderColor:'#707070'}}>
@@ -140,7 +149,7 @@ const Home = ({navigation}) => {
                </View>
                     {
                             HomeState.friendlist.map((id,key) => {
-                               if(HomeState.friendlist == ''){
+                                if(HomeState.friendlist == ''){
                                    return(
                                     <View style={{flex:1}}>
                                     <Text style={{textAlign:'center'}}>You dont have any friend</Text>
@@ -150,10 +159,9 @@ const Home = ({navigation}) => {
                                if(key === HomeState.friendlist.length - 1 && loading === true){
                                    setLoading(false)
                                }
-                               console.log(id.profileImg)
                                return(
                                    
-                                   <Friendlist url={id.profileImg} key={key} name={id.data.friend} funct={()=>{gotochatroom(id.data.friend)}} />
+                                   <Friendlist url={id.profileImg} key={key} name={id.displayname} funct={()=>{gotochatroom(id.data.friend)}} />
                                )
                            }) 
                     }

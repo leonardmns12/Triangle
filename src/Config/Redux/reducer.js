@@ -6,7 +6,9 @@ const loginState = {
 };
 
 const homeState = {
-    friendlist : []
+    friendlist : [],
+    displayname : '',
+    statusmessage : ''
 }
 
 const registerState = {
@@ -25,7 +27,7 @@ const chatWindowState = {
         receiver : '',
         message : '',
         timestamp : '',
-        token : ''
+        token : '',
     },
     sender : '',
     receiver : '',
@@ -68,6 +70,7 @@ const invitationReducer = (state = invitationState, action) => {
             [action.intype] : action.value
         }
     }
+    
     return state;
 }
 
@@ -76,6 +79,12 @@ const homeReducer = (state = homeState , action) => {
         return{
             ...state,
             friendlist : action.value
+        }
+    }
+    if(action.type === 'SET_SHOWPROFILE'){
+        return{
+            ...state,
+            [action.tipe] : action.value
         }
     }
     return state;

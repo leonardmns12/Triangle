@@ -225,3 +225,12 @@ export const setEditProfile = (username , data , path) => {
   [path] : data,
   })
 }
+
+export const getDisplayName = (username , type) => {
+  const displayname = database()
+  .ref('users/' + username + '/' + type +'/' +type)
+  .once('value').then(function(snapshot){
+    return snapshot.val()
+  })
+  return displayname
+}
