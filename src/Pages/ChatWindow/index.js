@@ -1,5 +1,5 @@
 import React , { useEffect , useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { TouchableOpacity, TextInput, ScrollView } from 'react-native-gesture-handler';
 import PaperPlaneLogo from '../../../assets/chatWindow/paper-plane.svg';
 import ImagesLogo from '../../../assets/chatWindow/photos.svg';
@@ -9,10 +9,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { onChange } from 'react-native-reanimated';
 import { sendMessage , checkMessage , addChatDatabase} from '../../Config/Redux/restApi/';
 import firebase from '../../Config/Firebase/';
-import database from '@react-native-firebase/database'
+import database from '@react-native-firebase/database';
+import storage from '@react-native-firebase/storage';
 const ChatWindow = ({navigation}) => {
-    useEffect(()=>{
-        starter()   
+    useEffect(()=>{  
+        getProfileImg()
+        starter() 
 },[])
     const chatState = useSelector(state => state.chatReducer);
     const dispatch = useDispatch();
@@ -65,12 +67,15 @@ const ChatWindow = ({navigation}) => {
             console.log('error')
         }
     }
-    const loadChat = async () => {
-        const res = checkMessage(chatState.sender, chatState.receiver)
-        if(res){
-            alert('data null')
-        }else{
-            alert('data found')
+    const getProfileImg = async () => {
+        const url = await storage()
+        .ref('images/' + chatState.receiver)
+        .getDownloadURL().catch( e => {
+            console.log(e)
+            dispatch({type:'SET_PROFILEIMG' , value : 'null'})  
+        })
+        if(url !== undefined){
+            dispatch({type:'SET_PROFILEIMG' , value:{uri:url}})
         }
     }
     function getHash(input){
@@ -120,9 +125,9 @@ const ChatWindow = ({navigation}) => {
             {
                 chatState.message.map((id,key) => {
                     if( id.data.sender === chatState.sender){
-                    return <Receiver key={key} chatMessage={id.data.message} timestamp={id.data.timestamp}/>
+                    return <Receiver  key={key} chatMessage={id.data.message} timestamp={id.data.timestamp}/>
                     }else{
-                    return <Sender key={key} chatMessage={id.data.message} timestamp={id.data.timestamp}/>
+                    return <Sender img={chatState.profileImg} key={key} chatMessage={id.data.message} timestamp={id.data.timestamp}/>
                     }
                     
                 }) 

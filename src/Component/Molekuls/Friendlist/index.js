@@ -1,13 +1,16 @@
-import React , { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React , { useEffect , useState } from 'react';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
-const friendlist = ({navigation , name, funct}) => {
+const friendlist = ({navigation , name, funct, url }) => {
 
     return(
         <TouchableOpacity onPress={funct}>
         <View style={[style.borderlist,{}]}>
-            <View style={[style.friendprofile,{}]}></View>
+       
+            <View style={[style.friendprofile,{}]}>
+            <Image source={url} style = {{width: 40, height: 40 , borderRadius: 20}}/>
+            </View>
             <Text style={[style.profilename,{}]}>{name}</Text>
         </View>
         </TouchableOpacity>
@@ -16,8 +19,6 @@ const friendlist = ({navigation , name, funct}) => {
 
 const style = StyleSheet.create({
     borderlist : {
-        borderWidth : 1,
-        borderColor : '#707070',  
         height : 56,
         borderRadius: 30,
         flexDirection : 'row',
@@ -28,7 +29,6 @@ const style = StyleSheet.create({
         borderRadius: 20,
         height : 40,
         width : 40,
-        borderColor : '#707070',
         marginLeft : 18,
         justifyContent: 'center',
         alignItems : 'center',
@@ -36,7 +36,7 @@ const style = StyleSheet.create({
     },
     profilename : {
         fontSize : 18,
-        color : '#707070',
+        paddingLeft: 10,
         alignItems : 'center',
         marginTop : 14,
         marginLeft : 5

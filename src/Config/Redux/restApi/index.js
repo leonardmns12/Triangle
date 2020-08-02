@@ -208,3 +208,20 @@ export const checkPermission = () => {
   })
 }
 
+export const saveDisplayName = (username , displayname) => {
+  database().ref('users/' + username + '/displayname').set({
+    displayname : displayname
+  })
+}
+
+export const saveStatusMessage = (username ,statusmessage) => {
+  database().ref('users/' + username + '/statusmessage').set({
+    statusmessage : statusmessage
+  })
+}
+
+export const setEditProfile = (username , data , path) => {
+  database().ref('users/' + username + '/' + path).set({
+  [path] : data,
+  })
+}

@@ -29,7 +29,8 @@ const chatWindowState = {
     },
     sender : '',
     receiver : '',
-    message : []
+    message : [],
+    profileImg : 'null'
 }
 
 const findfriend = {
@@ -41,6 +42,11 @@ const invitationState = {
     listincoming : [],
     senderid : '',
     receiverid : ''
+}
+
+const editprofileState = {
+    statusmessage : '',
+    displayname : ''
 }
 
 const invitationReducer = (state = invitationState, action) => {
@@ -125,6 +131,16 @@ const loginReducer = (state = loginState, action) => {
     return state;
 };
 
+const editprofileReducer = (state = editprofileState , action) => {
+    if(action.type === 'SET_EDITPROFILE'){
+        return{
+            ...state,
+            [action.inputType] : action.value
+        }
+    }
+    return state;
+}
+
 const chatReducer = (state = chatWindowState, action) => {
     if(action.type === 'SET_MESSAGE'){
         return{
@@ -159,6 +175,12 @@ const chatReducer = (state = chatWindowState, action) => {
             message : action.value
         }
     }
+    if(action.type === 'SET_PROFILEIMG'){
+        return{
+            ...state,
+            profileImg : action.value
+        }
+    }
     return state;
 }
 
@@ -168,7 +190,8 @@ const reducer = combineReducers({
     chatReducer,
     findFriendReducer,
     invitationReducer,
-    homeReducer
+    homeReducer,
+    editprofileReducer
 })
 
 export default reducer;

@@ -5,13 +5,17 @@ import NavigationMenu from '../../../Component/Molekuls/NavigationMenu/';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Contents from '../../../Component/Molekuls/Timeline';
 import { signOutUser , getUsername , checkPermission } from '../../../Config/Redux/restApi/';
+import { useDispatch , useSelector } from 'react-redux';
 
 const Profile = ({navigation}) => {
     const gtchat = (screen) => {
         navigation.replace(screen);
     }
-
+    const HomeState = useSelector(state => state.homeReducer)
+    const dispatch = useDispatch();
     const onClickLogout = async () => {
+        
+        dispatch({type:'SET_HOMEFRIEND',  value: []});
         const res = await signOutUser();
         navigation.replace('Login');
     }

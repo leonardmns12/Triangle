@@ -3,7 +3,7 @@ import React from 'react';
 import { View , Text , StyleSheet, Image} from 'react-native';
 import {  ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { Button, Input } from '../../Component/';
-import { createNewUser, createUser, addFriend , updateUser } from '../../Config/Redux/restApi/';
+import { createNewUser, createUser, addFriend , updateUser , setEditProfile } from '../../Config/Redux/restApi/';
 import { useSelector , useDispatch } from 'react-redux';
 import { YellowBox } from 'react-native';
 import _ from 'lodash';
@@ -26,13 +26,19 @@ const Register = ({navigation}) => {
                 alert(res);
                 const userData = {
                     username : form.username,
-                    email : form.email,
+                    email : form.email
                 }
                 const updateData = {
                     username : form.username
                 }
+                const editProfile = {
+                    displayname : form.username,
+                    statusmessage : ''
+                }
                 await createUser(userData);
                 await updateUser(updateData);
+                await setEditProfile(form.username,form.username,'displayname')
+                await setEditProfile(form.username,'','statusmessage')
                 dispatch({type:'CLEAR_FORM'});
             }
         }

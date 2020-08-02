@@ -1,4 +1,4 @@
-import React , { useEffect, useState } from 'react';
+import React , { useEffect, useState , Suspense } from 'react';
 import { View , Text, ScrollView, StyleSheet, AsyncStorage , ActivityIndicator, BackHandler } from 'react-native';
 import NavigationMenu from '../../../Component/Molekuls/NavigationMenu/';
 import Friendlist from '../../../Component/Molekuls/Friendlist/';
@@ -9,64 +9,68 @@ import AddFriend from '../../../../assets/Home/addfriend.svg';
 import Magnifier from '../../../../assets/Home/magnifier.svg';
 import database from '@react-native-firebase/database';
 import { useSelector , useDispatch } from 'react-redux';
+import storage from '@react-native-firebase/storage';
 
 const Home = ({navigation}) => {
     useEffect(()=>{
         checkPermission()
         BackHandler.addEventListener('hardwareBackPress', cleardispatch);
         _retrieveUsername();
-        cleardispatch()
+        // cleardispatch()
         
     },[])
     const cleardispatch = () => {
         const data = []
         dispatch({type:'SET_LISTMSG' , value:data})
     }
-    const [loading , setLoading] = useState(true);
+    const [profileImg , setProfileImg] = useState('')
+    const [loading , setLoading] = useState(false);
     const HomeState = useSelector(state => state.homeReducer)
     const dispatch = useDispatch()
     const getAllFriend = (username) => { 
     const dataFriend = database().ref('users/' + username + '/friend');
-    dataFriend.on('value', function(snapshot){
+    dataFriend.on('value',async function(snapshot){
       const data = []
       if(snapshot.val() === null || snapshot.val() === undefined){
         
       }else{
+        
           Object.keys(snapshot.val()).map(key => {
             data.push({
                 id: key,
-                data: snapshot.val()[key]
+                data: snapshot.val()[key],
                 })
             })
-            // console.log(data)
+            for(let i = 0; i < data.length; i++){
+                const uri = await getProfileUri(data[i].data)
+                console.log(uri)
+                data[i] = {
+                    ...data[i],
+                    profileImg : uri
+                }
+            }
             dispatch({type:'SET_HOMEFRIEND',  value: data});
         }
     })
     }
     const _retrieveUsername = async () => {
-      
+            
             const value = await AsyncStorage.getItem('username');
             if (value !== null) {
             //   alert(value)
-              setUsername(value)
               const res = await getAllFriend(value)
               if(res){
                   console.log('data null')
               }
-        
               
             // alert(value);
             }
       };
-    // const onClickLogout = async () => {
-    //     const res = await signOutUser();
-    //     navigation.replace('Login');
-    // }
     const gtchat = (screen) => {
         navigation.replace(screen);
     }
     const editProfile = async () => {
-        
+        navigation.navigate('EditProfile')
     }
     const search = () => {
         alert('search');
@@ -75,12 +79,24 @@ const Home = ({navigation}) => {
         navigation.navigate('FindFriend');
     }
     const gotochatroom = async (friend) => {
-        
+        const username = await AsyncStorage.getItem('username');
         dispatch({type: 'SET_RECEIVER' , value:friend})
         dispatch({type: 'SET_SENDER' , value:username})
         navigation.navigate('ChatWindow')
     }
-    const [username , setUsername] = useState('');
+    const getProfileUri = async (friend) => {
+        const img = await storage()
+        .ref('images/' + friend.friend)
+        .getDownloadURL()
+        .catch(e => {
+            const url = 'https://firebasestorage.googleapis.com/v0/b/triang…=media&token=8e8f6b02-b104-4de1-8d04-d2887c764a6d'
+            return url
+        })
+        if(img !== undefined){
+            const url = { uri : img}
+            return url
+        }
+    }
     return(
         <View style={{flex:1 , position:'relative'}}>
             <View style={{flex:1, backgroundColor:'rgba(0,94,97,0.5)' , borderBottomLeftRadius:41, borderBottomRightRadius:41, position:'relative'}}>
@@ -122,19 +138,26 @@ const Home = ({navigation}) => {
 
                <View style={{display:'flex' , alignItems:'center'}}>
                </View>
-                <ActivityIndicator animating={loading} />
-                {
-                       HomeState.friendlist.map((id,key) => {
-                        if(key === HomeState.friendlist.length - 1 && loading === true){
-                            setLoading(false)
-                        }
-                        return(
-                            
-                            <Friendlist key={key} name={id.data.friend} funct={()=>{gotochatroom(id.data.friend)}} />
-                        )
-                    }) 
-                        // setLoading(false)
-                }
+                    {
+                            HomeState.friendlist.map((id,key) => {
+                               if(HomeState.friendlist == ''){
+                                   return(
+                                    <View style={{flex:1}}>
+                                    <Text style={{textAlign:'center'}}>You dont have any friend</Text>
+                                    </View>
+                                   )
+                               }
+                               if(key === HomeState.friendlist.length - 1 && loading === true){
+                                   setLoading(false)
+                               }
+                               console.log(id.profileImg)
+                               return(
+                                   
+                                   <Friendlist url={id.profileImg} key={key} name={id.data.friend} funct={()=>{gotochatroom(id.data.friend)}} />
+                               )
+                           }) 
+                    }
+                <ActivityIndicator animating={loading}/>
             </ScrollView>
             </View>
             <NavigationMenu home="active" gotoChat={()=>{gtchat('Chat')}}

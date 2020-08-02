@@ -1,7 +1,7 @@
 import React , { useEffect, Fragment , useState } from 'react';
-import { StyleSheet, Text, View} from 'react-native';
+import { StyleSheet, Text, View, Image} from 'react-native';
 import Avatar from '../../../../assets/chatWindow/avatar.svg';
-const Sender = ({navigation, chatMessage , timestamp}) => {
+const Sender = ({navigation, chatMessage , timestamp , img}) => {
     useEffect(()=>{
         convertTime()
     },[])
@@ -30,7 +30,14 @@ const Sender = ({navigation, chatMessage , timestamp}) => {
     return(
     <Fragment>
         <View style={{flexDirection:'row', marginTop:10}}>
-                    <Avatar height={30} width={30} />
+                    {
+                        img === 'null' ? (
+                         <Avatar height={30} width={30} />
+                        ) : (
+                        <Image source={img} style = {{width: 30, height: 30 , borderRadius: 20}}/>
+                        )
+                    }
+                    
                     <View style={[styles.chatText,{position:'relative'}]}>
                     <Text>{chatMessage}</Text>
                     </View>       
