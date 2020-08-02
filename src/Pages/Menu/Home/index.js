@@ -1,15 +1,18 @@
 import React , { useEffect, useState , Suspense } from 'react';
-import { View , Text, ScrollView, StyleSheet, AsyncStorage , ActivityIndicator, BackHandler } from 'react-native';
+import { View , Text, ScrollView, StyleSheet, AsyncStorage , ActivityIndicator, BackHandler , Modal , TouchableOpacity , Image } from 'react-native';
 import NavigationMenu from '../../../Component/Molekuls/NavigationMenu/';
 import Friendlist from '../../../Component/Molekuls/Friendlist/';
 import { Button } from '../../../Component/';
 import { signOutUser , getUsername , checkPermission, getDisplayName } from '../../../Config/Redux/restApi/';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import AddFriend from '../../../../assets/Home/addfriend.svg';
 import Magnifier from '../../../../assets/Home/magnifier.svg';
 import database from '@react-native-firebase/database';
 import { useSelector , useDispatch } from 'react-redux';
 import storage from '@react-native-firebase/storage';
+import LeftLogo from '../../../../assets/chatWindow/left.svg';
+import UserLogo from '../../../../assets/popupprofile/user.svg';
+import BlockLogo from '../../../../assets/block.svg';
+import ChatLogo from '../../../../assets/chat.svg';
 
 const Home = ({navigation}) => {
     useEffect(()=>{
@@ -50,12 +53,14 @@ const Home = ({navigation}) => {
                 })
             })
             for(let i = 0; i < data.length; i++){
-                const uri = await getProfileUri(data[i].data)
+                const uri = await getProfileUri(data[i].data.friend)
                 const displayname = await getDisplayName(data[i].data.friend , 'displayname')
+                const statusmessage = await getDisplayName(data[i].data.friend , 'statusmessage')
                 data[i] = {
                     ...data[i],
                     profileImg : uri,
-                    displayname : displayname
+                    displayname : displayname,
+                    statusmessage : statusmessage
                 }
             }
             dispatch({type:'SET_HOMEFRIEND',  value: data});
@@ -89,13 +94,13 @@ const Home = ({navigation}) => {
     }
     const gotochatroom = async (friend) => {
         const username = await AsyncStorage.getItem('username');
-        dispatch({type: 'SET_RECEIVER' , value:friend})
+        dispatch({type: 'SET_RECEIVER' , value:modalUsername})
         dispatch({type: 'SET_SENDER' , value:username})
         navigation.navigate('ChatWindow')
     }
     const getProfileUri = async (friend) => {
         const img = await storage()
-        .ref('images/' + friend.friend)
+        .ref('images/' + friend)
         .getDownloadURL()
         .catch(e => {
             const url = 'https://firebasestorage.googleapis.com/v0/b/triang…=media&token=8e8f6b02-b104-4de1-8d04-d2887c764a6d'
@@ -106,8 +111,57 @@ const Home = ({navigation}) => {
             return url
         }
     }
+    const gotoProfile = (e) => {
+        alert(e)
+    }
+    const [modalName , setModalName] = useState('')
+    const [modalVisible , setModalVisible] = useState(false)
+    const [modalUri , setModalUri] = useState({uri : 'https://firebasestorage.googleapis.com/v0/b/triang…=media&token=8e8f6b02-b104-4de1-8d04-d2887c764a6d'})
+    const [modalStatus, setModalStatus] = useState('')
+    const [modalUsername , setModalUsername] = useState('')
     return(
         <View style={{flex:1 , position:'relative'}}>
+            <Modal 
+            animationType={"fade"}
+            visible={modalVisible}
+            transparent={true}
+            >
+                <View style={{backgroundColor:'#000000aa' , flex:1, justifyContent:'center'}}>
+                    <View style={{backgroundColor:'rgba(255,255,255,0.85)',borderWidth:1,borderRadius:8, marginHorizontal:'20%', marginVertical:'30%' , flex:1}}>
+                        <View style={{position:'absolute', padding:10, right:0,flex:1}}>
+                        <TouchableOpacity onPress={()=>{ setModalVisible(false) }}>
+                            <LeftLogo width={30} height={30}/>
+                        </TouchableOpacity>
+                        </View> 
+                            <View style={{padding:20, justifyContent:'center', alignItems:'center',flex:1}}>
+                            {
+                            modalUri.uri === 'https://firebasestorage.googleapis.com/v0/b/triang…=media&token=8e8f6b02-b104-4de1-8d04-d2887c764a6d' ? (
+                                <View style={{width:130, height:130, borderWidth:1 , backgroundColor:'#FFFFFF' , borderRadius:100,marginBottom:16}}></View>
+                            ): (
+                                <Image source={modalUri} style = {{width: 130, height: 130 , borderRadius: 100,marginBottom:18}}/>
+                            )
+                            }     
+                            <Text style={{fontSize:18 , fontFamily:'ITCKRISTEN', marginBottom:8}}>{modalName}</Text>
+                            <Text>{modalStatus}</Text>
+                           
+                            </View>
+                            <View style={{ flexDirection:'row', justifyContent:'center', alignItems:'center', }}>
+                                <TouchableOpacity onPress={()=>{gotochatroom(modalUsername) , setModalVisible(false)}} style={{backgroundColor:'#F3F3F3', flex:1, height:40, borderBottomLeftRadius:8, borderColor:'#777777', borderWidth:1, justifyContent:'center' , alignItems: 'center'}}>
+                                    <ChatLogo width={18} height={18}/>
+                                    <Text style={{fontSize:8}}>Chat</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={()=>{gotoProfile(modalUri.uri)}} style={{backgroundColor:'#F3F3F3', flex:1,height:40, borderColor:'#777777', borderWidth:1, justifyContent:'center', alignItems:'center'}}>
+                                    <UserLogo width={18} height={18}/>
+                                    <Text style={{fontSize:8}}>Profile</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={{backgroundColor:'#F3F3F3', flex:1, height:40, borderBottomRightRadius:8, borderColor:'#777777', borderWidth:1, justifyContent:'center', alignItems:'center'}}>
+                                    <BlockLogo width={18} height={18}/>
+                                    <Text style={{fontSize:8}}>Remove Friend</Text>
+                                </TouchableOpacity>
+                            </View>
+                    </View>     
+                </View> 
+            </Modal>
             <View style={{flex:1, backgroundColor:'rgba(0,94,97,0.5)' , borderBottomLeftRadius:41, borderBottomRightRadius:41, position:'relative'}}>
               <View style={{position:'relative'}}>
 
@@ -161,7 +215,13 @@ const Home = ({navigation}) => {
                                }
                                return(
                                    
-                                   <Friendlist url={id.profileImg} key={key} name={id.displayname} funct={()=>{gotochatroom(id.data.friend)}} />
+                                   <Friendlist url={id.profileImg} key={key} name={id.displayname} funct={()=>{ 
+                                       setModalVisible(true)
+                                       setModalName(id.displayname)
+                                       setModalUri(id.profileImg)
+                                       setModalStatus(id.statusmessage)
+                                       setModalUsername(id.data.friend)
+                                    }} />
                                )
                            }) 
                     }
