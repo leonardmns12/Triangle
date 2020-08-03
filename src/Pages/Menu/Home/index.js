@@ -22,7 +22,14 @@ const Home = ({navigation}) => {
         _retrieveUsername();
         // cleardispatch()
         
+        return () => {
+            unmounting()
+        }
     },[])
+    const unmounting = async () => {
+        const username = await AsyncStorage.getItem('username')
+        database().ref('users/' + username + '/friend').off()
+    }
     const cleardispatch = () => {
         const data = []
         dispatch({type:'SET_LISTMSG' , value:data})
@@ -76,8 +83,6 @@ const Home = ({navigation}) => {
               if(res){
                   console.log('data null')
               }
-              
-            // alert(value);
             }
       };
     const gtchat = (screen) => {

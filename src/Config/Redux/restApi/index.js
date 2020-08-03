@@ -184,12 +184,16 @@ export const checkMessage = (sender) => {
   })
 }
 
-export const addChatDatabase = (sender , receiver) => {
-  database().ref('users/' + sender + '/chat').set({
-    friend : receiver
+export const addChatDatabase = (data) => {
+  database().ref('users/' + data.sender + '/chat/' + data.receiver).set({
+    friend : data.receiver,
+    message : data.message,
+    timestamp : data.timestamp
   })
-  database().ref('users/' + receiver + '/chat').set({
-    friend : sender
+  database().ref('users/' + data.receiver + '/chat/' + data.sender).set({
+    friend : data.sender,
+    message : data.message,
+    timestamp : data.timestamp
   })
 }
 

@@ -1,5 +1,5 @@
 import React , { useEffect , useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator , FlatList } from 'react-native';
 import { TouchableOpacity, TextInput, ScrollView } from 'react-native-gesture-handler';
 import PaperPlaneLogo from '../../../assets/chatWindow/paper-plane.svg';
 import ImagesLogo from '../../../assets/chatWindow/photos.svg';
@@ -15,7 +15,14 @@ const ChatWindow = ({navigation}) => {
     useEffect(()=>{  
         getProfileImg()
         starter() 
-},[])
+        return () => {
+            unmounting()
+        }
+        },[])
+        const unmounting = async () => {
+            const res = await getmsgid() 
+            database().ref('messages/' + res).off()
+        }
     const chatState = useSelector(state => state.chatReducer);
     const dispatch = useDispatch();
     const getReceiverToken = (username) => {
@@ -50,7 +57,7 @@ const ChatWindow = ({navigation}) => {
         dispatch({type:'SET_MESSAGE', inputType: 'timestamp', inputValue: new Date().getTime()});
         if( chatState.form.message.length > 0){
             sendMessage(data,res);
-            addChatDatabase(data.sender, data.receiver)
+            addChatDatabase(data)
             dispatch({type:'SET_MESSAGE', inputType: 'message', inputValue: ''});
         }
         // await getMessage(chatState.userId);
@@ -59,6 +66,7 @@ const ChatWindow = ({navigation}) => {
     const onClickBack = () => {
         navigation.replace('Chat');
     }
+    const [value ,setvalue] = useState('')
     const starter = async () => {
         try{         
         const res = await getmsgid()
@@ -96,7 +104,7 @@ const ChatWindow = ({navigation}) => {
     }
     const getMessage = async (messageId) => {
         const getDataPost = firebase.database().ref('messages/' + messageId);
-        getDataPost.on('value', function(snapshot) {
+        getDataPost.on('value',async function(snapshot) {
         const data = []
         if(snapshot.val() === null || snapshot.val() === undefined){
 
@@ -107,11 +115,18 @@ const ChatWindow = ({navigation}) => {
                     data: snapshot.val()[key]
                     })
                 })
-            dispatch({type:'SET_LISTMSG' , value:data})
+            dispatch({type:'SET_LISTMSG' , value:data.reverse()})
         }
         });
     }
     const [code ,setcode] = useState('')
+    const renderItem = ({ item }) => (
+        item.data.sender === chatState.sender ? (
+            <Receiver  chatMessage={item.data.message} timestamp={item.data.timestamp}/>
+        ): (
+            <Sender img={chatState.profileImg} key={key} chatMessage={item.data.message} timestamp={item.data.timestamp}/>
+        )
+      );
     return(
         <View style={{flex:1}}>
             <View style={{flex:1}}>
@@ -121,7 +136,17 @@ const ChatWindow = ({navigation}) => {
                 </TouchableOpacity>
                 <Text style={[styles.headerText,{}]}>{chatState.receiver}</Text>
             </View>
-            <ScrollView showsVerticalScrollIndicator={false} style={{flex:1 , backgroundColor:'#FFFFFF', paddingTop: 10, paddingHorizontal:10}}>
+            <View style={{flex:1 , backgroundColor : '#FFFFFF',paddingTop: 10, paddingHorizontal:10}}> 
+                <FlatList
+                inverted = {-1}
+                data = {chatState.message}
+                renderItem={renderItem}
+                keyExtractor={item => item.id}
+                />
+            </View>
+
+            {/* <ScrollView showsVerticalScrollIndicator={false} style={{flex:2 , backgroundColor:'#FFFFFF', paddingTop: 10, paddingHorizontal:10
+            }} >
             {
                 chatState.message.map((id,key) => {
                     if( id.data.sender === chatState.sender){
@@ -132,9 +157,9 @@ const ChatWindow = ({navigation}) => {
                     
                 }) 
             }
-            </ScrollView>
+            </ScrollView> */}
             </View>
-            <View style={{backgroundColor:'#FFFFFF', borderTopWidth:0.9 , height:60, alignItems: 'center', flexDirection: 'row'}}>
+            <View style={{backgroundColor:'#FFFFFF', borderTopWidth:0.9 , height:50, alignItems: 'center', flexDirection: 'row'}}>
                 <TouchableOpacity style={{marginLeft:15, marginRight:10}}>
                     <ImagesLogo height={25} width={25}/>
                 </TouchableOpacity>

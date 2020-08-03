@@ -30,7 +30,7 @@ const Receiver = ({navigation,chatMessage,timestamp}) => {
     const [time , setTime] = useState('')
     return(
     <Fragment>
-        <View style={{ alignItems:'flex-end', marginTop:10}}>
+        <View style={{ alignItems:'flex-end', marginBottom:'4%'}}>
                 <Text style={[styles.receiverText,{}]}>{chatMessage}</Text>
                 <Text style={{fontSize:12,marginRight:5}}>{time}</Text>
         </View>

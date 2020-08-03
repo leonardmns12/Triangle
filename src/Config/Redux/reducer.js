@@ -8,7 +8,7 @@ const loginState = {
 const homeState = {
     friendlist : [],
     displayname : '',
-    statusmessage : ''
+    statusmessage : '',
 }
 
 const registerState = {
@@ -49,6 +49,11 @@ const invitationState = {
 const editprofileState = {
     statusmessage : '',
     displayname : ''
+}
+
+const chatMenuState = {
+    chatlist : [],
+    username : ''
 }
 
 const invitationReducer = (state = invitationState, action) => {
@@ -150,6 +155,17 @@ const editprofileReducer = (state = editprofileState , action) => {
     return state;
 }
 
+const chatMenuReducer = (state = chatMenuState , action) => {
+    if(action.type === 'SET_CHATLIST'){
+        return{
+            ...state,
+            chatlist : action.value
+        }
+    }
+    
+    return state;
+}
+
 const chatReducer = (state = chatWindowState, action) => {
     if(action.type === 'SET_MESSAGE'){
         return{
@@ -200,7 +216,8 @@ const reducer = combineReducers({
     findFriendReducer,
     invitationReducer,
     homeReducer,
-    editprofileReducer
+    editprofileReducer,
+    chatMenuReducer
 })
 
 export default reducer;

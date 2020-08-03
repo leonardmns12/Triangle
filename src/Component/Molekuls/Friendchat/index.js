@@ -22,8 +22,6 @@ const Friendchat = ({navigation , name, textmsg, timestamp}) => {
 
 const styles = StyleSheet.create({
     borderlist : {
-        borderColor : '#707070',
-        borderWidth : 1,
         borderRadius : 31,
         height : 50,
         marginHorizontal : 15,
