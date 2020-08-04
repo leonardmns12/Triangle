@@ -7,7 +7,7 @@ import LeftLogo from '../../../assets/chatWindow/left.svg';
 import { Sender, Receiver } from '../../Component';
 import { useDispatch, useSelector } from 'react-redux';
 import { onChange } from 'react-native-reanimated';
-import { sendMessage , checkMessage , addChatDatabase} from '../../Config/Redux/restApi/';
+import { sendMessage , checkMessage , addChatDatabase , updateRead} from '../../Config/Redux/restApi/';
 import firebase from '../../Config/Firebase/';
 import database from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
@@ -41,6 +41,18 @@ const ChatWindow = ({navigation}) => {
     const onChangeInput = (e , type) => {
         dispatch({type:'SET_MESSAGE', inputType: type, inputValue: e});
     }
+    function leadingzero(num) {
+        var s = num+"";
+        while (s.length < 2) s = "0" + s;
+        return s;
+    }
+    const convertTime = (val) => {
+        const date = new Date(val)
+        const hours = date.getHours();
+        const minutes = leadingzero(date.getMinutes());
+        return hours+':'+minutes
+        
+    }
     const sendMessages = async () => {
         const res = await getmsgid()
         const token = await getReceiverToken(chatState.receiver)
@@ -52,12 +64,21 @@ const ChatWindow = ({navigation}) => {
             timestamp : new Date().getTime(),
             token : token
         }
+        const data1 = {
+            message : chatState.form.message,
+            sender : chatState.sender,
+            receiver : chatState.receiver,
+            timestamp : new Date().getTime(),
+            realtime : convertTime(new Date().getTime()),
+            isRead : false,
+            token : token
+        }
         dispatch({type:'SET_MESSAGE', inputType: 'sender', inputValue: chatState.sender});
         dispatch({type:'SET_MESSAGE', inputType: 'receiver', inputValue: chatState.receiver});
         dispatch({type:'SET_MESSAGE', inputType: 'timestamp', inputValue: new Date().getTime()});
         if( chatState.form.message.length > 0){
             sendMessage(data,res);
-            addChatDatabase(data)
+            addChatDatabase(data1)
             dispatch({type:'SET_MESSAGE', inputType: 'message', inputValue: ''});
         }
         // await getMessage(chatState.userId);
@@ -66,8 +87,8 @@ const ChatWindow = ({navigation}) => {
     const onClickBack = () => {
         navigation.replace('Chat');
     }
-    const [value ,setvalue] = useState('')
     const starter = async () => {
+        await updateRead(chatState.sender, chatState.receiver)
         try{         
         const res = await getmsgid()
         getMessage(res)
@@ -124,7 +145,7 @@ const ChatWindow = ({navigation}) => {
         item.data.sender === chatState.sender ? (
             <Receiver  chatMessage={item.data.message} timestamp={item.data.timestamp}/>
         ): (
-            <Sender img={chatState.profileImg} key={key} chatMessage={item.data.message} timestamp={item.data.timestamp}/>
+            <Sender img={chatState.profileImg} chatMessage={item.data.message} timestamp={item.data.timestamp}/>
         )
       );
     return(

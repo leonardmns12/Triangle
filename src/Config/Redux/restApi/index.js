@@ -188,12 +188,16 @@ export const addChatDatabase = (data) => {
   database().ref('users/' + data.sender + '/chat/' + data.receiver).set({
     friend : data.receiver,
     message : data.message,
-    timestamp : data.timestamp
+    realtime : data.realtime,
+    timestamp : data.timestamp,
+    isRead : true
   })
   database().ref('users/' + data.receiver + '/chat/' + data.sender).set({
     friend : data.sender,
     message : data.message,
-    timestamp : data.timestamp
+    realtime : data.realtime,
+    timestamp : data.timestamp,
+    isRead : data.isRead
   })
 }
 
@@ -237,4 +241,10 @@ export const getDisplayName = (username , type) => {
     return snapshot.val()
   })
   return displayname
+}
+
+export const updateRead = (username , friend) => {
+  database().ref('users/' + username + '/chat/' + friend).update({
+    isRead : true
+  })
 }

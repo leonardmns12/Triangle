@@ -1,22 +1,37 @@
-import React from 'react';
-import { View , TouchableOpacity , StyleSheet , Text } from 'react-native';
+import React, { useEffect , useState } from 'react';
+import { View , TouchableOpacity , StyleSheet , Text, Image } from 'react-native';
+import storage from '@react-native-firebase/storage';
 
-
-const Friendchat = ({navigation , name, textmsg, timestamp}) => {
-
+const Friendchat = ({navigation, profileuri , name, textmsg, realtime ,isRead , funct}) => {
+    // useEffect(()=>{
+    //     convertTime()
+    //     console.log('berubah')
+    // },[timestamp])
+    
+    const [time , setTime] = useState('')
     return(
-        <TouchableOpacity style={[styles.borderlist,{}]}>
-            <View style={[styles.profileimg,{}]}></View>
+        <TouchableOpacity onPress={funct} style={[styles.borderlist,{}]}>  
+            {
+               profileuri.uri === 'undefined' ? (
+                <View style={[styles.profileimg,{}]}></View>
+               ) : (
+                <Image source={profileuri} style = {[styles.profileimg]}/>
+               )
+            }
             <View>
             <Text style={[styles.chatname,{}]}>{name}</Text>
             <Text style={[styles.chatmsg,{}]}>{textmsg}</Text>
             </View>
             <View style={[styles.timestamp,{}]}>
-            <Text style={{fontSize : 10 , fontFamily : 'ITCKRISTEN', color:'#707070' }}>{timestamp}</Text>
-            <Text style={{color:'#00BFA6' , fontSize:12}}>New</Text>
+            <Text style={{fontSize : 10 , fontFamily : 'ITCKRISTEN', color:'#707070' }}>{realtime}</Text>
+            {
+                isRead === false ? (
+                    <Text style={{color:'#00BFA6' , fontSize:12}}>New</Text>
+                ) : null
+            }
+            
             </View>
         </TouchableOpacity>
-
     )
 }
 

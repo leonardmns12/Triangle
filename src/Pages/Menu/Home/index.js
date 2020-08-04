@@ -23,9 +23,13 @@ const Home = ({navigation}) => {
         // cleardispatch()
         
         return () => {
-            unmounting()
+            console.log(mount)
+            if(mount === true){
+                unmounting()
+            }
         }
     },[])
+    const [mount, setmount] = useState(false)
     const unmounting = async () => {
         const username = await AsyncStorage.getItem('username')
         database().ref('users/' + username + '/friend').off()
@@ -169,7 +173,6 @@ const Home = ({navigation}) => {
             </Modal>
             <View style={{flex:1, backgroundColor:'rgba(0,94,97,0.5)' , borderBottomLeftRadius:41, borderBottomRightRadius:41, position:'relative'}}>
               <View style={{position:'relative'}}>
-
                   <View style={[style.addfriend,{width: 40, height: 38}]}>
                       <View style={[,{}]}>
                       <AddFriend onPress={addfriend} width={40} height={38} />
@@ -216,7 +219,7 @@ const Home = ({navigation}) => {
                                    )
                                }
                                if(key === HomeState.friendlist.length - 1 && loading === true){
-                                   setLoading(false)
+                                   setmount(true)
                                }
                                return(
                                    

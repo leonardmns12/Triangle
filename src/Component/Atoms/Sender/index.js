@@ -29,6 +29,7 @@ const Sender = ({navigation, chatMessage , timestamp , img}) => {
     const [time , setTime] = useState('')
     return(
     <Fragment>
+        <Text style={{marginLeft:45,color:'black', fontSize:12}}>{time}</Text>
         <View style={{flexDirection:'row', marginTop:10}}>
                     {
                         img === 'null' ? (
@@ -42,7 +43,7 @@ const Sender = ({navigation, chatMessage , timestamp , img}) => {
                     <Text>{chatMessage}</Text>
                     </View>       
          </View>
-         <Text style={{marginLeft:45,color:'black', fontSize:12}}>{time}</Text>
+         
     </Fragment>
     )
 }

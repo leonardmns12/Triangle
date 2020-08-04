@@ -9,6 +9,7 @@ import Friendchat from '../../../Component/Molekuls/Friendchat/';
 import database from '@react-native-firebase/database';
 import { useSelector, useDispatch } from 'react-redux';
 import { getDisplayName } from '../../../Config/Redux/restApi/';
+import storage from '@react-native-firebase/storage';
 const Chat = ({navigation}) => {
     const gtchat = (screen) => {
         navigation.replace(screen);
@@ -20,15 +21,11 @@ const Chat = ({navigation}) => {
         console.log(AsyncStorage.getItem('username'))
     }
     useEffect(()=>{
-        
         starter()
-
         return () => {
             unmounting() 
         }
     },[])
-    const [allfriend , setallfriend] = useState([])
-    const [friendlist , setfriendlist] = useState([])
     const starter = async () => {
         const username = await AsyncStorage.getItem('username')
         await getChatData(username)
@@ -36,7 +33,18 @@ const Chat = ({navigation}) => {
     }
     const unmounting = async () => {
         const username = await AsyncStorage.getItem('username')
+        dispatch({type:'SET_CHATLIST' , value:chatState.allfriend})
         database().ref('users/' + username + '/chat').off()
+    }
+    const getProfilePicture = async (username) => {
+        const res = await storage()
+        .ref('images/' + username).getDownloadURL()
+        .catch(e => { 
+            return {uri : 'undefined'}
+        })
+        if(res !== undefined){
+            return {uri : res}
+        }
     }
     const getChatData = (username) => {
         const data = database()
@@ -50,19 +58,22 @@ const Chat = ({navigation}) => {
             })
             for(let i = 0;  i < data.length; i++){
                 const displayname = await getDisplayName(data[i].id , 'displayname')
+                const profilepicture = await getProfilePicture(data[i].id)
+                console.log(profilepicture)
                 data[i] = {
                     ...data[i],
-                    displayname : displayname
+                    displayname : displayname,
+                    profilepicture : profilepicture
                 }
 
             }
             // setfriendlist(data)
-            setallfriend(data)
-            dispatch({type:'SET_CHATLIST' , value:data})
+            dispatch({type:'SET_ALLFRIEND' , value:data.sort((a, b) => parseFloat(b.data.timestamp) - parseFloat(a.data.timestamp))})
+            dispatch({type:'SET_CHATLIST' , value:data.sort((a, b) => parseFloat(b.data.timestamp) - parseFloat(a.data.timestamp))})
         })
     }
     const searchUser = (findtext) => {
-        const data = allfriend.filter(i => {
+        const data = chatState.allfriend.filter(i => {
             const itemData = i.displayname.toUpperCase();
             
              const textData = findtext.toUpperCase();
@@ -80,8 +91,12 @@ const Chat = ({navigation}) => {
         
         return text;
     }
-
-
+    const gotochatroom = async (friend) => {
+        const username = await AsyncStorage.getItem('username');
+        dispatch({type: 'SET_RECEIVER' , value:friend})
+        dispatch({type: 'SET_SENDER' , value:username})
+        navigation.navigate('ChatWindow')
+    }
     return(
         <View style={{flex:1}}>
             <View style={[styles.header,{}]}>
@@ -104,7 +119,7 @@ const Chat = ({navigation}) => {
                     chatState.chatlist.map((id, key) => {
                         const msg = removeString(id.data.message)
                         return(
-                        <Friendchat key={key} name={id.displayname} timestamp={"19:00"} textmsg={msg} />
+                        <Friendchat key={key} profileuri={id.profilepicture} funct={()=>{gotochatroom(id.id)}} name={id.displayname} isRead={id.data.isRead} realtime={id.data.realtime} textmsg={msg} />
                         )
                     })
                 }
@@ -118,7 +133,6 @@ const Chat = ({navigation}) => {
         </View>
     )
 }
-
 const styles = StyleSheet.create({
     header : {
         height : 57,
@@ -144,5 +158,4 @@ const styles = StyleSheet.create({
         fontFamily : 'ITCKRISTEN'
     }
 })
-
 export default Chat;

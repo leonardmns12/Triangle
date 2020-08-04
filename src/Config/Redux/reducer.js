@@ -53,7 +53,7 @@ const editprofileState = {
 
 const chatMenuState = {
     chatlist : [],
-    username : ''
+    allfriend : []
 }
 
 const invitationReducer = (state = invitationState, action) => {
@@ -162,6 +162,12 @@ const chatMenuReducer = (state = chatMenuState , action) => {
             chatlist : action.value
         }
     }
+    if(action.type === 'SET_ALLFRIEND'){
+        return{
+            ...state,
+            allfriend : action.value
+        }
+    }
     
     return state;
 }
@@ -217,7 +223,7 @@ const reducer = combineReducers({
     invitationReducer,
     homeReducer,
     editprofileReducer,
-    chatMenuReducer
+    chatMenuReducer,
 })
 
 export default reducer;
