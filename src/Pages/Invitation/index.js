@@ -101,6 +101,10 @@ const Invitation = ({navigation}) => {
       
     
     }
+
+    const gotoFindFriend = () => {
+        navigation.replace('FindFriend')
+    }
     
     const fetchpending = () => {
         
@@ -110,7 +114,7 @@ const Invitation = ({navigation}) => {
         <View style={{flex:1}}>
              <View style={[styles.header,{}]}>
                     <TouchableOpacity style={{paddingLeft:18, paddingTop:11}}> 
-                    <LeftLogo height={33} width={33}></LeftLogo>
+                    <LeftLogo onPress={gotoFindFriend} height={33} width={33}></LeftLogo>
                     </TouchableOpacity>
                     <Text style={[styles.headerText,{}]}>Invitation</Text>
             </View>

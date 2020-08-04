@@ -128,12 +128,16 @@ const FindFriend = ({navigation}) => {
         navigation.navigate('Invitation')
     }
 
+    const gotoHomes = () => {
+        navigation.replace('Home')
+    } 
+
     return(
         <Fragment>
             <View style={{flex:1}}>
                 <View style={[styles.header,{}]}>
                     <TouchableOpacity style={{paddingLeft:18, paddingTop:11}}> 
-                    <LeftLogo height={33} width={33}></LeftLogo>
+                    <LeftLogo onPress={gotoHomes} height={33} width={33}></LeftLogo>
                     </TouchableOpacity>
                     <Text style={[styles.headerText,{}]}>Find Friend</Text>
                     <View  style={{position : 'absolute' , right:'5%', top:'25%'}}>

@@ -6,6 +6,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import Contents from '../../../Component/Molekuls/Timeline';
 import { signOutUser , getUsername , checkPermission } from '../../../Config/Redux/restApi/';
 import { useDispatch , useSelector } from 'react-redux';
+import Home from '../Home';
 
 const Profile = ({navigation}) => {
     const gtchat = (screen) => {
@@ -26,10 +27,10 @@ const Profile = ({navigation}) => {
               <View style={{position:'relative'}}>
                 <View style={{flexDirection:'row', marginTop: 43, marginBottom:7}}>
                     <View style={[style.profileimg ,{}]}></View>
-                    <Text style={[style.profilename, {}]}>Leonard Monosa</Text>
+                    <Text style={[style.profilename, {}]}>{HomeState.displayname}</Text>
                 </View>
                 <View style={{width:220, marginBottom: 50}}>
-                    <Text style={[style.bio , {}]}>Some people being wise by adding more friends.</Text>
+                    <Text style={[style.bio , {}]}>{HomeState.statusmessage}</Text>
                 </View>
                </View>
                <TouchableOpacity onPress={onClickLogout} style={{position: 'relative',marginHorizontal:250, marginVertical:15 ,backgroundColor:'rgb(0,191,166)',width:100, height:27, borderRadius:20 , borderColor:'rgb(0,191,166)' }}>
