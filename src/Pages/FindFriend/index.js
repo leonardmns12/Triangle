@@ -168,10 +168,10 @@ const FindFriend = ({navigation}) => {
                 </View>
             </View>
             <View>
-            <NavigationMenu home="active" gotoChat={()=>{gtchat('Chat')}}
+            {/* <NavigationMenu home="active" gotoChat={()=>{gtchat('Chat')}}
                 gotoTimeline={()=>{gtchat('Timeline')}}
                 gotoProfile={()=>{gtchat('Profile')}}     
-                ></NavigationMenu>
+                ></NavigationMenu> */}
             </View>
         </Fragment>
     )
