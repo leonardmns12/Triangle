@@ -5,10 +5,11 @@ import { ScrollView } from 'react-native-gesture-handler';
 import Invitationlist from '../../Component/Molekuls/Invitationlist/';
 import database from '@react-native-firebase/database';
 import { useDispatch , useSelector } from 'react-redux';
-import { addtofriend , addtofriend1 } from '../../Config/Redux/restApi/';
+import { addtofriend , addtofriend1 ,getId } from '../../Config/Redux/restApi/';
 const Invitation = ({navigation}) => {
     const InvitationState = useSelector(state => state.invitationReducer)
     const dispatch = useDispatch()
+    const[loading , setloading] = useState(false);
     useEffect(() => {
         // getpendinglist('leonardganteng')
        starter()
@@ -44,6 +45,7 @@ const Invitation = ({navigation}) => {
     const getincominglist = (userId) => {
     const dataincoming = database().ref('users/' + userId + '/incomingFriend')
     dataincoming.on('value', function(snapshot){
+        setloading(true)
         const data1 = []
         if(snapshot.val() === null || snapshot.val() === undefined){
             dispatch({type:'SET_INCOMING',  value: data1});
@@ -56,58 +58,40 @@ const Invitation = ({navigation}) => {
             })
         dispatch({type:'SET_INCOMING',  value: data1});
         }
+        setloading(false)
     })
 }
-    function search(nameKey , myArray){
-        for(var i = 0; i < myArray.length; i++){
-            if(myArray[i].data.friend === nameKey){
-                return myArray[i].id;
-            }
-        }
-    }
-    const getId = (username , from , key, types ) => {
-         console.log('users/' + username + '/' + from + '/' + key)
-        const getdata =  database().ref('users/' + username + '/' + from).once('value').then(async function(snapshot){
-            const data1 = []
-            if(snapshot.val() === undefined || snapshot.val() === null){
-              // crid('')
-              // csid('')
-              console.log('kosong ' +from)
-            }
-            else{
-                Object.keys(snapshot.val()).map(key => {
-                    data1.push({
-                        id: key,
-                        data: snapshot.val()[key]
-                    })
-                })
-                    return search(key,data1)
-            }
-        })
-        console.log('getdata = '+getdata)
-        return getdata;
-        
-    }
-
-    const accept = async (e) => {
-        
-        const getSender = await AsyncStorage.getItem('username');
-        const rid = await getId(getSender , 'incomingFriend' , e , 'receiverid') 
-        const sid = await getId( e , 'pendingFriend' , getSender , 'senderid')
-        // )
-        console.log('rid = '+rid)
-        addtofriend(getSender, e ,  sid, rid)
-        addtofriend1(getSender, e ,  sid, rid)  
-      
     
+   
+
+    const accept = async (e,type) => {
+        if(loading === false){
+            setloading(true)
+            const getSender = await AsyncStorage.getItem('username');
+            const rid = await getId(getSender , 'incomingFriend' , e ) 
+            const sid = await getId( e , 'pendingFriend' , getSender)
+            if(type === 'accept'){  
+                await addtofriend(getSender, e ,  sid, rid)
+                await addtofriend1(getSender, e ,  sid, rid) 
+                setloading(false)
+            }
+            if(type === 'decline'){
+                await addtofriend1(getSender, e ,  sid, rid) 
+                setloading(false)
+            }
+            if(type === 'cancelinvite'){
+
+                const ridc = await getId(getSender , 'pendingFriend' , e , 'receiverid') 
+                const sidc = await getId(e , 'incomingFriend' , getSender , 'senderid')
+                await addtofriend1(e, getSender ,  ridc, sidc) 
+                setloading(false)
+            }
+            
+        }
     }
 
     const gotoFindFriend = () => {
         navigation.replace('FindFriend')
-    }
-    
-    const fetchpending = () => {
-        
     }
     
     return(
@@ -125,7 +109,7 @@ const Invitation = ({navigation}) => {
             {
                 InvitationState.listincoming.map((id,key) => {
                     return(
-                        <Invitationlist key={key} name={id.data.friend} visible={"block"} funct={()=>{accept(id.data.friend)}}/>
+                        <Invitationlist decline={()=>{accept(id.data.friend,'decline')}} key={key} name={id.data.friend} visible={"block"} funct={()=>{accept(id.data.friend,'accept')}}/>
                     )
                 }) 
             }
@@ -138,7 +122,7 @@ const Invitation = ({navigation}) => {
               InvitationState.listpending.map((id,key) => {
                 return(
                
-                 <Invitationlist key={key} name={id.data.friend} visible={"none"}/>
+                 <Invitationlist decline={()=>{accept(id.data.friend,'cancelinvite')}} key={key} name={id.data.friend} visible={"none"}/>
                 )
             }) 
             }
@@ -152,7 +136,7 @@ const Invitation = ({navigation}) => {
 const styles = StyleSheet.create({
     header : {
         height : 57,
-        backgroundColor : '#00BFA6',
+        backgroundColor : '#1BB0DF',
         flexDirection : 'row'
     },
     headerText : {

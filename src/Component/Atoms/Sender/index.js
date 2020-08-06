@@ -1,7 +1,10 @@
 import React , { useEffect, Fragment , useState } from 'react';
-import { StyleSheet, Text, View, Image} from 'react-native';
+import { StyleSheet, Text, View, Image , Modal, Animated} from 'react-native';
 import Avatar from '../../../../assets/chatWindow/avatar.svg';
-const Sender = ({navigation, chatMessage , timestamp , img}) => {
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import CloseButton from '../../../../assets/chatWindow/close.svg';
+import { PinchGestureHandler } from 'react-native-gesture-handler'
+const Sender = ({navigation, chatMessage , timestamp , img , photo}) => {
     useEffect(()=>{
         convertTime()
     },[])
@@ -27,6 +30,9 @@ const Sender = ({navigation, chatMessage , timestamp , img}) => {
         
     }
     const [time , setTime] = useState('')
+    const [modal , setmodal] = useState(false)
+    const scale = React.useRef(new Animated.Value(1)).current;
+    const handlePinch = Animated.event([{nativeEvent: {scale}}],{ useNativeDriver: true });
     return(
     <Fragment>
         <Text style={{marginLeft:45,color:'black', fontSize:12}}>{time}</Text>
@@ -38,11 +44,35 @@ const Sender = ({navigation, chatMessage , timestamp , img}) => {
                         <Image source={img} style = {{width: 30, height: 30 , borderRadius: 20}}/>
                         )
                     }
-                    
-                    <View style={[styles.chatText,{position:'relative'}]}>
-                    <Text>{chatMessage}</Text>
-                    </View>       
+                    {
+                        photo !== 'null' ? (
+                            <TouchableOpacity  onPress={()=>{setmodal(true)}}  style={{marginLeft:'5%'}}>
+                            <Image source={photo} style={{width:128 , height:128, borderRadius:20}}/>
+                            </TouchableOpacity>
+                        ) : (
+                            <View style={[styles.chatText,{position:'relative'}]}>
+                            <Text>{chatMessage}</Text>
+                            </View>  
+                        )
+                    }
+                         
          </View>
+         <Modal visible={modal}>
+             <View style={{right:10, top:10, position:'absolute' , height:30 , width:30}}>
+                <CloseButton width={25} height={25} onPress={()=>{setmodal(false)}}  />
+             </View>
+             <View style={{zIndex:-1,justifyContent:'center', alignItems:'center', flex:1 , backgroundColor:'black'}}>
+                
+                {
+                    photo !== 'null' ? (
+                    <PinchGestureHandler onGestureEvent={handlePinch}>
+                    <Animated.Image source={photo} resizeMode={'contain'} style={{width:'100%' , height:'100%'}}/>
+                    </PinchGestureHandler>    
+                    ) : null
+                }
+               
+             </View>
+         </Modal>
          
     </Fragment>
     )
@@ -51,11 +81,13 @@ const Sender = ({navigation, chatMessage , timestamp , img}) => {
 const styles = StyleSheet.create({
     chatText : {
         marginLeft:10,
-        borderRadius:18,
+        borderBottomLeftRadius:18,
+        borderBottomRightRadius:18,
+        borderTopRightRadius:18,
         paddingHorizontal: 15,
         maxWidth: 200,
         fontSize: 16,
-        backgroundColor: '#00BFA6',
+        backgroundColor: '#F6F6F6',
         color : 'black',
         paddingTop: 3,
         paddingBottom:3

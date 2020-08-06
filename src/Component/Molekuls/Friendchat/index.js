@@ -3,17 +3,17 @@ import { View , TouchableOpacity , StyleSheet , Text, Image } from 'react-native
 import storage from '@react-native-firebase/storage';
 
 const Friendchat = ({navigation, profileuri , name, textmsg, realtime ,isRead , funct}) => {
-    // useEffect(()=>{
-    //     convertTime()
-    //     console.log('berubah')
-    // },[timestamp])
+    useEffect(()=>{
+        console.log('uri : ')
+        console.log(profileuri)
+    },[])
     
     const [time , setTime] = useState('')
     return(
         <TouchableOpacity onPress={funct} style={[styles.borderlist,{}]}>  
             {
-               profileuri.uri === 'undefined' ? (
-                <View style={[styles.profileimg,{}]}></View>
+               profileuri.uri.uri === 'undefined' ? (
+                <View style={[styles.profileimg,{}]}></View> 
                ) : (
                 <Image source={profileuri} style = {[styles.profileimg]}/>
                )
@@ -44,8 +44,7 @@ const styles = StyleSheet.create({
         flexDirection : 'row'
     },
     profileimg : {
-        borderWidth : 1,
-        borderColor : '#707070',
+        backgroundColor: 'gray',
         width : 40,
         height : 40,
         borderRadius : 20,

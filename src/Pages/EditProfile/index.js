@@ -85,10 +85,7 @@ const EditProfile = ({navigation}) => {
     const dispatch = useDispatch();
     const state = useSelector(state => state.editprofileReducer)
     const oninputchange = (type , e) => {
-        dispatch({type:'SET_EDITPROFILE' , inputType: type , value : e})
-    }
-    const imgprofile = () => {
-        alert(state.displayname)
+          dispatch({type:'SET_EDITPROFILE' , inputType: type , value : e})
     }
     const saveBtn = async () => {
         const username = await AsyncStorage.getItem('username');
@@ -126,7 +123,7 @@ const EditProfile = ({navigation}) => {
     }
     return(
         <View style={{flex:1}}>
-             <View style={{flex:2, backgroundColor:'rgba(0,94,97,0.5)' , borderBottomLeftRadius:41, borderBottomRightRadius:41, position:'relative'}}>
+             <View style={{flex:2, backgroundColor:'rgba(27,176,233,1)' , borderBottomLeftRadius:41, borderBottomRightRadius:41, position:'relative'}}>
              <View style={{position:'relative'}}>
                 <View style={{flexDirection : 'row', alignItems: 'center', padding: 16, justifyContent : 'space-between'}}>
                     <TouchableOpacity onPress={gotohome} style={{}}>
@@ -152,9 +149,9 @@ const EditProfile = ({navigation}) => {
              <View style={{flex:3}}>
                 <View style={{marginHorizontal:21, marginVertical:35}}>
                         <Text style={{fontSize:14, fontFamily:'ITCKRISTEN'}}>Display Name</Text>
-                        <TextInput onChangeText={(e)=>{oninputchange('displayname', e)}} value={state.displayname} style={{borderBottomWidth:1, height:40, marginBottom:10}}></TextInput>
+                        <TextInput maxLength={22} onChangeText={(e)=>{oninputchange('displayname', e)}} value={state.displayname} style={{borderBottomWidth:1, height:40, marginBottom:10}}></TextInput>
                         <Text style={{fontSize:14, fontFamily:'ITCKRISTEN'}}>Status Message</Text>
-                        <TextInput onChangeText={(e)=>{oninputchange('statusmessage' , e)}} value={state.statusmessage} style={{borderBottomWidth:1, height:40, marginBottom:10}}></TextInput>
+                        <TextInput maxLength={55} onChangeText={(e)=>{oninputchange('statusmessage' , e)}} value={state.statusmessage} style={{borderBottomWidth:1, height:40, marginBottom:10}}></TextInput>
                 </View>
                 
              </View>

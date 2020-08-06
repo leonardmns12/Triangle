@@ -35,10 +35,10 @@ return(
         </View>
             </View> 
         <View style={{}}>
-        <NavigationMenu timeline="active" gotoHome={()=>{gtchat('Home')}}
+        {/* <NavigationMenu timeline="active" gotoHome={()=>{gtchat('Home')}}
             gotoChat={()=>{gtchat('Chat')}}
             gotoProfile={()=>{gtchat('Profile')}}     
-            ></NavigationMenu>
+            ></NavigationMenu> */}
         </View>
     </View>
 )

@@ -9,6 +9,7 @@ const homeState = {
     friendlist : [],
     displayname : '',
     statusmessage : '',
+    profileuri : 'null',
 }
 
 const registerState = {
@@ -32,11 +33,13 @@ const chatWindowState = {
     sender : '',
     receiver : '',
     message : [],
-    profileImg : 'null'
+    profileImg : 'null',
+    downloaduri : ''
 }
 
 const findfriend = {
     name : '',
+    render : false
 }
 
 const invitationState = {
@@ -54,6 +57,27 @@ const editprofileState = {
 const chatMenuState = {
     chatlist : [],
     allfriend : []
+}
+
+const resultFriendState = {
+    displayname : '',
+    profileimg : false
+}
+
+const resultFriendReducer = (state = resultFriendState , action) => {
+    if(action.type === 'SET_RESULTFRIEND'){
+        return{
+            ...state,
+            displayname : action.value
+        }
+    }
+    if(action.type === 'SET_RESULTFRIENDIMG'){
+        return{
+            ...state,
+            profileimg : action.value
+        }
+    }
+    return state;
 }
 
 const invitationReducer = (state = invitationState, action) => {
@@ -124,6 +148,12 @@ const findFriendReducer = (state = findfriend , action) => {
         return{
             ...state,
             name : action.value
+        }
+    }
+    if(action.type === 'SET_RENDER'){
+        return{
+            ...state,
+            render : action.value
         }
     }
     return state;
@@ -212,8 +242,15 @@ const chatReducer = (state = chatWindowState, action) => {
             profileImg : action.value
         }
     }
+    if(action.type === 'SET_DOWNLOADURI'){
+        return{
+            ...state,
+            downloaduri : action.value
+        }
+    }
     return state;
 }
+
 
 const reducer = combineReducers({
     registerReducer ,
@@ -224,6 +261,7 @@ const reducer = combineReducers({
     homeReducer,
     editprofileReducer,
     chatMenuReducer,
+    resultFriendReducer
 })
 
 export default reducer;

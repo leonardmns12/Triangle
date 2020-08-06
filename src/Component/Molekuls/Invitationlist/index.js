@@ -1,10 +1,24 @@
-import React from 'react';
-import { View , Text , TouchableOpacity , StyleSheet , name} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View , Text , TouchableOpacity , StyleSheet , Image} from 'react-native';
+import storage from '@react-native-firebase/storage';
 
-
-
-const Invitationlist = ({navigation , name , visible, funct}) => {
- 
+const Invitationlist = ({navigation , name , visible, funct , decline}) => {
+    useEffect(()=>{
+        getProfileImg(name)
+    },[name])
+    const [profileuri , setprofileuri] = useState(false);
+    const getProfileImg = async (e) => {
+        const res = await storage().ref('images/' + e)
+        .getDownloadURL().catch(f => {
+            console.log('error while fetching profile image ' + f)
+            return false
+        })
+        if(res !== false){
+            setprofileuri({uri:res})
+        }else{
+            setprofileuri(false)
+        }
+    }
     const checkvisible = (visible) => {
         if(visible === 'none'){
         }else{
@@ -17,13 +31,20 @@ const Invitationlist = ({navigation , name , visible, funct}) => {
     }
     return(
         <View style={[styles.borderlist,{marginVertical : 5}]}>
-            <View style={[styles.profileimg,{}]}></View>
+            {
+                profileuri === false ? (
+                    <View style={[styles.profileimg,{}]}></View>
+                ) : (
+                    <View style={{marginTop:5}}><Image source={profileuri} style={{width:35 , height:35, borderRadius:20}}/></View>
+                )
+            }
+            
             <Text style={[styles.proflename,{}]}>{name}</Text>
             <View style={{position : 'absolute', right : 5, flexDirection : 'row', top : '35%'}}>
                 {
                     checkvisible(visible)
                 }
-                <TouchableOpacity style={[styles.actionbutton,{}]}>
+                <TouchableOpacity onPress={decline} style={[styles.actionbutton,{}]}>
                 <View style={[styles.borderaction,{}]}>
                 <Text style={[styles.actiontext,{backgroundColor : '#CE5454'}]}>Decline</Text>
                 </View>
@@ -36,8 +57,6 @@ const Invitationlist = ({navigation , name , visible, funct}) => {
 
 const styles = StyleSheet.create({
     borderlist : {
-        borderWidth : 1,
-        borderColor : '#707070',
         width : 300,
         borderRadius : 31,
         height : 50,

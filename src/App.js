@@ -1,7 +1,7 @@
 
 import React , { Component } from 'react';
 import {NavigationContainer} from '@react-navigation/native';
-import _ from 'lodash';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
   StyleSheet,
   ScrollView,
@@ -16,12 +16,13 @@ import Router from './Router';
 import { Provider } from 'react-redux';
 import { store } from './Config/Redux/'; 
 
+
 export default class App extends Component{
   render(){
     return(
     <Provider store={store}>
       <NavigationContainer>
-        <Router/>
+      <Router/> 
       </NavigationContainer>
     </Provider>     
 

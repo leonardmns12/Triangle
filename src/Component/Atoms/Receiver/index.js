@@ -1,7 +1,7 @@
 import React , { Fragment , useEffect, useState } from 'react';
-import { StyleSheet, Text, View} from 'react-native';
-
-const Receiver = ({navigation,chatMessage,timestamp}) => {
+import { StyleSheet, Text, View , Image , TouchableOpacity , Modal} from 'react-native';
+import CloseButton from '../../../../assets/chatWindow/close.svg';
+const Receiver = ({navigation,chatMessage,timestamp,img}) => {
     useEffect(()=>{
         convertTime()
     },[])
@@ -28,25 +28,52 @@ const Receiver = ({navigation,chatMessage,timestamp}) => {
         
     }
     const [time , setTime] = useState('')
+    const [modal , setmodal] = useState(false)
     return(
     <Fragment>
-        <View style={{ alignItems:'flex-end', marginBottom:'4%'}}>
-                <Text style={[styles.receiverText,{}]}>{chatMessage}</Text>
-                <Text style={{fontSize:12,marginRight:5}}>{time}</Text>
-        </View>
-        
+        {
+            img !== 'null' ? (
+                <View style={{alignItems:'flex-end'}}>
+                <TouchableOpacity onPress={()=>{setmodal(true)}}  style={{marginBottom:'4%'}}>
+                   <Image  source={img} style = {{width: 128 , height:128, borderRadius:20}}/>
+                </TouchableOpacity> 
+                </View>
+            ) : (
+                <View style={{ alignItems:'flex-end', marginBottom:'4%'}}>
+                    <Text style={[styles.receiverText,{}]}>{chatMessage}</Text>
+                    <Text style={{fontSize:12,marginRight:5}}>{time}</Text>
+                </View>
+            )
+        }
+        <Modal
+        visible={modal}
+        >
+            <View style={{right:10, top:10, position:'absolute' , height:30 , width:30}}>
+            <CloseButton width={25} height={25} onPress={()=>{setmodal(false)}}  />
+            </View>
+            <View style={{zIndex:-1,justifyContent:'center', alignItems:'center', flex:1 , backgroundColor:'black'}}>
+            
+            {
+                img !== 'null' ? (
+                <Image source={img} resizeMode={'contain'} style={{width:'100%' , height:'100%'}}/> 
+                ) : null
+            }
+            
+            </View>
+        </Modal>
     </Fragment>
     )
 }
 
 const styles = StyleSheet.create({
     receiverText : {
-        backgroundColor:'#00BFA6', 
+        backgroundColor:'#1492E6', 
         maxWidth: 200,
+        color: '#FFFFFF',
         borderRadius:18,
         paddingHorizontal: 15,
         paddingTop: 3,
-        paddingBottom: 3,
+        paddingBottom:3,
         minHeight:30
     }
 })

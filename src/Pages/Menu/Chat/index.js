@@ -46,30 +46,37 @@ const Chat = ({navigation}) => {
             return {uri : res}
         }
     }
+    const addfriend = () => {
+        navigation.navigate('FindFriend');
+    }
     const getChatData = (username) => {
         const data = database()
         .ref('users/' + username + '/chat').on('value' ,async function(snapshot){
-            const data = []
-            Object.keys(snapshot.val()).map(key => {
-                data.push({
-                    id: key,
-                    data: snapshot.val()[key],
-                    })
-            })
-            for(let i = 0;  i < data.length; i++){
-                const displayname = await getDisplayName(data[i].id , 'displayname')
-                const profilepicture = await getProfilePicture(data[i].id)
-                console.log(profilepicture)
-                data[i] = {
-                    ...data[i],
-                    displayname : displayname,
-                    profilepicture : profilepicture
-                }
+            if(snapshot.val() === null || snapshot.val() === undefined){
 
-            }
-            // setfriendlist(data)
+            }else{
+                const data = []
+                Object.keys(snapshot.val()).map(key => {
+                    data.push({
+                        id: key,
+                        data: snapshot.val()[key],
+                        })
+                })
+                for(let i = 0;  i < data.length; i++){
+                    const displayname = await getDisplayName(data[i].id , 'displayname')
+                    const profilepicture = await getProfilePicture(data[i].id)
+                    console.log(profilepicture)
+                    data[i] = {
+                        ...data[i],
+                        displayname : displayname,
+                        profilepicture : profilepicture
+                    }
+    
+                }
             dispatch({type:'SET_ALLFRIEND' , value:data.sort((a, b) => parseFloat(b.data.timestamp) - parseFloat(a.data.timestamp))})
             dispatch({type:'SET_CHATLIST' , value:data.sort((a, b) => parseFloat(b.data.timestamp) - parseFloat(a.data.timestamp))})
+            }
+            // setfriendlist(data)     
         })
     }
     const searchUser = (findtext) => {
@@ -103,20 +110,21 @@ const Chat = ({navigation}) => {
                 <TouchableOpacity style={{paddingLeft:18, paddingTop:11}}> 
                 <LeftLogo height={33} width={33}></LeftLogo>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={gotoFindUser} style={{position:'absolute' , right:'3%', top:'8%'}}>
+                <TouchableOpacity onPress={addfriend} style={{position:'absolute' , right:'3%', top:'8%'}}>
                 <Addfriend height={40} width={38}></Addfriend>
                 </TouchableOpacity>
                 <Text style={[styles.headerText,{}]}>Chat</Text>
             </View>
-                <View style={{ backgroundColor:'white'}}>
-                <View style={{position:'absolute', marginVertical:20, marginLeft: 25}}>
+                <View style={{ backgroundColor:'white', paddingHorizontal:'5%'}}>
+                {/* <View style={{marginVertical:20, marginLeft: 25}}>
                 <Magnifier height={23} width={23} />
-                </View>
-                <TextInput onChangeText={(e)=>{searchUser(e)}} placeholder="Search Friends" style={[styles.input ,{}]}></TextInput>
+                </View> */}
+                <TextInput elevation={5} onChangeText={(e)=>{searchUser(e)}} placeholder="Search Friends" style={[styles.input ,{}]}></TextInput>
                 </View>
             <ScrollView style={{flex: 1, backgroundColor:'#FFFFFF'}}>
                 {
                     chatState.chatlist.map((id, key) => {
+                        console.log(id.profilepicture)
                         const msg = removeString(id.data.message)
                         return(
                         <Friendchat key={key} profileuri={id.profilepicture} funct={()=>{gotochatroom(id.id)}} name={id.displayname} isRead={id.data.isRead} realtime={id.data.realtime} textmsg={msg} />
@@ -125,10 +133,10 @@ const Chat = ({navigation}) => {
                 }
             </ScrollView>
             <View style={{}}>
-            <NavigationMenu chat="active" gotoHome={()=>{gtchat('Home')}}
+            {/* <NavigationMenu chat="active" gotoHome={()=>{gtchat('Home')}}
                 gotoTimeline={()=>{gtchat('Timeline')}}
                 gotoProfile={()=>{gtchat('Profile')}}     
-                ></NavigationMenu>
+                ></NavigationMenu> */}
             </View>
         </View>
     )
@@ -136,7 +144,7 @@ const Chat = ({navigation}) => {
 const styles = StyleSheet.create({
     header : {
         height : 57,
-        backgroundColor : '#00BFA6',
+        backgroundColor : '#1BB0DF',
         flexDirection : 'row'
     },
     headerText : {
@@ -147,15 +155,23 @@ const styles = StyleSheet.create({
         marginLeft: 20
     },
     input : {
-        borderWidth : 1,
+        shadowColor: "black",
+        shadowOpacity: 0.8,
+        shadowRadius: 0.5,
+        shadowOffset: {
+          height: 1,
+          width: 0,
+        },
+        backgroundColor: 'white',
         borderColor : '#707070',
         height:40,
-        width:340,
+        width:'95%',
         marginHorizontal: 10,
         borderRadius : 17,
         marginVertical : 13,
         paddingLeft : 50,
-        fontFamily : 'ITCKRISTEN'
+        fontFamily : 'ITCKRISTEN',
+        zIndex:-1
     }
 })
 export default Chat;

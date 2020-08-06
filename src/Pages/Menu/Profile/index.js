@@ -1,5 +1,5 @@
 import React from 'react';
-import { View , Text, StyleSheet, ScrollView} from 'react-native';
+import { View , Text, StyleSheet, ScrollView  , Alert, BackHandler} from 'react-native';
 import { simpanData } from '../../../Config/Redux/restApi/';
 import NavigationMenu from '../../../Component/Molekuls/NavigationMenu/';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -15,10 +15,17 @@ const Profile = ({navigation}) => {
     const HomeState = useSelector(state => state.homeReducer)
     const dispatch = useDispatch();
     const onClickLogout = async () => {
-        
+        dispatch({type:'SET_ALLFRIEND' , value:[]})
+        dispatch({type:'SET_CHATLIST' , value:[]})
         dispatch({type:'SET_HOMEFRIEND',  value: []});
         const res = await signOutUser();
-        navigation.replace('Login');
+        Alert.alert(
+            'Logout',
+            'You need to restart apps to login back',
+            [
+              {text: 'OK', onPress: () => BackHandler.exitApp()},
+            ]
+        );
     }
 
     return(
@@ -50,10 +57,10 @@ const Profile = ({navigation}) => {
         </ScrollView>
             </View>
             <View style={{}}>
-            <NavigationMenu profile="active" gotoHome={()=>{gtchat('Home')}}
+            {/* <NavigationMenu profile="active" gotoHome={()=>{gtchat('Home')}}
                 gotoTimeline={()=>{gtchat('Timeline')}}
                 gotoChat={()=>{gtchat('Chat')}}     
-                ></NavigationMenu>
+                ></NavigationMenu> */}
             </View>
         </View>
     )

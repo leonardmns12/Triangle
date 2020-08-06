@@ -3,7 +3,7 @@ import { View , Text, ScrollView, StyleSheet, AsyncStorage , ActivityIndicator, 
 import NavigationMenu from '../../../Component/Molekuls/NavigationMenu/';
 import Friendlist from '../../../Component/Molekuls/Friendlist/';
 import { Button } from '../../../Component/';
-import { signOutUser , getUsername , checkPermission, getDisplayName } from '../../../Config/Redux/restApi/';
+import { signOutUser , getUsername , checkPermission, getDisplayName , removeFriends , getId} from '../../../Config/Redux/restApi/';
 import AddFriend from '../../../../assets/Home/addfriend.svg';
 import Magnifier from '../../../../assets/Home/magnifier.svg';
 import database from '@react-native-firebase/database';
@@ -13,6 +13,7 @@ import LeftLogo from '../../../../assets/chatWindow/left.svg';
 import UserLogo from '../../../../assets/popupprofile/user.svg';
 import BlockLogo from '../../../../assets/block.svg';
 import ChatLogo from '../../../../assets/chat.svg';
+import { StackActions , NavigationAction } from '@react-navigation/native';
 
 const Home = ({navigation}) => {
     useEffect(()=>{
@@ -21,7 +22,6 @@ const Home = ({navigation}) => {
         BackHandler.addEventListener('hardwareBackPress', cleardispatch);
         _retrieveUsername();
         // cleardispatch()
-        
         return () => {
             console.log(mount)
             if(mount === true){
@@ -40,6 +40,16 @@ const Home = ({navigation}) => {
     }
     const ShowProfile = async () => {
         const username = await AsyncStorage.getItem('username');
+        const uri = await storage().ref('images/'+ username)
+        .getDownloadURL().catch(e => {
+            console.log('user doesnt have profile picture')
+            return false
+        })
+        if(uri !== false){
+            dispatch({type:'SET_SHOWPROFILE' , tipe:'profileuri', value:{uri:uri}})
+        }else{
+            dispatch({type:'SET_SHOWPROFILE' , tipe:'profileuri', value: 'null'})
+        }
         const dn = await getDisplayName(username, 'displayname')
         const sm = await getDisplayName(username , 'statusmessage')
         dispatch({type:'SET_SHOWPROFILE' , tipe:'displayname', value: dn})
@@ -54,9 +64,8 @@ const Home = ({navigation}) => {
     dataFriend.on('value',async function(snapshot){
       const data = []
       if(snapshot.val() === null || snapshot.val() === undefined){
-        
+        dispatch({type:'SET_HOMEFRIEND',  value: data});
       }else{
-        
           Object.keys(snapshot.val()).map(key => {
             data.push({
                 id: key,
@@ -99,7 +108,7 @@ const Home = ({navigation}) => {
         alert('search');
     }
     const addfriend = () => {
-        navigation.navigate('FindFriend');
+        navigation.navigate('FindFriend')
     }
     const gotochatroom = async (friend) => {
         const username = await AsyncStorage.getItem('username');
@@ -122,6 +131,36 @@ const Home = ({navigation}) => {
     }
     const gotoProfile = (e) => {
         alert(e)
+    }
+    // function getHash(input){
+    //     var hash = 0, len = input.length;
+    //     for (var i = 0; i < len; i++) {
+    //       hash  = ((hash << 5) - hash) + input.charCodeAt(i);
+    //       hash |= 0; // to 32bit integer
+    //     }
+    //     return hash;
+    //   }
+    // const [imageUri , setimageuri] = useState('')
+    // const getmsgid = (usera , userb) => {
+    //     if(getHash(usera) > getHash(userb)){
+    //         return usera.concat(userb)
+    //     }else{
+    //         return userb.concat(usera)
+    //     }
+    // }
+    const removeFriend = async (friend) => {
+        const username = await AsyncStorage.getItem('username')
+        const friendid = await getId(friend , 'friend' , username)
+        const userid = await getId(username , 'friend' , friend)
+        await removeFriends(username,friend,userid,friendid)
+        // const msgid = getmsgid(username,friend)
+        //future update , delete chat message , and stored image
+        // await storage().ref('message/images/' +msgid +'/').delete().then(()=>{
+        //     console.log('all storage deleted!')
+        // }).catch(e => {
+        //     console.log('cannot delete from storage => ' +e)
+        // })
+        setModalVisible(false)
     }
     const [modalName , setModalName] = useState('')
     const [modalVisible , setModalVisible] = useState(false)
@@ -159,11 +198,11 @@ const Home = ({navigation}) => {
                                     <ChatLogo width={18} height={18}/>
                                     <Text style={{fontSize:8}}>Chat</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={()=>{gotoProfile(modalUri.uri)}} style={{backgroundColor:'#F3F3F3', flex:1,height:40, borderColor:'#777777', borderWidth:1, justifyContent:'center', alignItems:'center'}}>
+                                <TouchableOpacity onPress={()=>{gotoProfile(modalUsername)}} style={{backgroundColor:'#F3F3F3', flex:1,height:40, borderColor:'#777777', borderWidth:1, justifyContent:'center', alignItems:'center'}}>
                                     <UserLogo width={18} height={18}/>
                                     <Text style={{fontSize:8}}>Profile</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={{backgroundColor:'#F3F3F3', flex:1, height:40, borderBottomRightRadius:8, borderColor:'#777777', borderWidth:1, justifyContent:'center', alignItems:'center'}}>
+                                <TouchableOpacity onPress={()=>{removeFriend(modalUsername)}} style={{backgroundColor:'#F3F3F3', flex:1, height:40, borderBottomRightRadius:8, borderColor:'#777777', borderWidth:1, justifyContent:'center', alignItems:'center'}}>
                                     <BlockLogo width={18} height={18}/>
                                     <Text style={{fontSize:8}}>Remove Friend</Text>
                                 </TouchableOpacity>
@@ -171,7 +210,7 @@ const Home = ({navigation}) => {
                     </View>     
                 </View> 
             </Modal>
-            <View style={{flex:1, backgroundColor:'rgba(0,94,97,0.5)' , borderBottomLeftRadius:41, borderBottomRightRadius:41, position:'relative'}}>
+            <View style={{flex:1, backgroundColor:'rgba(27,176,233,1)', borderBottomLeftRadius:41, borderBottomRightRadius:41, position:'relative',}}>
               <View style={{position:'relative'}}>
                   <View style={[style.addfriend,{width: 40, height: 38}]}>
                       <View style={[,{}]}>
@@ -179,15 +218,22 @@ const Home = ({navigation}) => {
                       </View>
                   </View>
                 <View style={{flexDirection:'row', marginTop: 43, marginBottom:7}}>
-                    <View style={[style.profileimg ,{}]}></View>
+                    
+                    {
+                        HomeState.profileuri === 'null' ? (
+                            <View style={[style.profileimg ,{}]}></View>   
+                        ) :  (
+                            <Image source={HomeState.profileuri} style={{width:50, height:50, borderRadius:100 , marginLeft:12}}/> 
+                        )
+                    }
                     <Text style={[style.profilename, {}]}>{HomeState.displayname}</Text>
                 </View>
                 <View style={{width:220, marginBottom: 50}}>
                     <Text style={[style.bio , {}]}>{HomeState.statusmessage}</Text>
                 </View>
                </View>
-            <TouchableOpacity onPress={editProfile} style={{backgroundColor:'rgb(0,191,166)',width:339, height:27, marginHorizontal:10, borderWidth:1 , borderColor:'#707070'}}>
-            <Text style={{color:'white', fontSize:13, textAlign:'center', marginTop:3}}>
+            <TouchableOpacity onPress={editProfile} style={{justifyContent:'center',position:'absolute',bottom:0,backgroundColor:'rgb(0,194,255)',borderBottomLeftRadius:41, borderBottomRightRadius:41,width:'100%', height:50}}>
+            <Text style={{color:'white', fontSize:16, textAlign:'center', marginTop:3}}>
             Edit Profile
             </Text>
             </TouchableOpacity>
@@ -236,10 +282,10 @@ const Home = ({navigation}) => {
                 <ActivityIndicator animating={loading}/>
             </ScrollView>
             </View>
-            <NavigationMenu home="active" gotoChat={()=>{gtchat('Chat')}}
+            {/* <NavigationMenu home="active" gotoChat={()=>{gtchat('Chat')}}
                 gotoTimeline={()=>{gtchat('Timeline')}}
                 gotoProfile={()=>{gtchat('Profile')}}     
-            ></NavigationMenu>
+            ></NavigationMenu> */}
         </View>
     )
 }

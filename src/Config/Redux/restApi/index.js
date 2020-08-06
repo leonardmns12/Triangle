@@ -90,7 +90,28 @@ export const createNewUser = (data) => {
       reject(false);
     })
   }
-
+  export const checkfriend = (username , namekey) => {
+    const friend = database().ref('users/' + username + '/friend')
+    .once('value').then(function(snapshot){
+        if(snapshot.val() === null || snapshot.val() === undefined){
+        }else{
+          const data = []
+          Object.keys(snapshot.val()).map(key => {
+            data.push({
+                id: key,
+                data: snapshot.val()[key]
+            })
+          })
+          const res = search(namekey,data)
+          if(res){
+            return true
+          }else{
+            return false
+          }
+        }
+    })
+    return friend
+  }
   function search(nameKey , myArray){
     for(var i = 0; i < myArray.length; i++){
         if(myArray[i].data.friend === nameKey){
@@ -111,6 +132,36 @@ export const createNewUser = (data) => {
     console.log('users/' + sender + '/pendingFriend/' + receiverid)
     database().ref('users/' + receiver + '/incomingFriend/' + senderid).remove()
     database().ref('users/' + sender + '/pendingFriend/' + receiverid).remove()
+  }
+
+  export const removeFriends = (usera , userb , ida, idb) => {
+    console.log('users/' + usera + '/friend/' + ida)
+    console.log('users/' + userb + '/friend/' + idb)
+    database().ref('users/' + usera + '/friend/' + ida).remove()
+    database().ref('users/' + userb + '/friend/' + idb).remove()
+  }
+
+  export const checkIncoming = (username , namekey) => {
+    const incoming = database().ref('users/' + username + '/incomingFriend')
+    .once('value').then(function(snapshot){
+      if(snapshot.val() === null || snapshot.val() === undefined){
+      }else{
+        const data = []
+        Object.keys(snapshot.val()).map(key => {
+          data.push({
+              id: key,
+              data: snapshot.val()[key]
+          })
+        })
+        const res = search(namekey,data)
+        if(res){
+          return true
+        }else{
+          return false
+        }
+      }
+    })
+    return incoming
   }
 
   export const checkPending = (username , namekey) => {
@@ -154,7 +205,9 @@ export const createNewUser = (data) => {
           receiver: data.receiver,
           message : data.message,
           timestamp : data.timestamp,
-          token : data.token
+          token : data.token,
+          image : data.image,
+          downloaduri : data.downloaduri
         });
   }
 
@@ -247,4 +300,34 @@ export const updateRead = (username , friend) => {
   database().ref('users/' + username + '/chat/' + friend).update({
     isRead : true
   })
+}
+function search2(nameKey , myArray){
+  for(var i = 0; i < myArray.length; i++){
+      if(myArray[i].data.friend === nameKey){
+          return myArray[i].id;
+      }
+  }
+}
+export const getId = (username , from , key ) => {
+  console.log('users/' + username + '/' + from + '/' + key)
+ const getdata =  database().ref('users/' + username + '/' + from).once('value').then(async function(snapshot){
+     const data1 = []
+     if(snapshot.val() === undefined || snapshot.val() === null){
+       // crid('')
+       // csid('')
+       console.log('kosong ' +from)
+     }
+     else{
+         Object.keys(snapshot.val()).map(key => {
+             data1.push({
+                 id: key,
+                 data: snapshot.val()[key]
+             })
+         })
+             return search2(key,data1)
+     }
+ })
+ console.log('getdata = '+getdata)
+ return getdata;
+ 
 }
