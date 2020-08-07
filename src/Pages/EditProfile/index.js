@@ -21,6 +21,14 @@ const EditProfile = ({navigation}) => {
     },[mounting])
     const starter = async () => {
       const username = await AsyncStorage.getItem('username');
+      try{ 
+      const async_displayname = await AsyncStorage.getItem('displayname');
+      const async_statusmsg = await AsyncStorage.getItem('statusmsg');
+      dispatch({type: 'SET_EDITPROFILE' , inputType : 'displayname' , value:async_displayname})
+      dispatch({type: 'SET_EDITPROFILE' , inputType : 'statusmessage' , value:async_statusmsg})
+      }catch{
+        console.log('error retrieving data')
+      }  
       getDisplayName(username)
       getStatusMessage(username)
       const uri = await storage()
@@ -40,12 +48,14 @@ const EditProfile = ({navigation}) => {
       const displaydata = database().ref('users/' + username + '/displayname/displayname')
       .once('value').then(async function(snapshot){
         dispatch({type: 'SET_EDITPROFILE' , inputType : 'displayname' , value:snapshot.val()})
+        await AsyncStorage.setItem('displayname' , snapshot.val())
       })
     }
     const getStatusMessage = (username) => {
       const displayMessage = database().ref('users/' + username + '/statusmessage/statusmessage')
       .once('value').then(async function(snapshot){
         dispatch({type: 'SET_EDITPROFILE' , inputType : 'statusmessage' , value:snapshot.val()})
+        await AsyncStorage.setItem('statusmessage' , snapshot.val())
       })
     }
     const chooseFile = () => {

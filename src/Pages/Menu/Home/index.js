@@ -23,7 +23,7 @@ const Home = ({navigation}) => {
         _retrieveUsername();
         // cleardispatch()
         return () => {
-            console.log(mount)
+            console.log('exit')
             if(mount === true){
                 unmounting()
             }
@@ -39,6 +39,18 @@ const Home = ({navigation}) => {
         dispatch({type:'SET_LISTMSG' , value:data})
     }
     const ShowProfile = async () => {
+        try{
+            const async_profileuri = await AsyncStorage.getItem('profileuri')
+            if(async_profileuri !== null){
+                dispatch({type:'SET_SHOWPROFILE' , tipe:'profileuri', value:{uri:async_profileuri}})
+            }
+            const async_displayname = await AsyncStorage.getItem('displayname')
+            const async_statusmsg = await AsyncStorage.getItem('statusmsg')
+            if(async_statusmsg !== null) dispatch({type:'SET_SHOWPROFILE' , tipe:'statusmessage', value: async_statusmsg})
+            if(async_displayname !== null) dispatch({type:'SET_SHOWPROFILE' , tipe:'displayname', value: async_displayname})
+        }catch{
+            console.log('data not found in storage')
+        }
         const username = await AsyncStorage.getItem('username');
         const uri = await storage().ref('images/'+ username)
         .getDownloadURL().catch(e => {
@@ -47,6 +59,7 @@ const Home = ({navigation}) => {
         })
         if(uri !== false){
             dispatch({type:'SET_SHOWPROFILE' , tipe:'profileuri', value:{uri:uri}})
+            await AsyncStorage.setItem('profileuri', uri)
         }else{
             dispatch({type:'SET_SHOWPROFILE' , tipe:'profileuri', value: 'null'})
         }
@@ -54,6 +67,8 @@ const Home = ({navigation}) => {
         const sm = await getDisplayName(username , 'statusmessage')
         dispatch({type:'SET_SHOWPROFILE' , tipe:'displayname', value: dn})
         dispatch({type:'SET_SHOWPROFILE' , tipe:'statusmessage', value: sm})
+        await AsyncStorage.setItem('displayname' , dn)
+        await AsyncStorage.setItem('statusmsg' , sm)
     }
     const [profileImg , setProfileImg] = useState('')
     const [loading , setLoading] = useState(false);
@@ -84,11 +99,22 @@ const Home = ({navigation}) => {
                 }
             }
             dispatch({type:'SET_HOMEFRIEND',  value: data});
+            await AsyncStorage.setItem(
+                'friendlist',JSON.stringify(data)
+            )
         }
     })
     }
     const _retrieveUsername = async () => {
-            
+            try{
+                const async_friendlist = await AsyncStorage.getItem('friendlist');
+                if(async_friendlist !== null){
+                    dispatch({type:'SET_HOMEFRIEND',  value: JSON.parse(async_friendlist)});
+                }
+                
+            }catch{
+                console.log('no data found!')
+            }
             const value = await AsyncStorage.getItem('username');
             if (value !== null) {
             //   alert(value)

@@ -28,6 +28,10 @@ const Chat = ({navigation}) => {
     },[])
     const starter = async () => {
         const username = await AsyncStorage.getItem('username')
+        const async_chatlist = await AsyncStorage.getItem('chatlist')
+        if(async_chatlist !== null){
+        dispatch({type:'SET_CHATLIST' , value:JSON.parse(async_chatlist)})
+        }
         await getChatData(username)
         
     }
@@ -71,10 +75,10 @@ const Chat = ({navigation}) => {
                         displayname : displayname,
                         profilepicture : profilepicture
                     }
-    
                 }
             dispatch({type:'SET_ALLFRIEND' , value:data.sort((a, b) => parseFloat(b.data.timestamp) - parseFloat(a.data.timestamp))})
             dispatch({type:'SET_CHATLIST' , value:data.sort((a, b) => parseFloat(b.data.timestamp) - parseFloat(a.data.timestamp))})
+            await AsyncStorage.setItem('chatlist', JSON.stringify(data.sort((a, b) => parseFloat(b.data.timestamp) - parseFloat(a.data.timestamp))))
             }
             // setfriendlist(data)     
         })
