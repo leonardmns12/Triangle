@@ -2,14 +2,24 @@
 import React , { Component } from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import messaging from '@react-native-firebase/messaging';
+
+messaging().setBackgroundMessageHandler(async remoteMessage => {
+  console.log('Message handled in the background!', remoteMessage);
+});
+
+
+function HeadlessCheck({ isHeadless }) {
+  if (isHeadless) {
+    // App has been launched in the background by iOS, ignore
+    return null;
+  }
+
+  return <App />;
+}
+
 import {
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Image
+  AppRegistry
 } from 'react-native';
 
 import Router from './Router';
@@ -30,7 +40,5 @@ export default class App extends Component{
   }
 }
 
-const styles = StyleSheet.create({
- 
-});
+AppRegistry.registerComponent('app', () => HeadlessCheck);
 
