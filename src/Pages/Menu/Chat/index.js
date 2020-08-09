@@ -85,15 +85,6 @@ const Chat = ({navigation}) => {
             // setfriendlist(data)     
         })
     }
-    const removeString = (text) => {
-        if(text.length >= 12) {
-            const res = text.substring(0, 12);
-            const text2 = ' . . .'
-            return res.concat(text2);
-        }
-        
-        return text;
-    }
     const gotochatroom = async (friend) => {
         const username = await AsyncStorage.getItem('username');
         dispatch({type: 'SET_RECEIVER' , value:friend})
@@ -105,10 +96,8 @@ const Chat = ({navigation}) => {
         await deleteChatlist(username , friend)
     }
     const renderItem = ({item}) => {
-        const msg = removeString(item.data.message)
-        console.log(item.displayname)
         return(  
-        <Friendchat onPress={()=>{deletechatlist(item.id)}} profileuri={item.profilepicture} funct={()=>{gotochatroom(item.id)}} name={item.displayname} isRead={item.data.isRead} realtime={item.data.realtime} textmsg={msg} />
+            <Friendchat onPress={()=>{deletechatlist(item.id)}} profileuri={item.profilepicture} funct={()=>{gotochatroom(item.id)}} name={item.displayname} isRead={item.data.isRead} realtime={item.data.realtime} textmsg={item.data.message} />
         )
     }
     const searchUser = (findtext) => {

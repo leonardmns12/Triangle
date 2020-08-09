@@ -8,6 +8,16 @@ const Friendchat = ({navigation, profileuri , name, textmsg, realtime ,isRead , 
         console.log('uri : ')
         console.log(profileuri)
     },[])
+    const [msg , setmsg] = useState('')
+    const removeString = (text) => {
+        if(text !== undefined && text.length > 12){
+            const res = text.substring(0, 12);
+            const text2 = ' . . .'
+            return res.concat(text2);
+            
+        }
+        return text;
+    }
     const RightAction = (progress ,dragX) => {
         const scale = dragX.interpolate({
             inputRange: [-100, 0],
@@ -36,7 +46,7 @@ const Friendchat = ({navigation, profileuri , name, textmsg, realtime ,isRead , 
                 }
                 <View>
                 <Text style={[styles.chatname,{}]}>{name}</Text>
-                <Text style={[styles.chatmsg,{}]}>{textmsg}</Text>
+                <Text style={[styles.chatmsg,{}]}>{removeString(textmsg)}</Text>
                 </View>
                 <View style={[styles.timestamp,{}]}>
                 <Text style={{fontSize : 10 , fontFamily : 'ITCKRISTEN', color:'#707070' }}>{realtime}</Text>

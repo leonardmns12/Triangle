@@ -72,9 +72,10 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         borderRadius:18,
         paddingHorizontal: 15,
-        paddingTop: 3,
-        paddingBottom:3,
-        minHeight:30
+        paddingTop: '2%',
+        paddingBottom:'3%',
+        minHeight:30,
+        fontFamily : 'HelveticaMedium',
     }
 })
 export default Receiver;

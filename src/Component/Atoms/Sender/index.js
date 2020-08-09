@@ -51,7 +51,7 @@ const Sender = ({navigation, chatMessage , timestamp , img , photo}) => {
                             </TouchableOpacity>
                         ) : (
                             <View style={[styles.chatText,{position:'relative'}]}>
-                            <Text>{chatMessage}</Text>
+                            <Text style={{fontFamily : 'HelveticaMedium'}}>{chatMessage}</Text>
                             </View>  
                         )
                     }
@@ -89,8 +89,8 @@ const styles = StyleSheet.create({
         fontSize: 16,
         backgroundColor: '#F6F6F6',
         color : 'black',
-        paddingTop: 3,
-        paddingBottom:3
+        paddingTop: '2%',
+        paddingBottom: '2%'
     }
 })
 
