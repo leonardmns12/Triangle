@@ -153,11 +153,13 @@ const FindFriend = ({navigation}) => {
                         <View style={{borderWidth:1, height: 22, width:22 , borderRadius: 100, backgroundColor: '#1BB0DF'}}></View>
                         <Text style={{marginLeft:7}}>ID</Text>
                     </View>
-                    <View style={{marginHorizontal:'10%', flexDirection: 'row'}}>
-                    <TextInput style={[styles.input,{}]} value={id} placeholder="Enter your friend's ID" onChangeText={ (e) => {onChange(e)} }></TextInput>
-                    <TouchableOpacity onPress={onClickSearch} style={{borderWidth:1, width: 44, height: 36, backgroundColor:'#FFFFFF', alignItems: 'center' , justifyContent: 'center'}}>
+                    <View style={[styles.input,{marginHorizontal:'10%', flexDirection: 'row'}]}>
+                    <TextInput style={[]} value={id} placeholder="Enter your friend's ID" onChangeText={ (e) => {onChange(e)} }></TextInput>
+                    <View style={{position:'absolute' , right : 5}}>
+                    <TouchableOpacity onPress={onClickSearch} style={{width: 44, height: 36, backgroundColor:'#FFFFFF', alignItems: 'center' , justifyContent: 'center'}}>
                     <Search height={25} width={25}></Search>
                     </TouchableOpacity>
+                    </View>
                     </View>
                     <ActivityIndicator size={'large'} animating={loading} />
                     {
@@ -191,9 +193,17 @@ const styles = StyleSheet.create({
         marginLeft: 20
     },
     input : {
-        borderWidth : 1,
+        shadowColor : 'black',
+        shadowOpacity: 0.1,
+        shadowRadius: 0.5,
+        shadowOffset: {
+          height: 1,
+          width: 0,
+        },
+        backgroundColor: 'white',
+        elevation:8,
         height : 36,
-        width : '85%',
+        width : '83%',
         paddingLeft : 29,
         fontWeight : 'bold',
         backgroundColor : '#FFFFFF'

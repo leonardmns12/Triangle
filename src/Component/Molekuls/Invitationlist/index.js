@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View , Text , TouchableOpacity , StyleSheet , Image} from 'react-native';
+import { View , Text , TouchableOpacity , StyleSheet , Image, Animated} from 'react-native';
 import storage from '@react-native-firebase/storage';
-
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 const Invitationlist = ({navigation , name , visible, funct , decline}) => {
     useEffect(()=>{
         getProfileImg(name)
@@ -19,38 +20,69 @@ const Invitationlist = ({navigation , name , visible, funct , decline}) => {
             setprofileuri(false)
         }
     }
-    const checkvisible = (visible) => {
-        if(visible === 'none'){
-        }else{
-        return <TouchableOpacity onPress={funct} style={[styles.actionbutton,{}]}>
-        <View style={[styles.borderaction,{}]}>
-        <Text style={[styles.actiontext,{backgroundColor: '#00BFA6'}]}>Accept</Text>
-        </View>
-        </TouchableOpacity>
-        }
+    const LeftAction = (progress , dragX) => {
+        const scale = dragX.interpolate({
+            inputRange: [0, 100],
+            outputRange: [0, 1],
+            extrapolate: 'clamp'
+        })
+        return(
+            <View style={styles.leftAction}>
+                <Animated.Text style={[styles.leftText , { transform: [{scale}]}]}>Swipe Left to Accept</Animated.Text>
+            </View>
+        )
+    }
+    const RightAction = (progress , dragX , onPress) => {
+        const scale = dragX.interpolate({
+            inputRange: [-100, 0],
+            outputRange: [1, 0],
+            extrapolate: 'clamp'
+        })
+        return(
+            <TouchableOpacity onPress={decline} style={{marginBottom:'5%'}}>
+                <View style={styles.rightAction}>
+                    <Animated.Text style={[styles.rightText , { transform: [{scale}]}]}>Decline</Animated.Text>
+                </View>
+            </TouchableOpacity>
+        )
     }
     return(
-        <View style={[styles.borderlist,{marginVertical : 5}]}>
+        <View style={{flex:1}}>
             {
-                profileuri === false ? (
-                    <View style={[styles.profileimg,{}]}></View>
+                funct !== null ? (
+                <Swipeable
+                renderLeftActions = {LeftAction}
+                onSwipeableLeftOpen = {funct}
+                renderRightActions = {RightAction}
+                >
+                <View style={[styles.borderlist]}>
+                    {
+                        profileuri === false ? (
+                            <View style={[styles.profileimg,{}]}></View>
+                        ) : (
+                            <View style={{marginTop:5}}><Image source={profileuri} style={{width:35 , height:35, borderRadius:20}}/></View>
+                        )
+                    }
+                <Text style={[styles.proflename,{}]}>{name}</Text>
+                </View>
+                </Swipeable>
                 ) : (
-                    <View style={{marginTop:5}}><Image source={profileuri} style={{width:35 , height:35, borderRadius:20}}/></View>
+                <Swipeable
+                renderRightActions = {RightAction}
+                >
+                <View style={[styles.borderlist]}>
+                    {
+                        profileuri === false ? (
+                            <View style={[styles.profileimg,{}]}></View>
+                        ) : (
+                            <View style={{marginTop:5}}><Image source={profileuri} style={{width:35 , height:35, borderRadius:20}}/></View>
+                        )
+                    }
+                <Text style={[styles.proflename,{}]}>{name}</Text>
+                </View>
+                </Swipeable>
                 )
             }
-            
-            <Text style={[styles.proflename,{}]}>{name}</Text>
-            <View style={{position : 'absolute', right : 5, flexDirection : 'row', top : '35%'}}>
-                {
-                    checkvisible(visible)
-                }
-                <TouchableOpacity onPress={decline} style={[styles.actionbutton,{}]}>
-                <View style={[styles.borderaction,{}]}>
-                <Text style={[styles.actiontext,{backgroundColor : '#CE5454'}]}>Decline</Text>
-                </View>
-                </TouchableOpacity>
-            </View>
-
         </View>
     )
 }
@@ -58,9 +90,11 @@ const Invitationlist = ({navigation , name , visible, funct , decline}) => {
 const styles = StyleSheet.create({
     borderlist : {
         width : 300,
-        borderRadius : 31,
-        height : 50,
-        flexDirection : 'row'
+        borderRadius:5,
+        flexDirection : 'row',
+        backgroundColor:'#FFFFFF',
+        paddingLeft: '5%',
+        marginBottom:'3%'
     },
     proflename : {
         fontSize : 12,
@@ -74,7 +108,6 @@ const styles = StyleSheet.create({
         borderWidth : 1,
         borderColor : '#707070',
         borderRadius : 20,
-        marginLeft: '5%',
         marginTop : 5
     },
     borderaction : {
@@ -88,7 +121,33 @@ const styles = StyleSheet.create({
     actiontext : {
         fontSize : 10,
         textAlign : 'center',
-    }
+    },
+    leftText : {
+        color: '#fFF',
+        fontWeight : '600',
+        padding: 20
+    },
+    leftAction : {
+        backgroundColor : '#388e3c',
+        justifyContent:'center',
+        flex:1,
+        borderRadius : 10,
+        marginBottom:'3%',
+    },
+    rightAction : {
+        backgroundColor: '#dd2c00',
+        justifyContent : 'center',
+        alignItems : 'flex-end',
+        flex:1,
+        borderRadius:10,
+        marginBottom:'3%'
+    },
+    rightText : {
+        color: '#fFF',
+        fontWeight : '600',
+        fontSize:16,
+        padding:10,
+    },
 
 })
 

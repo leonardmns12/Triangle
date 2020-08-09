@@ -1,11 +1,12 @@
 import React , { useEffect, useState } from 'react';
-import { View , StyleSheet , TouchableOpacity , Text, AsyncStorage } from 'react-native';
+import { View , StyleSheet , TouchableOpacity , Text, AsyncStorage , FlatList } from 'react-native';
 import LeftLogo from '../../../assets/chatWindow/left.svg';
 import { ScrollView } from 'react-native-gesture-handler';
 import Invitationlist from '../../Component/Molekuls/Invitationlist/';
 import database from '@react-native-firebase/database';
 import { useDispatch , useSelector } from 'react-redux';
 import { addtofriend , addtofriend1 ,getId } from '../../Config/Redux/restApi/';
+
 const Invitation = ({navigation}) => {
     const InvitationState = useSelector(state => state.invitationReducer)
     const dispatch = useDispatch()
@@ -45,7 +46,6 @@ const Invitation = ({navigation}) => {
     const getincominglist = (userId) => {
     const dataincoming = database().ref('users/' + userId + '/incomingFriend')
     dataincoming.on('value', function(snapshot){
-        setloading(true)
         const data1 = []
         if(snapshot.val() === null || snapshot.val() === undefined){
             dispatch({type:'SET_INCOMING',  value: data1});
@@ -58,7 +58,6 @@ const Invitation = ({navigation}) => {
             })
         dispatch({type:'SET_INCOMING',  value: data1});
         }
-        setloading(false)
     })
 }
     
@@ -93,9 +92,14 @@ const Invitation = ({navigation}) => {
     const gotoFindFriend = () => {
         navigation.replace('FindFriend')
     }
-    
+    const renderItem = ({ item }) => (
+        <Invitationlist decline={()=>{accept(item.data.friend,'decline')}} name={item.data.friend} visible={"block"} funct={()=>{accept(item.data.friend,'accept')}}/>
+      );
+    const renderItem2 = ({ item }) => (
+        <Invitationlist decline={()=>{accept(item.data.friend,'cancelinvite')}} name={item.data.friend} visible={"none"} funct={null}/>
+    );
     return(
-        <View style={{flex:1}}>
+        <View style={{flex:1,backgroundColor:'#FFFFFF'}}>
              <View style={[styles.header,{}]}>
                     <TouchableOpacity style={{paddingLeft:18, paddingTop:11}}> 
                     <LeftLogo onPress={gotoFindFriend} height={33} width={33}></LeftLogo>
@@ -105,28 +109,19 @@ const Invitation = ({navigation}) => {
           
             <Text style={[styles.titletext,{}]}>Incoming Invitation</Text>
             <View style={{flex : 1, alignItems:'center', justifyContent:'center'}}>
-            <ScrollView style={{flex:1 }}>
-            {
-                InvitationState.listincoming.map((id,key) => {
-                    return(
-                        <Invitationlist decline={()=>{accept(id.data.friend,'decline')}} key={key} name={id.data.friend} visible={"block"} funct={()=>{accept(id.data.friend,'accept')}}/>
-                    )
-                }) 
-            }
-            </ScrollView>
+              <FlatList
+                data = {InvitationState.listincoming}
+                renderItem={renderItem}
+                keyExtractor={item => item.id}
+                />
             </View>
             <Text style={[styles.titletext,{}]}>Pending Invitation</Text>
             <View style={{flex:1 , alignItems:'center', justifyContent:'center'}}>
-            <ScrollView style={{flex:1}}> 
-            {
-              InvitationState.listpending.map((id,key) => {
-                return(
-               
-                 <Invitationlist decline={()=>{accept(id.data.friend,'cancelinvite')}} key={key} name={id.data.friend} visible={"none"}/>
-                )
-            }) 
-            }
-            </ScrollView>
+            <FlatList
+                data = {InvitationState.listpending}
+                renderItem={renderItem2}
+                keyExtractor={item => item.id}
+                />
             </View>
          
         </View>

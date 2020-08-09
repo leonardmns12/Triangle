@@ -1,5 +1,5 @@
 import React , { useEffect, useState , Suspense } from 'react';
-import { View , Text, ScrollView, StyleSheet, AsyncStorage , ActivityIndicator, BackHandler , Modal , TouchableOpacity , Image } from 'react-native';
+import { View , Text, ScrollView, StyleSheet, AsyncStorage , ActivityIndicator, BackHandler , Modal , TouchableOpacity , Image , TextInput} from 'react-native';
 import NavigationMenu from '../../../Component/Molekuls/NavigationMenu/';
 import Friendlist from '../../../Component/Molekuls/Friendlist/';
 import { Button } from '../../../Component/';
@@ -13,8 +13,7 @@ import LeftLogo from '../../../../assets/chatWindow/left.svg';
 import UserLogo from '../../../../assets/popupprofile/user.svg';
 import BlockLogo from '../../../../assets/block.svg';
 import ChatLogo from '../../../../assets/chat.svg';
-import { StackActions , NavigationAction } from '@react-navigation/native';
-
+import Icon from 'react-native-vector-icons/FontAwesome';
 const Home = ({navigation}) => {
     useEffect(()=>{
         ShowProfile();
@@ -80,6 +79,10 @@ const Home = ({navigation}) => {
       const data = []
       if(snapshot.val() === null || snapshot.val() === undefined){
         dispatch({type:'SET_HOMEFRIEND',  value: data});
+        dispatch({type:'SET_ALLHOMEFRIEND',  value: data});
+        await AsyncStorage.setItem(
+            'friendlist',''
+        )
       }else{
           Object.keys(snapshot.val()).map(key => {
             data.push({
@@ -99,6 +102,7 @@ const Home = ({navigation}) => {
                 }
             }
             dispatch({type:'SET_HOMEFRIEND',  value: data});
+            dispatch({type:'SET_ALLHOMEFRIEND',  value: data});
             await AsyncStorage.setItem(
                 'friendlist',JSON.stringify(data)
             )
@@ -110,6 +114,7 @@ const Home = ({navigation}) => {
                 const async_friendlist = await AsyncStorage.getItem('friendlist');
                 if(async_friendlist !== null){
                     dispatch({type:'SET_HOMEFRIEND',  value: JSON.parse(async_friendlist)});
+                    dispatch({type:'SET_ALLHOMEFRIEND',  value: JSON.parse(async_friendlist)});
                 }
                 
             }catch{
@@ -129,9 +134,6 @@ const Home = ({navigation}) => {
     }
     const editProfile = async () => {
         navigation.navigate('EditProfile')
-    }
-    const search = () => {
-        alert('search');
     }
     const addfriend = () => {
         navigation.navigate('FindFriend')
@@ -158,22 +160,6 @@ const Home = ({navigation}) => {
     const gotoProfile = (e) => {
         alert(e)
     }
-    // function getHash(input){
-    //     var hash = 0, len = input.length;
-    //     for (var i = 0; i < len; i++) {
-    //       hash  = ((hash << 5) - hash) + input.charCodeAt(i);
-    //       hash |= 0; // to 32bit integer
-    //     }
-    //     return hash;
-    //   }
-    // const [imageUri , setimageuri] = useState('')
-    // const getmsgid = (usera , userb) => {
-    //     if(getHash(usera) > getHash(userb)){
-    //         return usera.concat(userb)
-    //     }else{
-    //         return userb.concat(usera)
-    //     }
-    // }
     const removeFriend = async (friend) => {
         const username = await AsyncStorage.getItem('username')
         const friendid = await getId(friend , 'friend' , username)
@@ -188,13 +174,23 @@ const Home = ({navigation}) => {
         // })
         setModalVisible(false)
     }
+    const searchUser = (findtext) => {
+        const data = HomeState.allfriend.filter(i => {
+            const itemData = i.displayname.toUpperCase();
+            
+             const textData = findtext.toUpperCase();
+              
+             return itemData.indexOf(textData) > -1;  
+        })
+        dispatch({type:'SET_HOMEFRIEND' , value:data})
+    }
     const [modalName , setModalName] = useState('')
     const [modalVisible , setModalVisible] = useState(false)
     const [modalUri , setModalUri] = useState({uri : 'https://firebasestorage.googleapis.com/v0/b/triang…=media&token=8e8f6b02-b104-4de1-8d04-d2887c764a6d'})
     const [modalStatus, setModalStatus] = useState('')
     const [modalUsername , setModalUsername] = useState('')
     return(
-        <View style={{flex:1 , position:'relative'}}>
+        <View style={{flex:1 , position:'relative', backgroundColor:'#FFFFFF'}}>
             <Modal 
             animationType={"fade"}
             visible={modalVisible}
@@ -202,7 +198,7 @@ const Home = ({navigation}) => {
             >
                 <View style={{backgroundColor:'#000000aa' , flex:1, justifyContent:'center'}}>
                     <View style={{backgroundColor:'rgba(255,255,255,0.85)',borderWidth:1,borderRadius:8, marginHorizontal:'20%', marginVertical:'30%' , flex:1}}>
-                        <View style={{position:'absolute', padding:10, right:0,flex:1}}>
+                        <View style={{position:'absolute', padding:10, right:0}}>
                         <TouchableOpacity onPress={()=>{ setModalVisible(false) }}>
                             <LeftLogo width={30} height={30}/>
                         </TouchableOpacity>
@@ -254,9 +250,9 @@ const Home = ({navigation}) => {
                     }
                     <Text style={[style.profilename, {}]}>{HomeState.displayname}</Text>
                 </View>
-                <View style={{width:220, marginBottom: 50}}>
+                {/* <View style={{width:220, marginBottom: 50}}>
                     <Text style={[style.bio , {}]}>{HomeState.statusmessage}</Text>
-                </View>
+                </View> */}
                </View>
             <TouchableOpacity onPress={editProfile} style={{justifyContent:'center',position:'absolute',bottom:0,backgroundColor:'rgb(0,194,255)',borderBottomLeftRadius:41, borderBottomRightRadius:41,width:'100%', height:50}}>
             <Text style={{color:'white', fontSize:16, textAlign:'center', marginTop:3}}>
@@ -265,19 +261,20 @@ const Home = ({navigation}) => {
             </TouchableOpacity>
             {/* <Button title="Logout" funct={onClickLogout} /> */}
             </View>
-            <View style={{flex:1}}>
+            <View style={{flex:2}}>
+                <View style={[style.input,{paddingHorizontal:'5%', elevation:5}]}>
+                <View style={{position:'absolute',marginVertical:'2.5%', marginLeft: '6%'}}>
+                <Icon name="search" color={'gray'} size={23} />
+                </View>
+                <TextInput onChangeText={(e)=>{searchUser(e)}}  placeholder="Search Friends" style={{}}></TextInput>
+                </View>
                 <View style={[style.homeinfo,{flexDirection : 'row'}]}>
-                    <Text style={[style.friendngroup,{marginRight:145}]}>
+                    <Text style={[style.friendngroup]}>
                     Friends & Group
                     </Text>
-                    <View style={{float:'right'}}>
-                        <TouchableOpacity onPress={search}>
-                            <Magnifier width={25} height={25}/>
-                        </TouchableOpacity>
-                    </View>
                 </View> 
             <ScrollView showsVerticalScrollIndicator={false}>
-                <View style={{height:22}}></View>
+                <View style={{height:10}}></View>
 
                <View style={{display:'flex' , alignItems:'center'}}>
                </View>
@@ -330,7 +327,8 @@ const style = StyleSheet.create({
         fontSize: 16,
         color: '#FFFFFF',
         marginTop: 12,
-        paddingHorizontal:15
+        paddingHorizontal:15,
+        fontFamily : 'Google-Sans'
     },
     bio: {
         marginLeft: 12,
@@ -342,13 +340,30 @@ const style = StyleSheet.create({
     },
 
     homeinfo : {
-        paddingTop : 14,
         paddingHorizontal : 30
 
     },
     friendngroup : {
         fontFamily : 'ITCKRISTEN',
         fontSize : 18
+    },
+    input : {
+        shadowColor : 'black',
+        shadowOpacity: 0.1,
+        shadowRadius: 0.5,
+        shadowOffset: {
+          height: 1,
+          width: 0,
+        },
+        backgroundColor: 'white',
+        borderColor : '#707070',
+        height:40,
+        width:'95%',
+        marginHorizontal: 10,
+        borderRadius : 17,
+        marginVertical : 13,
+        paddingLeft : 50,
+        fontFamily : 'ITCKRISTEN',
     }
 })
 //gasal

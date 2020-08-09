@@ -10,6 +10,7 @@ const homeState = {
     displayname : '',
     statusmessage : '',
     profileuri : 'null',
+    allfriend : []
 }
 
 const registerState = {
@@ -108,6 +109,12 @@ const homeReducer = (state = homeState , action) => {
         return{
             ...state,
             friendlist : action.value
+        }
+    }
+    if(action.type === 'SET_ALLHOMEFRIEND'){
+        return{
+            ...state,
+            allfriend : action.value
         }
     }
     if(action.type === 'SET_SHOWPROFILE'){

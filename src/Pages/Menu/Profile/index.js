@@ -1,10 +1,10 @@
 import React from 'react';
-import { View , Text, StyleSheet, ScrollView  , Alert, BackHandler} from 'react-native';
+import { View , Text, StyleSheet, ScrollView  , Alert, BackHandler, AsyncStorage} from 'react-native';
 import { simpanData } from '../../../Config/Redux/restApi/';
 import NavigationMenu from '../../../Component/Molekuls/NavigationMenu/';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Contents from '../../../Component/Molekuls/Timeline';
-import { signOutUser , getUsername , checkPermission } from '../../../Config/Redux/restApi/';
+import { signOutUser , clearToken } from '../../../Config/Redux/restApi/';
 import { useDispatch , useSelector } from 'react-redux';
 import Home from '../Home';
 
@@ -15,9 +15,16 @@ const Profile = ({navigation}) => {
     const HomeState = useSelector(state => state.homeReducer)
     const dispatch = useDispatch();
     const onClickLogout = async () => {
+        const username = await AsyncStorage.getItem('username')
         dispatch({type:'SET_ALLFRIEND' , value:[]})
         dispatch({type:'SET_CHATLIST' , value:[]})
         dispatch({type:'SET_HOMEFRIEND',  value: []});
+        await AsyncStorage.removeItem('username')
+        await AsyncStorage.removeItem('friendlist')
+        await AsyncStorage.removeItem('profileuri')
+        await AsyncStorage.removeItem('displayname')
+        await AsyncStorage.removeItem('statusmsg')
+        await clearToken(username)
         const res = await signOutUser();
         Alert.alert(
             'Logout',

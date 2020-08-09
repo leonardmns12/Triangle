@@ -331,3 +331,45 @@ export const getId = (username , from , key ) => {
  return getdata;
  
 }
+function search3(nameKey , myArray){
+  for(var i = 0; i < myArray.length; i++){
+      if(myArray[i].id === nameKey){
+          return true;
+      }
+  }
+}
+export const checkusername = (username) => {
+  const getuser = database().ref('users/').once('value').then(function(snapshot){
+    const data = []
+    console.log(snapshot.val())
+    if(snapshot.val() === null || snapshot.val()=== undefined){
+
+    }else{
+      Object.keys(snapshot.val()).map(key => {
+        data.push({
+            id: key,
+            data: snapshot.val()[key]
+        })
+      })
+      const res = search3(username,data)
+      console.log(res)
+      if(res){
+        return true;
+      }else{
+        return false
+      }
+      
+    }
+  })
+  return getuser;
+}
+
+export const clearToken = (username) => {
+    const data = database().ref('users/' + username + '/token').set({
+      key : ''
+    })
+}
+
+export const deleteChatlist = (username , friend) => {
+  database().ref('users/' + username + '/chat/' + friend).remove()
+}

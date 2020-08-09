@@ -124,9 +124,6 @@ const ChatWindow = ({navigation}) => {
         }
         // await getMessage(chatState.userId); 
     }
-    const onClickBack = () => {
-        navigation.replace('Chat');
-    }
     const starter = async () => {
         await updateRead(chatState.sender, chatState.receiver)
         try{         
@@ -231,9 +228,6 @@ const ChatWindow = ({navigation}) => {
         <View style={{flex:1}}>
             <View style={{flex:1}}>
             <View style={[styles.chatHeader,{}]}>
-                <TouchableOpacity onPress={onClickBack}>
-                    <LeftLogo width={33} height={33} />
-                </TouchableOpacity>
                 <Text style={[styles.headerText,{}]}>{chatState.receiver}</Text>
             </View>
             <View style={{flex:1 , backgroundColor : '#FFFFFF',paddingTop: 10, paddingHorizontal:10}}> 

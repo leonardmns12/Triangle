@@ -39,7 +39,8 @@ const style = StyleSheet.create({
         paddingLeft: 10,
         alignItems : 'center',
         marginTop : 14,
-        marginLeft : 5
+        marginLeft : 5,
+        fontFamily: 'Google-Sans'
     }
 })
 

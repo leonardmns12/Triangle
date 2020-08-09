@@ -1,15 +1,14 @@
 import React , { useEffect , useState } from 'react';
 import { View , Text , StyleSheet, TouchableOpacity, ScrollView , FlatList , AsyncStorage} from 'react-native';
-import NavigationMenu from '../../../Component/Molekuls/NavigationMenu/';
 import LeftLogo from '../../../../assets/chatWindow/left.svg';
 import Addfriend from '../../../../assets/Home/addfriend.svg';
-import Magnifier from '../../../../assets/Home/magnifier.svg';
 import { TextInput } from 'react-native-gesture-handler';
 import Friendchat from '../../../Component/Molekuls/Friendchat/';
 import database from '@react-native-firebase/database';
 import { useSelector, useDispatch } from 'react-redux';
-import { getDisplayName } from '../../../Config/Redux/restApi/';
+import { getDisplayName , deleteChatlist } from '../../../Config/Redux/restApi/';
 import storage from '@react-native-firebase/storage';
+import Icon from 'react-native-vector-icons/FontAwesome';
 const Chat = ({navigation}) => {
     const gtchat = (screen) => {
         navigation.replace(screen);
@@ -57,7 +56,10 @@ const Chat = ({navigation}) => {
         const data = database()
         .ref('users/' + username + '/chat').on('value' ,async function(snapshot){
             if(snapshot.val() === null || snapshot.val() === undefined){
-
+                const data = []
+                dispatch({type:'SET_ALLFRIEND' , value:[]})
+                dispatch({type:'SET_CHATLIST' , value:[]})
+                await AsyncStorage.setItem('chatlist', '')
             }else{
                 const data = []
                 Object.keys(snapshot.val()).map(key => {
@@ -83,16 +85,6 @@ const Chat = ({navigation}) => {
             // setfriendlist(data)     
         })
     }
-    const searchUser = (findtext) => {
-        const data = chatState.allfriend.filter(i => {
-            const itemData = i.displayname.toUpperCase();
-            
-             const textData = findtext.toUpperCase();
-              
-             return itemData.indexOf(textData) > -1;  
-        })
-        dispatch({type:'SET_CHATLIST' , value:data})
-    }
     const removeString = (text) => {
         if(text.length >= 12) {
             const res = text.substring(0, 12);
@@ -108,8 +100,29 @@ const Chat = ({navigation}) => {
         dispatch({type: 'SET_SENDER' , value:username})
         navigation.navigate('ChatWindow')
     }
+    const deletechatlist = async (friend) => {
+        const username = await AsyncStorage.getItem('username')
+        await deleteChatlist(username , friend)
+    }
+    const renderItem = ({item}) => {
+        const msg = removeString(item.data.message)
+        console.log(item.displayname)
+        return(  
+        <Friendchat onPress={()=>{deletechatlist(item.id)}} profileuri={item.profilepicture} funct={()=>{gotochatroom(item.id)}} name={item.displayname} isRead={item.data.isRead} realtime={item.data.realtime} textmsg={msg} />
+        )
+    }
+    const searchUser = (findtext) => {
+        const data = chatState.allfriend.filter(i => {
+            const itemData = i.displayname.toUpperCase();
+            
+             const textData = findtext.toUpperCase();
+              
+             return itemData.indexOf(textData) > -1;  
+        })
+        dispatch({type:'SET_CHATLIST' , value:data})
+    }
     return(
-        <View style={{flex:1}}>
+        <View style={{flex:1, backgroundColor:'#FFFFFF'}}>
             <View style={[styles.header,{}]}>
                 <TouchableOpacity style={{paddingLeft:18, paddingTop:11}}> 
                 <LeftLogo height={33} width={33}></LeftLogo>
@@ -119,23 +132,27 @@ const Chat = ({navigation}) => {
                 </TouchableOpacity>
                 <Text style={[styles.headerText,{}]}>Chat</Text>
             </View>
-                <View style={{ backgroundColor:'white', paddingHorizontal:'5%'}}>
-                {/* <View style={{marginVertical:20, marginLeft: 25}}>
-                <Magnifier height={23} width={23} />
-                </View> */}
-                <TextInput elevation={5} onChangeText={(e)=>{searchUser(e)}} placeholder="Search Friends" style={[styles.input ,{}]}></TextInput>
+                <View style={[styles.input,{paddingHorizontal:'5%', elevation:5}]}>
+                <View style={{position:'absolute',marginVertical:'2.5%', marginLeft: '6%'}}>
+                <Icon name="search" color={'gray'} size={23} />
                 </View>
-            <ScrollView style={{flex: 1, backgroundColor:'#FFFFFF'}}>
+                <TextInput onChangeText={(e)=>{searchUser(e)}} placeholder="Search Friends" style={{}}></TextInput>
+                </View>
+                <FlatList
+                data = {chatState.chatlist}
+                renderItem={renderItem}
+                keyExtractor={item => item.id}
+                />
+            {/* <ScrollView style={{flex: 1, backgroundColor:'#FFFFFF'}}>
                 {
                     chatState.chatlist.map((id, key) => {
-                        console.log(id.profilepicture)
                         const msg = removeString(id.data.message)
                         return(
                         <Friendchat key={key} profileuri={id.profilepicture} funct={()=>{gotochatroom(id.id)}} name={id.displayname} isRead={id.data.isRead} realtime={id.data.realtime} textmsg={msg} />
                         )
                     })
                 }
-            </ScrollView>
+            </ScrollView> */}
             <View style={{}}>
             {/* <NavigationMenu chat="active" gotoHome={()=>{gtchat('Home')}}
                 gotoTimeline={()=>{gtchat('Timeline')}}
@@ -159,8 +176,8 @@ const styles = StyleSheet.create({
         marginLeft: 20
     },
     input : {
-        shadowColor: "black",
-        shadowOpacity: 0.8,
+        shadowColor : 'black',
+        shadowOpacity: 0.1,
         shadowRadius: 0.5,
         shadowOffset: {
           height: 1,
@@ -175,7 +192,6 @@ const styles = StyleSheet.create({
         marginVertical : 13,
         paddingLeft : 50,
         fontFamily : 'ITCKRISTEN',
-        zIndex:-1
     }
 })
 export default Chat;
