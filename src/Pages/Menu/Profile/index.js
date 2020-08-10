@@ -1,5 +1,5 @@
 import React from 'react';
-import { View , Text, StyleSheet, ScrollView  , Alert, BackHandler, AsyncStorage} from 'react-native';
+import { View , Text, StyleSheet, ScrollView  , Alert, BackHandler, AsyncStorage, Image} from 'react-native';
 import { simpanData } from '../../../Config/Redux/restApi/';
 import NavigationMenu from '../../../Component/Molekuls/NavigationMenu/';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -7,6 +7,7 @@ import Contents from '../../../Component/Molekuls/Timeline';
 import { signOutUser , clearToken } from '../../../Config/Redux/restApi/';
 import { useDispatch , useSelector } from 'react-redux';
 import Home from '../Home';
+import LeftLogo from '../../../../assets/chatWindow/left.svg';
 
 const Profile = ({navigation}) => {
     const gtchat = (screen) => {
@@ -35,19 +36,40 @@ const Profile = ({navigation}) => {
         );
     }
 
+    const EditProf = async () => {
+        navigation.navigate('EditProfile')
+    }
+
     return(
         <View style={{flex:1}}>
-            <View style={{flex:1, backgroundColor:'rgba(0,94,97,0.5)' , borderBottomLeftRadius:41, borderBottomRightRadius:41, position:'relative'}}>
+            <View style={{flex:0.7, backgroundColor:'rgba(27,176,233,1)' , borderBottomLeftRadius:41, borderBottomRightRadius:41, position:'relative'}}>
               <View style={{position:'relative'}}>
-                <View style={{flexDirection:'row', marginTop: 43, marginBottom:7}}>
-                    <View style={[style.profileimg ,{}]}></View>
+                <View style={{flexDirection:'row'}}>
+                    {/* <TouchableOpacity style={{paddingLeft:1, paddingTop:11}}> 
+                    <LeftLogo height={33} width={33}></LeftLogo>
+                    </TouchableOpacity>  */}
+                    <Text style={[style.headerText,{}]}>Profile</Text>
+                    <TouchableOpacity>
+                        <Text style={[style.editprof, {}]} onPress={EditProf}>
+                            Edit
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={{flexDirection:'row', marginBottom:7}}>
+                    {
+                        HomeState.profileuri === 'null' ? (
+                            <View style={[style.profileimg ,{}]}></View> ) : (
+                            <Image source={HomeState.profileuri} style={{width:50, height:50, borderRadius:100 , marginLeft:12}}/> 
+                        )
+                    }
+                    {/* <View style={[style.profileimg ,{}]}></View> */}
                     <Text style={[style.profilename, {}]}>{HomeState.displayname}</Text>
                 </View>
                 <View style={{width:220, marginBottom: 50}}>
                     <Text style={[style.bio , {}]}>{HomeState.statusmessage}</Text>
                 </View>
                </View>
-               <TouchableOpacity onPress={onClickLogout} style={{position: 'relative',marginHorizontal:250, marginVertical:15 ,backgroundColor:'rgb(0,191,166)',width:100, height:27, borderRadius:20 , borderColor:'rgb(0,191,166)' }}>
+               <TouchableOpacity onPress={onClickLogout} style={{position: 'relative',marginHorizontal:240 ,backgroundColor:'#00C2FF',width:100, height:27, borderRadius:20 , borderColor:'rgb(0,191,166)' }}>
             <Text style={{color:'black', fontSize:15, textAlign:'center', marginTop:3, fontFamily:'ITCKRISTEN'}}>
             Logout
             </Text>
@@ -93,8 +115,20 @@ const style = StyleSheet.create({
         marginLeft: 12,
         color: '#FFFFFF',
     },
-    logout: {
-
+    headerText: {
+        fontSize : 20,
+        fontFamily : 'ITCKRISTEN',
+        color : '#FFFFFF',
+        paddingTop : 15,
+        marginLeft: '40%',
+    },
+    editprof: {
+        fontSize: 20,
+        fontFamily : 'ITCKRISTEN',
+        color : '#FFFFFF',
+        position: 'relative',
+        marginLeft: '45%',
+        marginTop: '7.5%',
     },
 })
 
