@@ -157,9 +157,7 @@ const Home = ({navigation}) => {
             return url
         }
     }
-    const gotoProfile = (e) => {
-        alert(e)
-    }
+    
     const removeFriend = async (friend) => {
         const username = await AsyncStorage.getItem('username')
         const friendid = await getId(friend , 'friend' , username)
@@ -189,6 +187,13 @@ const Home = ({navigation}) => {
     const [modalUri , setModalUri] = useState({uri : 'https://firebasestorage.googleapis.com/v0/b/triang…=media&token=8e8f6b02-b104-4de1-8d04-d2887c764a6d'})
     const [modalStatus, setModalStatus] = useState('')
     const [modalUsername , setModalUsername] = useState('')
+
+    const FriendsProf = async (friend) => {
+        const username = await AsyncStorage.getItem('username')
+        navigation.navigate('FriendsProfile')
+        setModalVisible(false)
+    }
+
     return(
         <View style={{flex:1 , position:'relative', backgroundColor:'#FFFFFF'}}>
             <Modal 
@@ -220,7 +225,7 @@ const Home = ({navigation}) => {
                                     <ChatLogo width={18} height={18}/>
                                     <Text style={{fontSize:8}}>Chat</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={()=>{gotoProfile(modalUsername)}} style={{backgroundColor:'#F3F3F3', flex:1,height:40, borderColor:'#777777', borderWidth:1, justifyContent:'center', alignItems:'center'}}>
+                                <TouchableOpacity onPress={() => {FriendsProf(modalUsername)}} style={{backgroundColor:'#F3F3F3', flex:1,height:40, borderColor:'#777777', borderWidth:1, justifyContent:'center', alignItems:'center'}}>
                                     <UserLogo width={18} height={18}/>
                                     <Text style={{fontSize:8}}>Profile</Text>
                                 </TouchableOpacity>

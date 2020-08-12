@@ -9,6 +9,7 @@ import ChatWindow from './ChatWindow/';
 import FindFriend from './FindFriend/';
 import Invitation from './Invitation/';
 import EditProfile from './EditProfile/';
+import FriendsProfile from './FriendsProfile/';
 
 export {ChatWindow};
 export {Home};
@@ -20,4 +21,5 @@ export {Login};
 export {Splash};
 export {FindFriend};
 export {Invitation};
-export {EditProfile}
+export {EditProfile};
+export {FriendsProfile};

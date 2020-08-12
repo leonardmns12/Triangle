@@ -1,11 +1,10 @@
 import React from 'react';
 import { View , Text, StyleSheet, ScrollView  , Alert, BackHandler, AsyncStorage, Image} from 'react-native';
-import { simpanData } from '../../../Config/Redux/restApi/';
-import NavigationMenu from '../../../Component/Molekuls/NavigationMenu/';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import Contents from '../../../Component/Molekuls/Timeline';
+import Content from '../../Component/Molekuls/Timeline';
 import { useDispatch , useSelector } from 'react-redux';
-import LeftLogo from '../../../../assets/chatWindow/left.svg';
+import LeftLogo from '../../../assets/chatWindow/left.svg';
+import ChatIcon from '../../../assets/navigation/comment.svg';
 
 const FriendsProfile = ({navigation}) => {
     const gtchat = (screen) => {
@@ -14,51 +13,65 @@ const FriendsProfile = ({navigation}) => {
     const HomeState = useSelector(state => state.homeReducer)
     const dispatch = useDispatch();
 
+    const GoBacktoHome = () => {
+        navigation.replace('Home')
+    }
+
     return(
         <View style={{flex:1}}>
-            <View style={{flex:0.7, backgroundColor:'rgba(27,176,233,1)', position:'relative'}}>
+            <View style={[style.header,{}]}>
+                <TouchableOpacity onPress={GoBacktoHome} style={{paddingLeft:10, paddingTop:11}}> 
+                <LeftLogo height={33} width={33}></LeftLogo>
+                </TouchableOpacity>
+                <Text style={[style.headerText,{}]}>Profile</Text>
+            </View>
+            <View style={{flex:0.6, backgroundColor:'#e8e6e6', position:'relative'}}>
               <View style={{position:'relative'}}>
-                <View style={{flexDirection:'row'}}>
-                    {/* <TouchableOpacity style={{paddingLeft:1, paddingTop:11}}> 
-                    <LeftLogo height={33} width={33}></LeftLogo>
-                    </TouchableOpacity>  */}
-                    <Text style={[style.headerText,{}]}>Profile</Text>
-                </View>
-                <View style={{flexDirection:'row', marginBottom:7}}>
-                    {
-                        HomeState.profileuri === 'null' ? (
-                            <View style={[style.profileimg ,{}]}></View> ) : (
-                            <Image source={HomeState.profileuri} style={{width:50, height:50, borderRadius:100 , marginLeft:12}}/> 
-                        )
-                    }
-                    {/* <View style={[style.profileimg ,{}]}></View> */}
-                    <Text style={[style.profilename, {}]}>{HomeState.displayname}</Text>
+                <View style={{flexDirection:'row',marginTop:10, marginBottom:7}}>
+                    <View style={[style.profileimg ,{}]}></View>
+                    <Text style={[style.profilename, {}]}>Nico</Text>
                 </View>
                 <View style={{width:220, marginBottom: 50}}>
-                    <Text style={[style.bio , {}]}>{HomeState.statusmessage}</Text>
+                    <Text style={[style.bio , {}]}>Better</Text>
                 </View>
+                <TouchableOpacity style={{flexDirection: 'row', width:100, height:30, backgroundColor:'#1BB0DF', marginLeft:140, borderRadius:50}}>
+                    <View style={{marginLeft:10,paddingTop:4}}>
+                    <ChatIcon  width = {20} height = {20} />
+                    </View>
+                    <Text style={{marginLeft: 10, paddingTop:4, fontFamily:'ITCKRISTEN', color:'#FFFFFF'}}>
+                        Chat
+                    </Text>
+                </TouchableOpacity>
                </View>
             </View>
             <View style={{flex:1}}>
             <ScrollView>
             <View> 
-                <Contents visible = {'block'} />
-                <Contents visible = {'none'} profilename={'Leonard'} commentcount={'2'} time={'17:20'} content={'111'}/>
-                <Contents visible = {'block'} profilename={'Leonard'} commentcount={'2'} time={'17:20'} content={'12312312312'}/>
+                <Content visible = {'block'} />
+                <Content visible = {'none'} profilename={'Leonard'} commentcount={'2'} time={'17:20'} content={'111'}/>
+                <Content visible = {'block'} profilename={'Leonard'} commentcount={'2'} time={'17:20'} content={'12312312312'}/>
             </View>
-        </ScrollView>
+            </ScrollView>
             </View>
             <View style={{}}>
-            {/* <NavigationMenu profile="active" gotoHome={()=>{gtchat('Home')}}
-                gotoTimeline={()=>{gtchat('Timeline')}}
-                gotoChat={()=>{gtchat('Chat')}}     
-                ></NavigationMenu> */}
             </View>
         </View>
     )
 }
 
 const style = StyleSheet.create({
+    header: {
+        height : 57,
+        backgroundColor : '#1BB0DF',
+        flexDirection : 'row'
+    },
+    // headerText: {
+    //     fontSize : 20,
+    //     fontFamily : 'ITCKRISTEN',
+    //     color : '#000000',
+    //     paddingTop : 15,
+    //     marginLeft: '10%',
+    // },
     profileimg : {
         width: 50,
         backgroundColor: '#FFFFFF',
@@ -70,28 +83,20 @@ const style = StyleSheet.create({
     },
     profilename : {
         fontSize: 16,
-        color: '#FFFFFF',
+        color: '#000000',
         marginTop: 12,
         paddingHorizontal:15
     },
     bio: {
         marginLeft: 12,
-        color: '#FFFFFF',
+        color: '#000000',
     },
     headerText: {
         fontSize : 20,
         fontFamily : 'ITCKRISTEN',
         color : '#FFFFFF',
         paddingTop : 15,
-        marginLeft: '40%',
-    },
-    editprof: {
-        fontSize: 20,
-        fontFamily : 'ITCKRISTEN',
-        color : '#FFFFFF',
-        position: 'relative',
-        marginLeft: '45%',
-        marginTop: '7.5%',
+        marginLeft: '30%',
     },
 })
 

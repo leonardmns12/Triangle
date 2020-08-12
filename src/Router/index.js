@@ -1,5 +1,5 @@
 import React , { useEffect , useState } from 'react';
-import { Login, Splash, Register, Home, Profile, Chat, Timeline, ChatWindow, FindFriend , Invitation, EditProfile } from '../Pages/';
+import { Login, Splash, Register, Home, Profile, Chat, Timeline, ChatWindow, FindFriend , Invitation, EditProfile, FriendsProfile } from '../Pages/';
 import {createStackNavigator} from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -200,6 +200,11 @@ const Router = () => {
             }}
             />
             <Stack.Screen name="EditProfile" component={EditProfile}
+            options={{
+                headerShown: false,
+            }}
+            />
+            <Stack.Screen name="FriendsProfile" component={FriendsProfile}
             options={{
                 headerShown: false,
             }}
