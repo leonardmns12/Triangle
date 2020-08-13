@@ -2,31 +2,23 @@ import React from 'react';
 import { View , Text, StyleSheet, ScrollView  , Alert, BackHandler, AsyncStorage, Image} from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Content from '../../Component/Molekuls/Timeline';
-import { useDispatch , useSelector } from 'react-redux';
 import LeftLogo from '../../../assets/chatWindow/left.svg';
-import ChatIcon from '../../../assets/navigation/comment.svg';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const FriendsProfile = ({navigation}) => {
-    const gtchat = (screen) => {
-        navigation.replace(screen);
-    }
-    const HomeState = useSelector(state => state.homeReducer)
-    const dispatch = useDispatch();
 
     const GoBacktoHome = () => {
         navigation.replace('Home')
     }
-
     return(
-        <View style={{flex:1}}>
+        <View style={{flex:1, backgroundColor: '#FFFFFF'}}>
             <View style={[style.header,{}]}>
                 <TouchableOpacity onPress={GoBacktoHome} style={{paddingLeft:10, paddingTop:11}}> 
                 <LeftLogo height={33} width={33}></LeftLogo>
                 </TouchableOpacity>
                 <Text style={[style.headerText,{}]}>Profile</Text>
             </View>
-            <View style={{flex:0.5, backgroundColor:'#e8e6e6', position:'relative'}}>
+            <View style={{flex:0.5, backgroundColor:'#F3F3F3', position:'relative'}}>
               <View style={{position:'relative'}}>
                 <View style={{flexDirection:'row',marginTop:5, marginBottom:7}}>
                     <View style={[style.profileimg ,{}]}></View>

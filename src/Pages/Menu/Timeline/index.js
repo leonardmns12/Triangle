@@ -47,7 +47,7 @@ return(
 const styles =  StyleSheet.create({
     header : {
         height : 57,
-        backgroundColor : '#00BFA6',
+        backgroundColor : '#1BB0DF',
         flexDirection : 'row'
     },
     headerText : {

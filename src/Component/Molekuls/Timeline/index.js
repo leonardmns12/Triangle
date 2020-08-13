@@ -12,7 +12,7 @@ const Timeline = ({navigation,profilename,content,commentcount,time,visible}) =>
         return <View style={[style.picture]}><ContentPicture /></View>
 
       }else{
-        return <View style={[style.picture],{display:'none'}}><ContentPicture /></View>
+        return <View style={[style.picture],{display:'none'}}></View>
       }
   }
     return (
@@ -25,7 +25,7 @@ const Timeline = ({navigation,profilename,content,commentcount,time,visible}) =>
                   <Text style = {{marginLeft : 5 ,marginTop : '-8%'}}>{commentcount}</Text>
                 </View>
             </View>
-            <View style = {{ minHeight : 50, maxHeight : 360}}>
+            <View style = {{ minHeight : 35, maxHeight : 350}}>
               
              
                     {isPicture(visible)}
@@ -45,8 +45,9 @@ const Timeline = ({navigation,profilename,content,commentcount,time,visible}) =>
 const style = StyleSheet.create({
      borderimage: {
         borderWidth : 1,
-        borderColor : '#707070',
-        borderRadius: 20,
+        borderColor : '#000000',
+        backgroundColor: '#FFFFFF',
+        borderRadius: 100,
         width : 46,
         height : 46,
         marginHorizontal : 12,
@@ -83,15 +84,23 @@ const style = StyleSheet.create({
         
         marginVertical : 15,
         marginHorizontal : 18,
-        borderColor : 'black',
-        borderWidth : 1,
+        backgroundColor: '#FAFAFA',
+        shadowColor:'#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.32,
+        shadowRadius:5.46,
+        elevation: 9,
         borderRadius : 30,
         width : 320,
         maxHeight : 360,   
-        minHeight : 160
+        minHeight : 160,
     },
     Time : {
-         color : 'rgba(0,0,0,0.5)'
+        fontFamily:'ITCKRISTEN',
+        color : 'rgba(0,0,0,0.5)',
     },
     picture : {
     
