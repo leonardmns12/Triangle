@@ -39,10 +39,13 @@ const Profile = ({navigation}) => {
     const EditProf = async () => {
         navigation.navigate('EditProfile')
     }
+    const logouts = (e) => {
+        alert(e)
+    }
 
     return(
         <View style={{flex:1}}>
-            <View style={{flex:0.7, backgroundColor:'rgba(27,176,233,1)' , borderBottomLeftRadius:41, borderBottomRightRadius:41, position:'relative'}}>
+            <View style={{flex:0.67, backgroundColor:'rgba(27,176,233,1)' , borderBottomLeftRadius:41, borderBottomRightRadius:41, position:'relative'}}>
               <View style={{position:'relative'}}>
                 <View style={{flexDirection:'row'}}>
                     {/* <TouchableOpacity style={{paddingLeft:1, paddingTop:11}}> 
@@ -68,15 +71,16 @@ const Profile = ({navigation}) => {
                 <View style={{width:220, marginBottom: 50}}>
                     <Text style={[style.bio , {}]}>{HomeState.statusmessage}</Text>
                 </View>
+               <View style={{flexDirection:'row', justifyContent:'flex-end', right:10}}>
+                <TouchableOpacity onPress={logouts} style={{backgroundColor:'#00C2FF',width:100, height:'37%', borderRadius:20 , borderColor:'rgb(0,191,166)', alignItems:'center' }}>
+                    <Text style={{color:'black', fontSize:20, textAlign:'center', marginTop:3, fontFamily:'ITCKRISTEN'}}>
+                        Logout
+                    </Text>
+                </TouchableOpacity>
                </View>
-               <TouchableOpacity onPress={onClickLogout} style={{position: 'relative',marginHorizontal:240 ,backgroundColor:'#00C2FF',width:100, height:27, borderRadius:20 , borderColor:'rgb(0,191,166)' }}>
-            <Text style={{color:'black', fontSize:15, textAlign:'center', marginTop:3, fontFamily:'ITCKRISTEN'}}>
-            Logout
-            </Text>
-            </TouchableOpacity>
-            {/* <Button title="Logout" funct={onClickLogout} /> */}
+               </View>
             </View>
-            <View style={{flex:1}}>
+            <View style={{flex:1.3}}>
             <ScrollView>
             <View> 
                 <Contents visible = {'block'} />
@@ -86,10 +90,6 @@ const Profile = ({navigation}) => {
         </ScrollView>
             </View>
             <View style={{}}>
-            {/* <NavigationMenu profile="active" gotoHome={()=>{gtchat('Home')}}
-                gotoTimeline={()=>{gtchat('Timeline')}}
-                gotoChat={()=>{gtchat('Chat')}}     
-                ></NavigationMenu> */}
             </View>
         </View>
     )

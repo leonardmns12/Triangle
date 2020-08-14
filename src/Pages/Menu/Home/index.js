@@ -202,7 +202,7 @@ const Home = ({navigation}) => {
             transparent={true}
             >
                 <View style={{backgroundColor:'#000000aa' , flex:1, justifyContent:'center'}}>
-                    <View style={{backgroundColor:'rgba(255,255,255,0.85)',borderWidth:1,borderRadius:8, marginHorizontal:'20%', marginVertical:'30%' , flex:1}}>
+                    <View style={{backgroundColor:'rgba(255,255,255,0.85)',borderWidth:1,borderRadius:8, marginHorizontal:'10%', marginVertical:'40%' , flex:1}}>
                         <View style={{position:'absolute', padding:10, right:0}}>
                         <TouchableOpacity onPress={()=>{ setModalVisible(false) }}>
                             <LeftLogo width={30} height={30}/>

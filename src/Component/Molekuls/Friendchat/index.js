@@ -10,8 +10,8 @@ const Friendchat = ({navigation, profileuri , name, textmsg, realtime ,isRead , 
     },[])
     const [msg , setmsg] = useState('')
     const removeString = (text) => {
-        if(text !== undefined && text.length > 12){
-            const res = text.substring(0, 12);
+        if(text !== undefined && text.length > 25){
+            const res = text.substring(0, 25);
             const text2 = ' . . .'
             return res.concat(text2);
             
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
         marginVertical : 4
     },
     chatname : {
-        fontSize : 12,
+        fontSize : 13,
         color : '#010001',
         fontFamily : 'ITCKRISTEN',
         marginTop : '8%'

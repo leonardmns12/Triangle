@@ -251,7 +251,7 @@ const ChatWindow = ({navigation}) => {
                             <Text style={{marginHorizontal:'5%', fontSize:12}}>{imageUri.fileName}</Text>
                         </View>  
                     ) : (
-                        <TextInput value={chatState.form.message} onChangeText={(e)=>{onChangeInput(e,'message')}} style={[styles.input,{}]} placeholder="Type here . . ."></TextInput> 
+                        <TextInput value={chatState.form.message} onChangeText={(e)=>{onChangeInput(e,'message')}} style={[styles.input,{}]} placeholder="Type here . . ." multiline></TextInput> 
                     )
                 }       
                 <View style={{position:'absolute', right:'5%'}}>

@@ -18,7 +18,7 @@ const FriendsProfile = ({navigation}) => {
                 </TouchableOpacity>
                 <Text style={[style.headerText,{}]}>Profile</Text>
             </View>
-            <View style={{flex:0.5, backgroundColor:'#F3F3F3', position:'relative'}}>
+            <View style={{flex:0.44, backgroundColor:'#F3F3F3', position:'relative'}}>
               <View style={{position:'relative'}}>
                 <View style={{flexDirection:'row',marginTop:5, marginBottom:7}}>
                     <View style={[style.profileimg ,{}]}></View>
@@ -27,11 +27,13 @@ const FriendsProfile = ({navigation}) => {
                 <View style={{width:220, marginBottom: 50}}>
                     <Text style={[style.bio , {}]}>Better</Text>
                 </View>
-                <TouchableOpacity style={{flexDirection: 'row', width:100, height:30, backgroundColor:'#1BB0DF', marginLeft:140, borderRadius:50, shadowOpacity:1}}>
-                    <View style={{marginLeft:10,paddingTop:4}}>
+               </View>
+               <View style={{flexDirection: 'row', justifyContent:'center'}}>
+                <TouchableOpacity style={{flexDirection:'row', width:100, height:30, backgroundColor:'#1BB0DF', borderRadius:50, alignItems:'center'}}>
+                    <View style={{marginLeft:15}}>
                     <Icon name='message' color='#FFFFFF' size={20} />
                     </View>
-                    <Text style={{marginLeft: 10, paddingTop:4, fontFamily:'ITCKRISTEN', color:'#FFFFFF'}}>
+                    <Text style={{marginLeft:6, fontFamily:'ITCKRISTEN', color:'#FFFFFF'}}>
                         Chat
                     </Text>
                 </TouchableOpacity>
