@@ -200,6 +200,7 @@ const Home = ({navigation}) => {
             animationType={"fade"}
             visible={modalVisible}
             transparent={true}
+            onRequestClose={() => { setModalVisible(false); }}
             >
                 <View style={{backgroundColor:'#000000aa' , flex:1, justifyContent:'center'}}>
                     <View style={{backgroundColor:'rgba(255,255,255,0.85)',borderWidth:1,borderRadius:8, marginHorizontal:'10%', marginVertical:'40%' , flex:1}}>

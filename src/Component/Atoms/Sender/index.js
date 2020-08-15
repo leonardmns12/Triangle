@@ -57,7 +57,8 @@ const Sender = ({navigation, chatMessage , timestamp , img , photo}) => {
                     }
                          
          </View>
-         <Modal visible={modal}>
+         <Modal visible={modal} 
+         onRequestClose={() => { setmodal(false) }}>
              <View style={{right:10, top:10, position:'absolute' , height:30 , width:30}}>
                 <CloseButton width={25} height={25} onPress={()=>{setmodal(false)}}  />
              </View>

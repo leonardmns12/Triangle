@@ -1,7 +1,5 @@
 import React from 'react';
 import { View , Text, StyleSheet, ScrollView  , Alert, BackHandler, AsyncStorage, Image} from 'react-native';
-import { simpanData } from '../../../Config/Redux/restApi/';
-import NavigationMenu from '../../../Component/Molekuls/NavigationMenu/';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Contents from '../../../Component/Molekuls/Timeline';
 import { signOutUser , clearToken } from '../../../Config/Redux/restApi/';
@@ -39,9 +37,6 @@ const Profile = ({navigation}) => {
     const EditProf = async () => {
         navigation.navigate('EditProfile')
     }
-    const logouts = (e) => {
-        alert(e)
-    }
 
     return(
         <View style={{flex:1}}>
@@ -65,14 +60,13 @@ const Profile = ({navigation}) => {
                             <Image source={HomeState.profileuri} style={{width:50, height:50, borderRadius:100 , marginLeft:12}}/> 
                         )
                     }
-                    {/* <View style={[style.profileimg ,{}]}></View> */}
                     <Text style={[style.profilename, {}]}>{HomeState.displayname}</Text>
                 </View>
                 <View style={{width:220, marginBottom: 50}}>
                     <Text style={[style.bio , {}]}>{HomeState.statusmessage}</Text>
                 </View>
                <View style={{flexDirection:'row', justifyContent:'flex-end', right:10}}>
-                <TouchableOpacity onPress={logouts} style={{backgroundColor:'#00C2FF',width:100, height:'37%', borderRadius:20 , borderColor:'rgb(0,191,166)', alignItems:'center' }}>
+                <TouchableOpacity onPress={onClickLogout} style={{backgroundColor:'#00C2FF',width:100, height:'37%', borderRadius:20 , borderColor:'rgb(0,191,166)', alignItems:'center' }}>
                     <Text style={{color:'black', fontSize:20, textAlign:'center', marginTop:3, fontFamily:'ITCKRISTEN'}}>
                         Logout
                     </Text>
