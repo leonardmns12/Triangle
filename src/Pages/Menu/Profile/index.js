@@ -42,11 +42,13 @@ const Profile = ({navigation}) => {
         <View style={{flex:1}}>
             <View style={{flex:0.67, backgroundColor:'rgba(27,176,233,1)' , borderBottomLeftRadius:41, borderBottomRightRadius:41, position:'relative'}}>
               <View style={{position:'relative'}}>
-                <View style={{flexDirection:'row'}}>
+                <View style={{position:'relative', alignItems:'center'}}>
                     {/* <TouchableOpacity style={{paddingLeft:1, paddingTop:11}}> 
                     <LeftLogo height={33} width={33}></LeftLogo>
                     </TouchableOpacity>  */}
                     <Text style={[style.headerText,{}]}>Profile</Text>
+                </View>
+                <View style={{position:'absolute', right:'1%'}}>
                     <TouchableOpacity>
                         <Text style={[style.editprof, {}]} onPress={EditProf}>
                             Edit
@@ -62,12 +64,12 @@ const Profile = ({navigation}) => {
                     }
                     <Text style={[style.profilename, {}]}>{HomeState.displayname}</Text>
                 </View>
-                <View style={{width:220, marginBottom: 50}}>
-                    <Text style={[style.bio , {}]}>{HomeState.statusmessage}</Text>
-                </View>
-               <View style={{flexDirection:'row', justifyContent:'flex-end', right:10}}>
-                <TouchableOpacity onPress={onClickLogout} style={{backgroundColor:'#00C2FF',width:100, height:'37%', borderRadius:20 , borderColor:'rgb(0,191,166)', alignItems:'center' }}>
-                    <Text style={{color:'black', fontSize:20, textAlign:'center', marginTop:3, fontFamily:'ITCKRISTEN'}}>
+                {/* <View style={{width:220, marginBottom: 50}}>
+                </View> */}
+               <View style={{flexDirection:'row'}}>
+                    <Text style={[style.bio , {width: '60%'}]}>{HomeState.statusmessage} asdasdasdasdasdasdasdasdausydgasd asdasdasd as das sa da asdasdasdas asdasdasdasdasdasdassdasdasdasdasdass</Text>
+                <TouchableOpacity onPress={onClickLogout} style={{backgroundColor:'#00C2FF',width:100, height:'32%', borderRadius:20 , borderColor:'rgb(0,191,166)', alignItems:'center', marginTop:'30%' }}>
+                    <Text style={{color:'black', fontSize:20, textAlign:'center', fontFamily:'ITCKRISTEN'}}>
                         Logout
                     </Text>
                 </TouchableOpacity>
@@ -94,7 +96,7 @@ const style = StyleSheet.create({
         width: 50,
         backgroundColor: '#FFFFFF',
         height: 50,
-        marginLeft: 12,
+        marginLeft: '4.5%',
         borderRadius: 100,
         borderColor: '#707070',
         borderWidth: 1
@@ -102,27 +104,22 @@ const style = StyleSheet.create({
     profilename : {
         fontSize: 16,
         color: '#FFFFFF',
-        marginTop: 12,
+        marginTop: '4.5%',
         paddingHorizontal:15
     },
     bio: {
-        marginLeft: 12,
+        marginLeft: '5%',
         color: '#FFFFFF',
     },
     headerText: {
         fontSize : 20,
         fontFamily : 'ITCKRISTEN',
         color : '#FFFFFF',
-        paddingTop : 15,
-        marginLeft: '40%',
     },
     editprof: {
         fontSize: 20,
         fontFamily : 'ITCKRISTEN',
         color : '#FFFFFF',
-        position: 'relative',
-        marginLeft: '45%',
-        marginTop: '7.5%',
     },
 })
 
