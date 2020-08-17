@@ -10,7 +10,7 @@ const PictureContent = () => {
 const styles =  StyleSheet.create({
     border : {
         marginHorizontal : '4.5%',
-        width : 290,
+        width : '90%',
         height : 120,
         borderColor : 'black',
         borderWidth : 1

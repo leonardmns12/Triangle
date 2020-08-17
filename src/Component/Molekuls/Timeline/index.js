@@ -94,7 +94,7 @@ const style = StyleSheet.create({
         shadowRadius:5.46,
         elevation: 9,
         borderRadius : 30,
-        width : 320,
+        width : '90%',
         maxHeight : 360,   
         minHeight : 160,
     },

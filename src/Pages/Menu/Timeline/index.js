@@ -21,7 +21,7 @@ return(
         </View>
         <View style={{flex:1}}>
             <Text style={[styles.timelinetext,{}]}>Friend With Something News</Text>
-        <View style={{width:310, borderWidth:1 , marginHorizontal: 18 }}>
+        <View style={{width:'90%', borderWidth:1 , marginHorizontal: 18 }}>
         </View>
         <ScrollView>
             <View> 
