@@ -10,6 +10,7 @@ import FindFriend from './FindFriend/';
 import Invitation from './Invitation/';
 import EditProfile from './EditProfile/';
 import FriendsProfile from './FriendsProfile/';
+import PostReply from './PostReply';
 
 export {ChatWindow};
 export {Home};
@@ -23,3 +24,4 @@ export {FindFriend};
 export {Invitation};
 export {EditProfile};
 export {FriendsProfile};
+export {PostReply};

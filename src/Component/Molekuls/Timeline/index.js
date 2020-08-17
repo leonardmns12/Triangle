@@ -5,7 +5,7 @@ import ChatIcon from '../../../../assets/navigation/comment-active.svg';
 import {ContentPicture} from '../../../Component/Atoms'
 
 
-const Timeline = ({navigation,profilename,content,commentcount,time,visible}) => {
+const Timeline = ({navigation,profilename,content,commentcount,time,visible,onpress}) => {
   const isPicture = (visible) => {
       if(visible == 'block'){
         
@@ -15,8 +15,10 @@ const Timeline = ({navigation,profilename,content,commentcount,time,visible}) =>
         return <View style={[style.picture],{display:'none'}}></View>
       }
   }
+
+
     return (
-        <View style = {[style.border]}> 
+        <TouchableOpacity onPress={onpress} style = {[style.border]}> 
             <View style = {{flexDirection : 'row'}}>
                 <View style = {[style.borderimage]}></View>
                   <Text style = {{marginVertical : 25}}>{profilename}</Text>
@@ -26,10 +28,8 @@ const Timeline = ({navigation,profilename,content,commentcount,time,visible}) =>
                 </View>
             </View>
             <View style = {{ minHeight : 35, maxHeight : 350}}>
-              
-             
-                    {isPicture(visible)}
             
+                    {isPicture(visible)}
 
                  <Text style = {{marginHorizontal : 20}} >{content}</Text> 
 
@@ -38,7 +38,7 @@ const Timeline = ({navigation,profilename,content,commentcount,time,visible}) =>
                 <Text style = {[style.Time]}>{time}</Text>
                 <View style = {[style.ReplyButton]} ><Text style = {[style.ReplyText]}> Reply</Text></View>
             </View>
-        </View>
+        </TouchableOpacity>
     )
 }
 

@@ -10,6 +10,11 @@ const gtchat = (screen) => {
     navigation.replace(screen);
 }
 
+const gotoPostReply = () => {
+    navigation.navigate('PostReply')
+}
+
+
 return(
     <View style={{flex:1}}>
         <View style={{flex:1, backgroundColor:'white'}}>
@@ -25,6 +30,11 @@ return(
         </View>
         <ScrollView>
             <View> 
+            <Contents onpress={gotoPostReply} visible = {'block'} />
+            <Contents visible = {'block'} />
+            <Contents visible = {'block'} />
+            <Contents visible = {'block'} />
+            <Contents visible = {'block'} />
                 <Contents visible = {'block'} />
                 <Contents visible = {'none'} profilename={'Leonard'} commentcount={'2'} time={'17:20'} content={'111'}/>
                 <Contents visible = {'block'} profilename={'Leonard'} commentcount={'2'} time={'17:20'} content={'12312312312'}/>

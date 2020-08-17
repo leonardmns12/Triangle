@@ -228,7 +228,7 @@ const ChatWindow = ({navigation}) => {
         <View style={{flex:1}}>
             <View style={{flex:1}}>
             <View style={[styles.chatHeader,{}]}>
-                <Text style={[styles.headerText,{}]}>{chatState.receiver}</Text>
+            <Text style={[styles.headerText,{}]}>{chatState.receiver}</Text>
             </View>
             <View style={{flex:1 , backgroundColor : '#FFFFFF',paddingTop: 10, paddingHorizontal:10}}> 
                 <FlatList
@@ -237,7 +237,7 @@ const ChatWindow = ({navigation}) => {
                 renderItem={renderItem}
                 keyExtractor={item => item.id}
                 />
-                <ActivityIndicator color={'#1BB0DF'} animating={loading}/>
+            <ActivityIndicator color={'#1BB0DF'} animating={loading}/>
             </View>
             </View>
             <View style={{backgroundColor:'#F6F6F6' , height:50, alignItems: 'center', flexDirection: 'row'}}>
