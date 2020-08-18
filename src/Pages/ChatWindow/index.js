@@ -122,6 +122,7 @@ const ChatWindow = ({navigation}) => {
                 dispatch({type:'SET_MESSAGE', inputType: 'message', inputValue: ''});
             }   
         }
+        setheight(41)
         // await getMessage(chatState.userId); 
     }
     const starter = async () => {
@@ -177,7 +178,7 @@ const ChatWindow = ({navigation}) => {
         }
         });
     }
-    const [code ,setcode] = useState('')
+    const [height ,setheight] = useState(1)
     const renderItem = ({ item }) => (
         item.data.sender === chatState.sender ? (
 
@@ -240,7 +241,7 @@ const ChatWindow = ({navigation}) => {
             <ActivityIndicator color={'#1BB0DF'} animating={loading}/>
             </View>
             </View>
-            <View style={{backgroundColor:'#F6F6F6' , height:50, alignItems: 'center', flexDirection: 'row'}}>
+            <View style={{backgroundColor:'#F6F6F6' , height:'auto', alignItems: 'center', flexDirection: 'row'}}>
                 <TouchableOpacity onPress={chooseFile} style={{marginLeft:15, marginRight:10}}>
                     <ImagesLogo height={25} width={25}/>
                 </TouchableOpacity>
@@ -251,7 +252,9 @@ const ChatWindow = ({navigation}) => {
                             <Text style={{marginHorizontal:'5%', fontSize:12}}>{imageUri.fileName}</Text>
                         </View>  
                     ) : (
-                        <TextInput value={chatState.form.message} onChangeText={(e)=>{onChangeInput(e,'message')}} style={[styles.input,{}]} placeholder="Type here . . ." multiline></TextInput> 
+                        <TextInput value={chatState.form.message} onChangeText={(e)=>{onChangeInput(e,'message')}} style={[styles.input,{height : Math.max(24, height)}]} placeholder="Type here . . ." multiline={true}
+                        onContentSizeChange={(event)=>{setheight(event.nativeEvent.contentSize.height)}}
+                        ></TextInput> 
                     )
                 }       
                 <View style={{position:'absolute', right:'5%'}}>
@@ -278,10 +281,9 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         elevation:8,
         width: '70%',
-        height: 36,
-        borderRadius: 18,
+        borderRadius: 10,
         fontWeight: 'bold',
-        paddingLeft: 27,
+        padding: 15,
         fontSize : 15,
     },
     headerText : {
