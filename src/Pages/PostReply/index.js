@@ -12,10 +12,10 @@ const PostReply = () => {
                 </TouchableOpacity>
                 <Text style={[styles.headerText,{}]}>Timeline</Text>
             </View>
-            <View style={{marginTop:10}}>
+            <View style={{padding:10, backgroundColor:"white"}}>
                 <View style={{flexDirection:'row', paddingLeft:10}}>
-                    <View style={{height:30 , width:30 , borderRadius:30, borderWidth:1}}></View>
-                    <Text style={{marginLeft:10, justifyContent:'center' , alignItems:'center', paddingTop:5, fontWeight:"bold", fontSize:16}}>Leonard Monosa</Text>
+                    <View style={[styles.profilePict]}></View>
+                    <Text style={[styles.profileName]}>Leonard Monosa</Text>
                 </View>
                 <View>
                     <Text style={{padding:"8%"}}>Some friend being wise by adding more friend</Text>
@@ -33,10 +33,10 @@ const PostReply = () => {
                 <PostComment name="Kent anderson" content="mantap" time="19.00"/>
                 <PostComment name="Kent anderson" content="mantap" time="19.00"/>
                 <PostComment name="Kent anderson" content="mantap" time="19.00"/>
-
             </ScrollView>
+
             <View style={{flexDirection:'row' , backgroundColor:'white', padding:10}}>
-                <TextInput placeholder="Ketik Disini" style={{borderWidth:1, backgroundColor:"white", width:'80%', borderRadius:10, padding:5, height:30, margin:10}} ></TextInput>
+                <TextInput placeholder="Ketik Disini" style={[styles.inputComment]}></TextInput>
                 <View style={{height:30 , width:30 , borderRadius:30, borderWidth:1, backgroundColor:'blue', margin:10}}></View>
             </View>
         </View>
@@ -60,6 +60,33 @@ const styles =  StyleSheet.create({
         fontSize : 18,
         marginHorizontal : 18,
         marginVertical : 15
+    },
+    profilePict : {
+        height:30 , 
+        width:30 , 
+        borderRadius:30, 
+        borderWidth:1
+    }, 
+    profileName : {
+        marginLeft:10, 
+        justifyContent:'center' , 
+        alignItems:'center', 
+        paddingTop:5, fontWeight:"bold", 
+        fontSize:16,
+    }, 
+    inputComment : {
+        backgroundColor:"white", 
+        width:'80%', 
+        borderRadius:10, 
+        padding:5, 
+        height:30, 
+        margin:10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,  
+        elevation: 5
+        
     }
 })
 
