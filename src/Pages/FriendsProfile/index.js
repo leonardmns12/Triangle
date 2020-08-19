@@ -22,7 +22,7 @@ const FriendsProfile = ({navigation}) => {
               <View style={{position:'relative'}}>
                 <View style={{flexDirection:'row',marginTop:5, marginBottom:7}}>
                     <View style={[style.profileimg ,{}]}></View>
-                    <Text style={[style.profilename, {}]}>Nico</Text>
+                    <Text style={[style.profilename, {}]}>Nico Ganteng banget</Text>
                 </View>
                 <View style={{width:220, marginBottom: 50}}>
                     <Text style={[style.bio , {}]}>Better</Text>
