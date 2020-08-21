@@ -110,6 +110,9 @@ const Chat = ({navigation}) => {
         })
         dispatch({type:'SET_CHATLIST' , value:data})
     }
+    const NewGroup = () => {
+        navigation.navigate('NewGroup')
+    }
     return(
         <View style={{flex:1, backgroundColor:'#FFFFFF'}}>
             <View style={[styles.header,{}]}>
@@ -117,7 +120,7 @@ const Chat = ({navigation}) => {
                 <LeftLogo height={33} width={33}></LeftLogo>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={addfriend} style={{position:'absolute' , right:'3%', top:'8%'}}>
-                <Addfriend height={40} width={38}></Addfriend>
+                <Addfriend  onPress={NewGroup} height={40} width={38}></Addfriend>
                 </TouchableOpacity>
                 <Text style={[styles.headerText,{}]}>Chat</Text>
             </View>
