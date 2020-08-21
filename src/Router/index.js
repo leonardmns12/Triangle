@@ -1,5 +1,5 @@
 import React , { useEffect , useState } from 'react';
-import { Login, Splash, Register, Home, Profile, Chat, Timeline, ChatWindow, FindFriend , Invitation, EditProfile, FriendsProfile , PostReply } from '../Pages/';
+import { Login, Splash, Register, Home, Profile, Chat, Timeline, ChatWindow, FindFriend , Invitation, EditProfile, FriendsProfile , PostReply, NewGroup } from '../Pages/';
 import {createStackNavigator} from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -208,6 +208,13 @@ const Router = () => {
             options={{
                 headerShown: false,
             }}
+            
+            />
+               <Stack.Screen name="NewGroup" component={NewGroup}
+            options={{
+                headerShown: false,
+            }}
+            
             />
              <Stack.Screen name="PostReply" component={PostReply}
             options={{

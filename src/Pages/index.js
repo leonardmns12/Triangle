@@ -11,6 +11,7 @@ import Invitation from './Invitation/';
 import EditProfile from './EditProfile/';
 import FriendsProfile from './FriendsProfile/';
 import PostReply from './PostReply';
+import NewGroup from './NewGroup';
 
 export {ChatWindow};
 export {Home};
@@ -25,3 +26,4 @@ export {Invitation};
 export {EditProfile};
 export {FriendsProfile};
 export {PostReply};
+export {NewGroup};
