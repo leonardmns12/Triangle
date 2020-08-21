@@ -17,7 +17,7 @@ const NewTimeline = () => {
                 toValue: 1,
                 useNativeDriver : true
             })
-        ]).start(()=>{navigation.navigate('Timeline')});
+        ]).start(()=>{navigation.navigate('CreatePost')});
         
     }
     const sizeStyle = {

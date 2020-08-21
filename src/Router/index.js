@@ -1,5 +1,5 @@
 import React , { useEffect , useState } from 'react';
-import { Login, Splash, Register, Home, Profile, Chat, Timeline, ChatWindow, FindFriend , Invitation, EditProfile, FriendsProfile , PostReply, NewGroup } from '../Pages/';
+import { Login, Splash, Register, Home, Profile, Chat, Timeline, ChatWindow, FindFriend , Invitation, EditProfile, FriendsProfile , PostReply, NewGroup , CreatePost } from '../Pages/';
 import {createStackNavigator} from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -114,6 +114,11 @@ const Stack = createStackNavigator();
             headerShown: false,
         }}
         />   
+        <Stack.Screen name="CreatePost" component={CreatePost}
+            options={{
+                headerShown: false,
+            }}
+        />    
         </Stack.Navigator>  
       )
   }
@@ -135,9 +140,6 @@ const Stack = createStackNavigator();
         </Stack.Navigator>  
       )
   }
-
-
-
 
 const Router = () => {
     const [render, setrender] = useState('')
@@ -164,6 +166,11 @@ const Router = () => {
                 headerShown: false,
             }}
             />
+            <Stack.Screen name="CreatePost" component={CreatePost}
+            options={{
+                headerShown: false,
+            }}
+            />    
             <Stack.Screen name="Register" component={Register}
             options={{
                 headerShown: false,

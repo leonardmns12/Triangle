@@ -373,3 +373,12 @@ export const clearToken = (username) => {
 export const deleteChatlist = (username , friend) => {
   database().ref('users/' + username + '/chat/' + friend).remove()
 }
+
+export const createNewGroup = (data) => {
+  const data1 = database().ref('group/').push({
+    admin : data.username,
+    name : data.groupname,
+    groupimg : null
+  }).key
+  return data1;
+}
