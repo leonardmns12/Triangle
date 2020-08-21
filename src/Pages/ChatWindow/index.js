@@ -241,7 +241,7 @@ const ChatWindow = ({navigation}) => {
             <ActivityIndicator color={'#1BB0DF'} animating={loading}/>
             </View>
             </View>
-            <View style={{backgroundColor:'#F6F6F6' , height:'auto', alignItems: 'center', flexDirection: 'row'}}>
+            <View style={{backgroundColor:'#F6F6F6' , height:'auto',minHeight:50, alignItems: 'center', flexDirection: 'row'}}>
                 <TouchableOpacity onPress={chooseFile} style={{marginLeft:15, marginRight:10}}>
                     <ImagesLogo height={25} width={25}/>
                 </TouchableOpacity>
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         fontWeight: 'bold',
         padding: 15,
-        fontSize : 15,
+        fontSize : 10,
     },
     headerText : {
         fontSize : 20,

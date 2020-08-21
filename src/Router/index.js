@@ -109,11 +109,6 @@ const Stack = createStackNavigator();
                 headerShown: false,
             }}
         />    
-        <Stack.Screen name="PostReply" component={PostReply} 
-        options={{
-            headerShown: false,
-        }}
-        />   
         </Stack.Navigator>  
       )
   }
@@ -210,6 +205,11 @@ const Router = () => {
             }}
             />
             <Stack.Screen name="FriendsProfile" component={FriendsProfile}
+            options={{
+                headerShown: false,
+            }}
+            />
+             <Stack.Screen name="PostReply" component={PostReply}
             options={{
                 headerShown: false,
             }}
