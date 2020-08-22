@@ -12,6 +12,7 @@ import EditProfile from './EditProfile/';
 import FriendsProfile from './FriendsProfile/';
 import PostReply from './PostReply';
 import NewGroup from './NewGroup';
+import CreatePost from './CreatePost';
 
 export {ChatWindow};
 export {Home};
@@ -27,3 +28,4 @@ export {EditProfile};
 export {FriendsProfile};
 export {PostReply};
 export {NewGroup};
+export {CreatePost}

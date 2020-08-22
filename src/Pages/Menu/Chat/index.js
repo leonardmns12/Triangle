@@ -9,6 +9,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { getDisplayName , deleteChatlist } from '../../../Config/Redux/restApi/';
 import storage from '@react-native-firebase/storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import IconAddGroup from 'react-native-vector-icons/MaterialIcons';
+
+
 const Chat = ({navigation}) => {
     const gtchat = (screen) => {
         navigation.replace(screen);
@@ -120,7 +123,7 @@ const Chat = ({navigation}) => {
                 <LeftLogo height={33} width={33}></LeftLogo>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={addfriend} style={{position:'absolute' , right:'3%', top:'8%'}}>
-                <Addfriend  onPress={NewGroup} height={40} width={38}></Addfriend>
+                <IconAddGroup onPress={NewGroup} size={38} name={"group-add"} color ={'white'}/> 
                 </TouchableOpacity>
                 <Text style={[styles.headerText,{}]}>Chat</Text>
             </View>
