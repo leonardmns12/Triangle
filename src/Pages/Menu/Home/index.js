@@ -14,6 +14,8 @@ import UserLogo from '../../../../assets/popupprofile/user.svg';
 import BlockLogo from '../../../../assets/block.svg';
 import ChatLogo from '../../../../assets/chat.svg';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon1 from 'react-native-vector-icons/Feather';
+import { FlatList } from 'react-native-gesture-handler';
 const Home = ({navigation}) => {
     useEffect(()=>{
         ShowProfile();
@@ -69,8 +71,6 @@ const Home = ({navigation}) => {
         await AsyncStorage.setItem('displayname' , dn)
         await AsyncStorage.setItem('statusmsg' , sm)
     }
-    const [profileImg , setProfileImg] = useState('')
-    const [loading , setLoading] = useState(false);
     const HomeState = useSelector(state => state.homeReducer)
     const dispatch = useDispatch()
     const getAllFriend = (username) => { 
@@ -109,6 +109,30 @@ const Home = ({navigation}) => {
         }
     })
     }
+    const getAllGroup = (username) => {
+    const dataGroup = database().ref('users/' + username + '/group');
+    dataGroup.on('value', async function(snapshot){
+        const data = []
+        if(snapshot.val() === null || snapshot.val() === undefined){
+            dispatch({ type: 'SET_HOMEGROUP' , value:data})
+        }else{
+            Object.keys(snapshot.val()).map(key => {
+                data.push({
+                    id: key,
+                    data: snapshot.val()[key],
+                    })
+            })
+            for(let i = 0; i < data.length; i++){
+                const uri = await getProfileUri(data[i].id)
+                data[i] = {
+                    ...data[i],
+                    profileImg : uri
+                }
+            }
+            dispatch({type:'SET_HOMEGROUP' , value : data})
+        }
+    })
+    }
     const _retrieveUsername = async () => {
             try{
                 const async_friendlist = await AsyncStorage.getItem('friendlist');
@@ -124,6 +148,7 @@ const Home = ({navigation}) => {
             if (value !== null) {
             //   alert(value)
               const res = await getAllFriend(value)
+              await getAllGroup(value)
               if(res){
                   console.log('data null')
               }
@@ -187,12 +212,49 @@ const Home = ({navigation}) => {
     const [modalUri , setModalUri] = useState({uri : 'https://firebasestorage.googleapis.com/v0/b/triang…=media&token=8e8f6b02-b104-4de1-8d04-d2887c764a6d'})
     const [modalStatus, setModalStatus] = useState('')
     const [modalUsername , setModalUsername] = useState('')
-
+    const [friendclick , setfriendclick] = useState(true)
+    const [groupclick , setgroupclick] = useState(false)
+    const [friendright , setfriendright] = useState(false)
+    const [groupright , setgroupright] = useState(true)
     const FriendsProf = async (friend) => {
         const username = await AsyncStorage.getItem('username')
         navigation.navigate('FriendsProfile')
         setModalVisible(false)
     }
+
+    const renderFriend = ({item}) => {
+        if(HomeState.friendlist == ''){
+            return(
+             <View style={{flex:1}}>
+             <Text style={{textAlign:'center'}}>You dont have any friend</Text>
+             </View>
+            )
+        }
+        return(
+            <Friendlist url={item.profileImg} name={item.displayname} funct={()=>{ 
+                setModalVisible(true)
+                setModalName(item.displayname)
+                setModalUri(item.profileImg)
+                setModalStatus(item.statusmessage)
+                setModalUsername(item.data.friend)
+             }} />
+        )
+    }
+
+    const renderGroup = ({item}) => {
+        if(HomeState.grouplist == ''){
+            return(
+             <View style={{flex:1}}>
+             <Text style={{textAlign:'center'}}>You dont have any group</Text>
+             </View>
+            )
+        }
+        return(
+            <Friendlist isgroup={true} url={item.profileImg} name={item.data.groupName} funct={()=>{
+                navigation.navigate('GroupInfo')
+            }}/>
+        )
+    } 
 
     return(
         <View style={{flex:1 , position:'relative', backgroundColor:'#FFFFFF'}}>
@@ -245,8 +307,7 @@ const Home = ({navigation}) => {
                       <AddFriend onPress={addfriend} width={40} height={38} />
                       </View>
                   </View>
-                <View style={{flexDirection:'row', marginTop: 43, marginBottom:7}}>
-                    
+                <View style={{flexDirection:'row', marginTop: 43, marginBottom:7}}>  
                     {
                         HomeState.profileuri === 'null' ? (
                             <View style={[style.profileimg ,{}]}></View>   
@@ -274,43 +335,75 @@ const Home = ({navigation}) => {
                 </View>
                 <TextInput onChangeText={(e)=>{searchUser(e)}}  placeholder="Search Friends" style={{}}></TextInput>
                 </View>
-                <View style={[style.homeinfo,{flexDirection : 'row'}]}>
-                    <Text style={[style.friendngroup]}>
-                    Friends & Group
-                    </Text>
-                </View> 
-            <ScrollView showsVerticalScrollIndicator={false}>
-                <View style={{height:10}}></View>
+                    <View style={{flex:1}}>
+                    <TouchableOpacity onPress={()=>{setfriendclick(!friendclick) , setfriendright(!friendright)}} style={[style.homeinfo,{flexDirection : 'row'}]}>
+                        {
+                            friendright ? (
+                                <View style={{position:'absolute' , right:'5%'}}>
+                                    <Icon1 name="arrow-right-circle" color={'rgba(27,176,233,1)'} size={25} />
+                                </View>
+                            ) : (
+                                <View style={{position:'absolute' , right:'5%'}}>
+                                    <Icon1 name="arrow-down-circle" color={'rgba(27,176,233,1)'} size={25} />
+                                </View>
+                            )
+                        }
+                        <View style={{width:35, justifyContent:'center'}}>
+                        <Icon name="user" size={20} style={{marginRight:'3%'}}/>
+                        </View>
+                        <Text style={[style.friendngroup]}>
+                        Friends
+                        </Text>
+                        <Text style={[style.friendngroup]}>
+                        ({HomeState.friendlist.length})
+                        </Text>
+                    </TouchableOpacity> 
+                        {
+                            friendclick ? (
+                                <View style={{height:'auto'}}>
+                                <FlatList
+                                data={HomeState.friendlist}
+                                renderItem = {renderFriend}
+                                keyExtractor={item => item.id}
+                                />
+                                </View>
+                            ) : null
+                        }
+                        
+                    <TouchableOpacity onPress={()=>{setgroupclick(!groupclick), setgroupright(!groupright)}} style={[style.homeinfo,{flexDirection : 'row',marginTop:'5%'}]}>
+                        {
+                            groupright ? (
+                                <View style={{position:'absolute' , right:'5%'}}>
+                                    <Icon1 name="arrow-right-circle" color={'rgba(27,176,233,1)'} size={25} />
+                                </View>
+                            ) : (
+                                <View style={{position:'absolute' , right:'5%'}}>
+                                    <Icon1 name="arrow-down-circle" color={'rgba(27,176,233,1)'} size={25} />
+                                </View>
+                            )
+                        }   
+                            <View style={{width:35, justifyContent:'center'}}>
+                            <Icon name="users" size={18} style={{marginRight:'3%'}}/>
+                            </View>
+                            <Text style={[style.friendngroup]}>
+                            Groups
+                            </Text>
+                            <Text style={[style.friendngroup]}>
+                            ({HomeState.grouplist.length})
+                            </Text>
+                    </TouchableOpacity> 
+                        {
+                            groupclick ? (
+                                <FlatList
+                                data={HomeState.grouplist}
+                                renderItem={renderGroup}
+                                keyExtractor={item => item.id}
+                                /> 
+                            ) : null
+                        }
+                    </View>        
+                </View>
 
-               <View style={{display:'flex' , alignItems:'center'}}>
-               </View>
-                    {
-                            HomeState.friendlist.map((id,key) => {
-                                if(HomeState.friendlist == ''){
-                                   return(
-                                    <View style={{flex:1}}>
-                                    <Text style={{textAlign:'center'}}>You dont have any friend</Text>
-                                    </View>
-                                   )
-                               }
-                               if(key === HomeState.friendlist.length - 1 && loading === true){
-                                   setmount(true)
-                               }
-                               return(
-                                   
-                                   <Friendlist url={id.profileImg} key={key} name={id.displayname} funct={()=>{ 
-                                       setModalVisible(true)
-                                       setModalName(id.displayname)
-                                       setModalUri(id.profileImg)
-                                       setModalStatus(id.statusmessage)
-                                       setModalUsername(id.data.friend)
-                                    }} />
-                               )
-                           }) 
-                    }
-                <ActivityIndicator animating={loading}/>
-            </ScrollView>
-            </View>
             {/* <NavigationMenu home="active" gotoChat={()=>{gtchat('Chat')}}
                 gotoTimeline={()=>{gtchat('Timeline')}}
                 gotoProfile={()=>{gtchat('Profile')}}     
@@ -346,12 +439,12 @@ const style = StyleSheet.create({
     },
 
     homeinfo : {
-        paddingHorizontal : 30
-
+        paddingHorizontal : 20
     },
     friendngroup : {
         fontFamily : 'ITCKRISTEN',
-        fontSize : 18
+        fontSize : 18,
+        marginRight: '2%'
     },
     input : {
         shadowColor : 'black',

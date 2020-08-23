@@ -382,3 +382,21 @@ export const createNewGroup = (data) => {
   }).key
   return data1;
 }
+
+export const addGroupMember = (username,group) => {
+  database().ref('group/' + group.id + '/member/' + username).set({
+    member : username
+  })
+  database().ref('users/' + username + '/group/' + group.id).set({
+    groupName : group.name
+  })
+}
+
+export const inviteGroupMember = (username, group) => {
+  database().ref('users/' + username + '/incomingFriend/' + group.id).set({
+    group : group.name
+  })
+  database().ref('group/' + group.id + '/pendingMember').push({
+    member : username
+  })
+}

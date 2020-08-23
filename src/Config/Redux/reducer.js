@@ -10,7 +10,8 @@ const homeState = {
     displayname : '',
     statusmessage : '',
     profileuri : 'null',
-    allfriend : []
+    allfriend : [],
+    grouplist : []
 }
 
 const registerState = {
@@ -121,6 +122,12 @@ const homeReducer = (state = homeState , action) => {
         return{
             ...state,
             [action.tipe] : action.value
+        }
+    }
+    if(action.type === 'SET_HOMEGROUP'){
+        return{
+            ...state,
+            grouplist : action.value
         }
     }
     return state;

@@ -53,7 +53,7 @@ const PostReply = () => {
                 <PostComment name="Kent anderson" content="mantap" time="19.00"/> 
             </ScrollView>
             <View style={{flexDirection:'row' , backgroundColor:'transparent', padding:0, margin:0 , height:'auto'}}>
-                <TextInput placeholder="Type Here" style={[styles.inputComment]}/>
+                <TextInput placeholder="Reply here" style={[styles.inputComment]}/>
                 <TouchableOpacity>
                     <Icon name="send-circle" size={38} color="#1BB0DF" style={{paddingTop:10}}/>
                 </TouchableOpacity>

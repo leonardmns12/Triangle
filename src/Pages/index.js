@@ -13,6 +13,7 @@ import FriendsProfile from './FriendsProfile/';
 import PostReply from './PostReply';
 import NewGroup from './NewGroup';
 import CreatePost from './CreatePost';
+import GroupInfo from './GroupInfo';
 
 export {ChatWindow};
 export {Home};
@@ -29,3 +30,4 @@ export {FriendsProfile};
 export {PostReply};
 export {NewGroup};
 export {CreatePost}
+export {GroupInfo}
