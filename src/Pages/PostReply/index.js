@@ -4,10 +4,12 @@ import PostComment from '../../Component/Molekuls/PostReplyComment/';
 import { TextInput } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import OptionIcon from 'react-native-vector-icons/SimpleLineIcons'
+import BackIcon from 'react-native-vector-icons/Ionicons'
 const PostReply = () => {
     return(
         <View style={{backgroundColor:'white', flex:1}}>
             <View style={[styles.header,{}]}>
+                <BackIcon name="chevron-back-circle-outline" size={40} color="white" style={{padding:8, paddingRight:0}}/>
                 <TouchableOpacity style={{paddingLeft:18, paddingTop:11}}> 
                 </TouchableOpacity>
                 <TouchableOpacity style={{position:'absolute' , right:'3%', top:'8%'}}>
@@ -20,7 +22,7 @@ const PostReply = () => {
                     <Text style={[styles.profileName]}>Leonard Monosa</Text>
                     <View style={{position:'absolute', right:0, padding:"0%" , flexDirection:'row', marginLeft:"2%"}}>
                         <TouchableOpacity>
-                            <OptionIcon name="options-vertical" size={20}/>
+                            <OptionIcon name="options-vertical" size={22} style={{padding:0, paddingTop:4}}/>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -50,7 +52,7 @@ const PostReply = () => {
                 <PostComment name="Kent anderson" content="mantap" time="19.00"/> 
                 <PostComment name="Kent anderson" content="mantap" time="19.00"/> 
             </ScrollView>
-            <View style={{flexDirection:'row' , backgroundColor:'white', padding:10 , height:'auto'}}>
+            <View style={{flexDirection:'row' , backgroundColor:'transparent', padding:0, margin:0 , height:'auto'}}>
                 <TextInput placeholder="Type Here" style={[styles.inputComment]}/>
                 <TouchableOpacity>
                     <Icon name="send-circle" size={38} color="#1BB0DF" style={{paddingTop:10}}/>
@@ -71,7 +73,7 @@ const styles =  StyleSheet.create({
         fontFamily : 'ITCKRISTEN',
         color : '#FFFFFF',
         paddingTop : 15,
-        marginLeft: 20
+        marginLeft: 0
     },
     timelinetext : {
         fontSize : 18,
