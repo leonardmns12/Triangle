@@ -6,6 +6,7 @@ import { signOutUser , clearToken } from '../../../Config/Redux/restApi/';
 import { useDispatch , useSelector } from 'react-redux';
 import Home from '../Home';
 import LeftLogo from '../../../../assets/chatWindow/left.svg';
+import Icon from 'react-native-vector-icons/AntDesign'
 
 const Profile = ({navigation}) => {
     const gtchat = (screen) => {
@@ -48,7 +49,8 @@ const Profile = ({navigation}) => {
                     </TouchableOpacity>  */}
                     <Text style={[style.headerText,{}]}>Profile</Text>
                 </View>
-                <View style={{position:'absolute', right:'1%'}}>
+                <View style={{flexDirection:'row', position:'absolute', right:'1%'}}>
+                <Icon name={'form'} size={23}/>
                     <TouchableOpacity>
                         <Text style={[style.editprof, {}]} onPress={EditProf}>
                             Edit
@@ -67,16 +69,16 @@ const Profile = ({navigation}) => {
                 {/* <View style={{width:220, marginBottom: 50}}>
                 </View> */}
                <View style={{flexDirection:'row'}}>
-                    <Text style={[style.bio , {width: '60%'}]}>{HomeState.statusmessage}</Text>
+                    <Text style={[style.bio , {width: '40%'}]}>{HomeState.statusmessage}</Text>
                 <TouchableOpacity onPress={onClickLogout} style={{backgroundColor:'#00C2FF',width:100, height:'32%', borderRadius:20 , borderColor:'rgb(0,191,166)', alignItems:'center', marginTop:'30%' }}>
-                    <Text style={{color:'black', fontSize:20, textAlign:'center', fontFamily:'ITCKRISTEN'}}>
+                    <Text style={{color:'white', fontSize:18, textAlign:'center', fontFamily:'ITCKRISTEN'}}>
                         Logout
                     </Text>
                 </TouchableOpacity>
                </View>
                </View>
             </View>
-            <View style={{flex:1.3}}>
+            <View style={{flex:1.3, backgroundColor: 'white'}}>
             <ScrollView>
             <View> 
                 <Contents visible = {'block'} />
@@ -108,7 +110,7 @@ const style = StyleSheet.create({
         paddingHorizontal:15
     },
     bio: {
-        marginLeft: '5%',
+        marginLeft: '23%',
         color: '#FFFFFF',
     },
     headerText: {

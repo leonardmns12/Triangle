@@ -14,6 +14,7 @@ import PostReply from './PostReply';
 import NewGroup from './NewGroup';
 import CreatePost from './CreatePost';
 import GroupInfo from './GroupInfo';
+import InviteGroupMember from './InviteGroupMember';
 
 export {ChatWindow};
 export {Home};
@@ -29,5 +30,6 @@ export {EditProfile};
 export {FriendsProfile};
 export {PostReply};
 export {NewGroup};
-export {CreatePost}
-export {GroupInfo}
+export {CreatePost};
+export {GroupInfo};
+export {InviteGroupMember};
