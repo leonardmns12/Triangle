@@ -243,14 +243,8 @@ export const addChatDatabase = (data) => {
     message : data.message,
     realtime : data.realtime,
     timestamp : data.timestamp,
-    isRead : true
-  })
-  database().ref('users/' + data.receiver + '/chat/' + data.sender).set({
-    friend : data.sender,
-    message : data.message,
-    realtime : data.realtime,
-    timestamp : data.timestamp,
-    isRead : data.isRead
+    isRead : true,
+    isGroup : data.isGroup
   })
 }
 
@@ -296,9 +290,10 @@ export const getDisplayName = (username , type) => {
   return displayname
 }
 
-export const updateRead = (username , friend) => {
+export const updateRead = (username , friend , a) => {
   database().ref('users/' + username + '/chat/' + friend).update({
-    isRead : true
+    isRead : true,
+    isGroup : a
   })
 }
 function search2(nameKey , myArray){
@@ -400,3 +395,50 @@ export const inviteGroupMember = (username, group) => {
     member : username
   })
 }
+
+export const getGroupName = (groupid) => {
+    const data = database().ref('group/' + groupid + '/name').once('value').then(async function(snapshot){
+      return snapshot.val()
+    })  
+    return data
+}
+
+export const getMemberGroup = (groupid) => {
+  const data = database().ref('group/' + groupid +'/member').once('value').then(async function(snapshot){
+    const data = []
+    if(snapshot.val() === null || snapshot.val() === undefined){
+      console.log('data kosong')
+    }else{
+      Object.keys(snapshot.val()).map(key => {
+        data.push({
+            id: key,
+            data: snapshot.val()[key]
+        })
+      })
+      console.log(data)
+      return data
+    }
+  })
+  return data
+}
+
+export const getPendingGroup = (groupid) => {
+  const data = database().ref('group/' + groupid +'/pendingMember').once('value').then(async function(snapshot){
+    const data = []
+    if(snapshot.val() === null || snapshot.val() === undefined){
+      console.log('data kosong')
+    }else{
+      Object.keys(snapshot.val()).map(key => {
+        data.push({
+            id: key,
+            data: snapshot.val()[key]
+        })
+      })
+      console.log(data)
+      return data
+    }
+  })
+  return data
+}
+
+

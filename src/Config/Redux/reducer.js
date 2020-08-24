@@ -11,7 +11,13 @@ const homeState = {
     statusmessage : '',
     profileuri : 'null',
     allfriend : [],
-    grouplist : []
+    grouplist : [],
+    pendinggroup : []
+}
+
+const groupInfoState = {
+    memberGroup : [],
+    pendingGroup : []
 }
 
 const registerState = {
@@ -64,6 +70,22 @@ const chatMenuState = {
 const resultFriendState = {
     displayname : '',
     profileimg : false
+}
+
+const groupInfoReducer = (state = groupInfoState , action) => {
+    if(action.type === 'SET_MEMBERGROUP'){
+        return{
+            ...state,
+            memberGroup : action.value
+        }
+    }
+    if(action.type === 'SET_GROUPPENDING'){
+        return{
+            ...state,
+            pendingGroup : action.value
+        }
+    }
+    return state;
 }
 
 const resultFriendReducer = (state = resultFriendState , action) => {
@@ -128,6 +150,12 @@ const homeReducer = (state = homeState , action) => {
         return{
             ...state,
             grouplist : action.value
+        }
+    }
+    if(action.type === 'SET_PENDINGGROUP'){
+        return{
+            ...state,
+            pendinggroup: action.value
         }
     }
     return state;
@@ -275,7 +303,8 @@ const reducer = combineReducers({
     homeReducer,
     editprofileReducer,
     chatMenuReducer,
-    resultFriendReducer
+    resultFriendReducer,
+    groupInfoReducer
 })
 
 export default reducer;

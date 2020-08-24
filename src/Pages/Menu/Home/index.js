@@ -1,4 +1,4 @@
-import React , { useEffect, useState , Suspense } from 'react';
+import React , { useEffect, useState , Fragment } from 'react';
 import { View , Text, ScrollView, StyleSheet, AsyncStorage , ActivityIndicator, BackHandler , Modal , TouchableOpacity , Image , TextInput} from 'react-native';
 import NavigationMenu from '../../../Component/Molekuls/NavigationMenu/';
 import Friendlist from '../../../Component/Molekuls/Friendlist/';
@@ -129,16 +129,41 @@ const Home = ({navigation}) => {
                     profileImg : uri
                 }
             }
-            dispatch({type:'SET_HOMEGROUP' , value : data})
+            const pg = await getPendingGroup(username)
+            if(pg) data.unshift({pendingGroup : true , id:'PendingGroup'})
+            await AsyncStorage.setItem('grouplist' , JSON.stringify(data))
+            dispatch({type:'SET_HOMEGROUP' , value : data})   
         }
     })
+    }
+    const getPendingGroup = (username) => {
+        const pendingData = database().ref('users/' + username + '/pendingGroup').once('value').then(async function(snapshot){
+            const data = []
+            if(snapshot.val() === null || snapshot.val() === undefined){
+                dispatch({type: 'SET_PENDINGGROUP' , value:data}) 
+                return false
+            } 
+            else{
+                Object.keys(snapshot.val()).map(key => {
+                    data.push({
+                        id: key,
+                        data: snapshot.val()[key],
+                        })
+                })
+                dispatch({type: 'SET_PENDINGGROUP' , value:data}) 
+                return true
+            }
+        })
+        return pendingData
     }
     const _retrieveUsername = async () => {
             try{
                 const async_friendlist = await AsyncStorage.getItem('friendlist');
+                const groupdata = await AsyncStorage.getItem('grouplist')
                 if(async_friendlist !== null){
                     dispatch({type:'SET_HOMEFRIEND',  value: JSON.parse(async_friendlist)});
                     dispatch({type:'SET_ALLHOMEFRIEND',  value: JSON.parse(async_friendlist)});
+                    dispatch({type:'SET_HOMEGROUP',  value: JSON.parse(groupdata)});
                 }
                 
             }catch{
@@ -149,6 +174,7 @@ const Home = ({navigation}) => {
             //   alert(value)
               const res = await getAllFriend(value)
               await getAllGroup(value)
+              
               if(res){
                   console.log('data null')
               }
@@ -167,7 +193,7 @@ const Home = ({navigation}) => {
         const username = await AsyncStorage.getItem('username');
         dispatch({type: 'SET_RECEIVER' , value:modalUsername})
         dispatch({type: 'SET_SENDER' , value:username})
-        navigation.navigate('ChatWindow')
+        navigation.navigate('ChatWindow' , {groupId : false})
     }
     const getProfileUri = async (friend) => {
         const img = await storage()
@@ -213,7 +239,7 @@ const Home = ({navigation}) => {
     const [modalStatus, setModalStatus] = useState('')
     const [modalUsername , setModalUsername] = useState('')
     const [friendclick , setfriendclick] = useState(true)
-    const [groupclick , setgroupclick] = useState(false)
+    const [groupclick , setgroupclick] = useState(true)
     const [friendright , setfriendright] = useState(false)
     const [groupright , setgroupright] = useState(true)
     const FriendsProf = async (friend) => {
@@ -249,9 +275,16 @@ const Home = ({navigation}) => {
              </View>
             )
         }
+        if(item.pendingGroup){
+            return(
+                <Friendlist isgroup={true} url={{uri:'https://firebasestorage.googleapis.com/v0/b/triang…=media&token=8e8f6b02-b104-4de1-8d04-d2887c764a6d'}} name={'Group Invitations (' + HomeState.pendinggroup.length + ')' } funct={()=>{
+                    navigation.navigate('GroupInfo')
+                }}/>
+            )
+        }
         return(
             <Friendlist isgroup={true} url={item.profileImg} name={item.data.groupName} funct={()=>{
-                navigation.navigate('GroupInfo')
+                navigation.navigate('GroupInfo' , {groupId : item.id})
             }}/>
         )
     } 
@@ -394,11 +427,13 @@ const Home = ({navigation}) => {
                     </TouchableOpacity> 
                         {
                             groupclick ? (
+                                <View style={{flex:1}}>
                                 <FlatList
                                 data={HomeState.grouplist}
                                 renderItem={renderGroup}
                                 keyExtractor={item => item.id}
                                 /> 
+                                </View>
                             ) : null
                         }
                     </View>        
