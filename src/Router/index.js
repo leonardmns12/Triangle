@@ -233,11 +233,11 @@ const Router = () => {
                 headerShown: false,
             }}
             />
-            {/* <Stack.Screen name="InviteChat" component={InviteChat}
+            <Stack.Screen name="InviteChat" component={InviteChat}
             options={{
                 headerShown: false,
             }}
-            /> */}
+            />
         </Stack.Navigator>
     );
 };

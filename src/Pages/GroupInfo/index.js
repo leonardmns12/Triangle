@@ -123,7 +123,7 @@ const GroupInfo = ({route, navigation}) => {
                
 
             <View style={{flexDirection:'row' , padding:5, margin:0 , height:'auto'}}>
-                <TouchableOpacity style={[styles.Footer, {backgroundColor:"#30D5C8"}]}>
+                <TouchableOpacity onPress={()=>{navigation.navigate('InviteChat')}} style={[styles.Footer, {backgroundColor:"#30D5C8"}]}>
                     <Text style={{fontWeight:"bold", textAlign: "center",}}>Invite to chat</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={gotochat} style={[styles.Footer, {backgroundColor:"white"}]}>
