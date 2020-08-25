@@ -403,7 +403,7 @@ export const getGroupName = (groupid) => {
     return data
 }
 
-export const getMemberGroup = (groupid) => {
+export const getMemberGroup = async (groupid) => {
   const data = database().ref('group/' + groupid +'/member').once('value').then(async function(snapshot){
     const data = []
     if(snapshot.val() === null || snapshot.val() === undefined){
@@ -415,14 +415,13 @@ export const getMemberGroup = (groupid) => {
             data: snapshot.val()[key]
         })
       })
-      console.log(data)
-      return data
     }
+    return data
   })
   return data
 }
 
-export const getPendingGroup = (groupid) => {
+export const getPendingGroup = async (groupid) => {
   const data = database().ref('group/' + groupid +'/pendingMember').once('value').then(async function(snapshot){
     const data = []
     if(snapshot.val() === null || snapshot.val() === undefined){
@@ -434,9 +433,8 @@ export const getPendingGroup = (groupid) => {
             data: snapshot.val()[key]
         })
       })
-      console.log(data)
-      return data
     }
+    return data
   })
   return data
 }
