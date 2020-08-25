@@ -1,5 +1,5 @@
 import React , { useEffect , useState, Fragment } from 'react';
-import { Login, Splash, Register, Home, Profile, Chat, Timeline, ChatWindow, FindFriend , Invitation, EditProfile, FriendsProfile , PostReply, NewGroup , CreatePost, GroupInfo } from '../Pages/';
+import { Login, Splash, Register, Home, Profile, Chat, Timeline, ChatWindow, FindFriend , Invitation, EditProfile, FriendsProfile , PostReply, NewGroup , CreatePost, GroupInfo, InviteChat } from '../Pages/';
 import {createStackNavigator} from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -233,6 +233,11 @@ const Router = () => {
                 headerShown: false,
             }}
             />
+            {/* <Stack.Screen name="InviteChat" component={InviteChat}
+            options={{
+                headerShown: false,
+            }}
+            /> */}
         </Stack.Navigator>
     );
 };

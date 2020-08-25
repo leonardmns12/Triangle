@@ -11,12 +11,12 @@ const GroupInfo = ({route, navigation}) => {
         getGroupMember()
     },[]) 
     const getGroupMember = async () => {
-        const res1 = AsyncStorage.getItem('pending')
+        const res1 = await AsyncStorage.getItem('pending')
         if(res1!==null){
             dispatch({type:'SET_GROUPPENDING' , value:res1})
         }
         dispatch({type:'SET_GROUPPENDING' , value:await getPendingGroup(route.params.groupId)})
-        const res = AsyncStorage.getItem('group')
+        const res = await AsyncStorage.getItem('group')
         if(res !== null){
             dispatch({type:'SET_MEMBERGROUP' , value:res})  
         }

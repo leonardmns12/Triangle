@@ -4,12 +4,12 @@ import { TouchableOpacity } from 'react-native-gesture-handler'
 import { TextInput } from 'react-native-gesture-handler'
 import Icon from 'react-native-vector-icons/AntDesign'
 
-const InviteGroupMember = () => {
+const InviteChat = () =>{
     return(
-     <View>
-         
-     </View>   
+        <View>
+
+        </View>
     )
 }
 
-export default InviteGroupMember;
+export default InviteChat;
