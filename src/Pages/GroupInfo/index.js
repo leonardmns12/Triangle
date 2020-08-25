@@ -13,12 +13,12 @@ const GroupInfo = ({route, navigation}) => {
     const getGroupMember = async () => {
         const res1 = await AsyncStorage.getItem('pending')
         if(res1!==null){
-            dispatch({type:'SET_GROUPPENDING' , value:res1})
+            dispatch({type:'SET_GROUPPENDING' , value:JSON.parse(res1)})
         }
         dispatch({type:'SET_GROUPPENDING' , value:await getPendingGroup(route.params.groupId)})
         const res = await AsyncStorage.getItem('group')
         if(res !== null){
-            dispatch({type:'SET_MEMBERGROUP' , value:res})  
+            dispatch({type:'SET_MEMBERGROUP' , value:JSON.parse(res)})  
         }
         dispatch({type:'SET_MEMBERGROUP' , value:await getMemberGroup(route.params.groupId)})
         await AsyncStorage.setItem('group',JSON.stringify(groupState.memberGroup))
@@ -28,7 +28,6 @@ const GroupInfo = ({route, navigation}) => {
     const [ModalOpen, SetModalOpen] = useState(false); 
     const [ModalRename, SetModalRename] = useState(false); 
     const [isSelected , setSelected] = useState(true);
-    const [member , setmember] = useState('')
     const gotochat = async () => {
         const username = await AsyncStorage.getItem('username')
         dispatch({type: 'SET_SENDER' , value:username})
