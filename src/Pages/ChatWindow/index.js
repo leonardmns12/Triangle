@@ -13,7 +13,7 @@ import firebase from '../../Config/Firebase/';
 import database from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
 import ImagePicker from 'react-native-image-picker';
-const ChatWindow = ({navigation}) => {
+const ChatWindow = ({route,navigation}) => {
     useEffect(()=>{  
         getProfileImg()
         starter() 
@@ -57,10 +57,9 @@ const ChatWindow = ({navigation}) => {
     }
     const [loading, setLoading] = useState(false)
     const sendMessages = async () => {
-        const res = await getmsgid()
-        const token = await getReceiverToken(chatState.receiver)
         if(imageUri !== ''){
             setLoading(true)
+            const res = !route.params.groupId ? await getmsgid() : route.params.groupId
             const imagelink = 'message/images/' + res +'/' + imageUri.fileName
             await storage().ref(imagelink)
             .putFile(imageUri.path).then(async(snapshot)=>{
@@ -72,10 +71,10 @@ const ChatWindow = ({navigation}) => {
                 const data = {
                     message : 'Sent you an image',
                     sender : chatState.sender,
-                    receiver : chatState.receiver,
+                    receiver : !route.params.groupId ? chatState.receiver : route.params.groupId,
                     timestamp : new Date().getTime(),
                     image : imagelink,
-                    token : token,
+                    token : !route.params.groupId ? await getReceiverToken(chatState.receiver) : 'abcd',
                     downloaduri : {uri : downloaduri}
                 }
                 const data1 = {
@@ -85,7 +84,8 @@ const ChatWindow = ({navigation}) => {
                     timestamp : new Date().getTime(),
                     realtime : convertTime(new Date().getTime()),
                     isRead : false,
-                    token : token
+                    token : !route.params.groupId ? await getReceiverToken(chatState.receiver) : 'abcd',
+                    isGroup : !route.params.groupId ? false : route.params.groupId
                 }
                 sendMessage(data,res);
                 addChatDatabase(data1) 
@@ -95,30 +95,33 @@ const ChatWindow = ({navigation}) => {
                 console.log('error while uploading => ' +e)
             })
              
-        }else{      
+        }else{     
+            const res = await getmsgid()
             const data = {
                 message : chatState.form.message,
                 sender : chatState.sender,
                 receiver : chatState.receiver,
                 timestamp : new Date().getTime(),
                 image : 'none',
-                token : token
+                token : !route.params.groupId ? await getReceiverToken(chatState.receiver) : 'abcd'
             }
-            const data1 = {
+
+            const data3 = {
                 message : chatState.form.message,
                 sender : chatState.sender,
-                receiver : chatState.receiver,
+                receiver : !route.params.groupId ? chatState.receiver : route.params.groupId,
                 timestamp : new Date().getTime(),
                 realtime : convertTime(new Date().getTime()),
                 isRead : false,
-                token : token
+                token : 'abcd',
+                isGroup : !route.params.groupId ? false : true
             }
             dispatch({type:'SET_MESSAGE', inputType: 'sender', inputValue: chatState.sender});
             dispatch({type:'SET_MESSAGE', inputType: 'receiver', inputValue: chatState.receiver});
             dispatch({type:'SET_MESSAGE', inputType: 'timestamp', inputValue: new Date().getTime()});
             if( chatState.form.message.length > 0){
-                sendMessage(data,res);
-                addChatDatabase(data1)
+                console.log(route.params.groupId)
+                !route.params.groupId ? (sendMessage(data,res),addChatDatabase(data3)) : (sendMessage(data,route.params.groupId),addChatDatabase(data3))
                 dispatch({type:'SET_MESSAGE', inputType: 'message', inputValue: ''});
             }   
         }
@@ -126,10 +129,20 @@ const ChatWindow = ({navigation}) => {
         // await getMessage(chatState.userId); 
     }
     const starter = async () => {
-        await updateRead(chatState.sender, chatState.receiver)
-        try{         
-        const res = await getmsgid()
-        getMessage(res)
+        if(route.params.groupId !== false){
+            await updateRead(chatState.sender, chatState.receiver , true)
+        }else{
+            await updateRead(chatState.sender, chatState.receiver , false)
+        }
+        
+        try{       
+        if(!route.params.groupId){
+            const res = await getmsgid()
+            getMessage(res)
+        }else{
+            getMessage(route.params.groupId)
+        }
+        
         }catch{
             console.log('error')
         }
@@ -190,9 +203,11 @@ const ChatWindow = ({navigation}) => {
             
         ): (
             item.data.image === 'none' || item.data.image === undefined ? (
-                <Sender photo={'null'} img={chatState.profileImg} chatMessage={item.data.message} timestamp={item.data.timestamp}/>
+                !route.params.groupId ? <Sender isGroup={false} photo={'null'} img={chatState.profileImg} chatMessage={item} timestamp={item.data.timestamp}/> : 
+                <Sender photo={'null'} isGroup={true} img={chatState.profileImg} chatMessage={item} timestamp={item.data.timestamp}/>
             ) : (
-                <Sender photo={item.data.downloaduri} img={chatState.profileImg} chatMessage={item.data.message} timestamp={item.data.timestamp}/>
+                !route.params.groupId ? <Sender photo={item.data.downloaduri} chatMessage={item} timestamp={item.data.timestamp}/> :
+                <Sender photo={item.data.downloaduri} isGroup={true} chatMessage={item} timestamp={item.data.timestamp}/>
             )
             
         )

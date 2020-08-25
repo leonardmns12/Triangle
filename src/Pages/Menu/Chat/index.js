@@ -6,7 +6,7 @@ import { TextInput } from 'react-native-gesture-handler';
 import Friendchat from '../../../Component/Molekuls/Friendchat/';
 import database from '@react-native-firebase/database';
 import { useSelector, useDispatch } from 'react-redux';
-import { getDisplayName , deleteChatlist } from '../../../Config/Redux/restApi/';
+import { getDisplayName , deleteChatlist , getGroupName } from '../../../Config/Redux/restApi/';
 import storage from '@react-native-firebase/storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import IconAddGroup from 'react-native-vector-icons/MaterialIcons';
@@ -72,13 +72,24 @@ const Chat = ({navigation}) => {
                         })
                 })
                 for(let i = 0;  i < data.length; i++){
-                    const displayname = await getDisplayName(data[i].id , 'displayname')
-                    const profilepicture = await getProfilePicture(data[i].id)
-                    console.log(profilepicture)
-                    data[i] = {
-                        ...data[i],
-                        displayname : displayname,
-                        profilepicture : profilepicture
+                    if(data[i].data.isGroup){
+                        const groupname = await getGroupName(data[i].id);
+                        console.log(data[i].id)
+                        const profilepicture = await getProfilePicture(data[i].id)
+                        data[i] = {
+                            ...data[i],
+                            displayname : groupname,
+                            profilepicture : profilepicture
+                        }
+                    }else{
+                        const displayname = await getDisplayName(data[i].id , 'displayname')
+                        const profilepicture = await getProfilePicture(data[i].id)
+                        console.log(profilepicture)
+                        data[i] = {
+                            ...data[i],
+                            displayname : displayname,
+                            profilepicture : profilepicture
+                        }
                     }
                 }
             dispatch({type:'SET_ALLFRIEND' , value:data.sort((a, b) => parseFloat(b.data.timestamp) - parseFloat(a.data.timestamp))})
@@ -88,20 +99,26 @@ const Chat = ({navigation}) => {
             // setfriendlist(data)     
         })
     }
-    const gotochatroom = async (friend) => {
+    const gotochatroom = async (friend,isGroup) => {
         const username = await AsyncStorage.getItem('username');
         dispatch({type: 'SET_RECEIVER' , value:friend})
         dispatch({type: 'SET_SENDER' , value:username})
-        navigation.navigate('ChatWindow')
+        isGroup ? navigation.navigate('ChatWindow' , {groupId : friend}) : navigation.navigate('ChatWindow' , {groupId : false})  
     }
     const deletechatlist = async (friend) => {
         const username = await AsyncStorage.getItem('username')
         await deleteChatlist(username , friend)
     }
     const renderItem = ({item}) => {
-        return(  
-            <Friendchat onPress={()=>{deletechatlist(item.id)}} profileuri={item.profilepicture} funct={()=>{gotochatroom(item.id)}} name={item.displayname} isRead={item.data.isRead} realtime={item.data.realtime} textmsg={item.data.message} />
-        )
+        if(item.data.isGroup){
+            return(
+                <Friendchat onPress={()=>{deletechatlist(item.id)}} profileuri={item.profilepicture} funct={()=>{gotochatroom(item.id,true)}} name={item.displayname} isRead={item.data.isRead} realtime={item.data.realtime} textmsg={item.data.message} />
+            )
+        }else{
+            return(  
+                <Friendchat onPress={()=>{deletechatlist(item.id)}} profileuri={item.profilepicture} funct={()=>{gotochatroom(item.id,false)}} name={item.displayname} isRead={item.data.isRead} realtime={item.data.realtime} textmsg={item.data.message} />
+            )
+        }
     }
     const searchUser = (findtext) => {
         const data = chatState.allfriend.filter(i => {

@@ -40,7 +40,7 @@ const Profile = ({navigation}) => {
     }
 
     return(
-        <View style={{flex:1}}>
+        <View style={{flex:1, backgroundColor:'#FFFFFF'}}>
             <View style={{flex:0.67, backgroundColor:'rgba(27,176,233,1)' , borderBottomLeftRadius:41, borderBottomRightRadius:41, position:'relative'}}>
               <View style={{position:'relative'}}>
                 <View style={{position:'relative', alignItems:'center'}}>
