@@ -30,14 +30,9 @@ return(
         </View>
         <ScrollView>
             <View> 
-            <Contents onpress={gotoPostReply} visible = {'block'} />
-            <Contents visible = {'block'} />
-            <Contents visible = {'block'} />
-            <Contents visible = {'block'} />
-            <Contents visible = {'block'} />
-                <Contents visible = {'block'} />
+            <Contents onpress={gotoPostReply} visible = {'none'} />
                 <Contents visible = {'none'} profilename={'Leonard'} commentcount={'2'} time={'17:20'} content={'111'}/>
-                <Contents visible = {'block'} profilename={'Leonard'} commentcount={'2'} time={'17:20'} content={'12312312312'}/>
+                <Contents visible = {'none'} profilename={'Leonard'} commentcount={'2'} time={'17:20'} content={'12312312312'}/>
             </View>
         </ScrollView>
         </View>

@@ -421,7 +421,7 @@ export const getMemberGroup = async (groupid) => {
   return data
 }
 
-export const getPendingGroup = async (groupid) => {
+export const getPendingGroup = (groupid) => {
   const data = database().ref('group/' + groupid +'/pendingMember').once('value').then(async function(snapshot){
     const data = []
     if(snapshot.val() === null || snapshot.val() === undefined){
@@ -438,5 +438,14 @@ export const getPendingGroup = async (groupid) => {
   })
   return data
 }
+
+export const newPost = (username, text) => {
+  database().ref('post').push({
+    value: text,
+    username : username,
+    timestamp : new Date().getTime()
+  })
+}
+
 
 

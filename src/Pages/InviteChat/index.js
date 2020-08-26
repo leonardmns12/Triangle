@@ -1,41 +1,106 @@
 import React, {useState, useEffect} from 'react'
-import {View , Text, StyleSheet, FlatList, AsyncStorage} from 'react-native'
+import {View , Text, StyleSheet, FlatList, AsyncStorage , Image} from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { TextInput } from 'react-native-gesture-handler'
-import Icon from 'react-native-vector-icons/AntDesign'
 import IconIon from 'react-native-vector-icons/Ionicons'
 import IconSearch from 'react-native-vector-icons/FontAwesome5'
+import IconCheck from 'react-native-vector-icons/Fontisto'
 import { useDispatch , useSelector } from 'react-redux';
 import GroupMember from '../../Component/Molekuls/GroupMember/'
-import { getMemberGroup , getPendingGroup } from '../../Config/Redux/restApi';
-import { color } from 'react-native-reanimated'
+import database from '@react-native-firebase/database'
+import storage from '@react-native-firebase/storage';
 
 
 const InviteChat = () =>{
-    useEffect(()=>{
-        getGroupMember()
-    },[]) 
-    const getGroupMember = async () => {
-        const res1 = await AsyncStorage.getItem('pending')
-        if(res1!==null){
-            dispatch({type:'SET_GROUPPENDING' , value:JSON.parse(res1)})
-        }
-        dispatch({type:'SET_GROUPPENDING' , value:await getPendingGroup(route.params.groupId)})
-        const res = await AsyncStorage.getItem('group')
-        if(res !== null){
-            dispatch({type:'SET_MEMBERGROUP' , value:JSON.parse(res)})  
-        }
-        dispatch({type:'SET_MEMBERGROUP' , value:await getMemberGroup(route.params.groupId)})
-        await AsyncStorage.setItem('group',JSON.stringify(groupState.memberGroup))
+
+    const getProfilePicture = async (user) => {
+        const res = await storage().ref('images/' + user).getDownloadURL().catch(e =>{
+            console.log('dia gapunya poto')
+            return false
+        })
+
+        return res
     }
+
+    const getFriend = (username) => {
+        const res = database().ref('users/' + username + '/friend').once('value').then(async function(snapshot){
+          const data = []
+          if(snapshot.val() === null || snapshot.val() === undefined){
+      
+          }else{
+            Object.keys(snapshot.val()).map(key => {
+              data.push({
+                  id: key,
+                  data: snapshot.val()[key],
+                  profileImg : ''
+              })
+            })
+            for(let i = 0; i < data.length; i++){
+                data[i] = {
+                    ...data[i],
+                    profileImg : await getProfilePicture(data[i].data.friend)
+                }
+            }
+          }
+          
+          return data
+        })
+        return res
+      }
+
+
     const dispatch = useDispatch()
-    const groupState = useSelector(state => state.groupInfoReducer);
-    const [isSelected , setSelected] = useState(true);
+    const globalState = useSelector(state => state.inviteChatReducer)
+    const [isClick , setClick] = useState(false);
+    const [friend , setfriend] = useState([])
+
+    const displayMember = async () => {
+        const username = await AsyncStorage.getItem('username')
+        const res = await getFriend(username)
+        dispatch({type:'SET_FRIENDINVITE' , value:res})
+        
+    }
+
+    useEffect(()=>{
+        displayMember()
+        getProfilePicture('wenny')
+    },[])
+
     const renderItem = ({item}) => {
         return(
-            <GroupMember name={item.data.member}/>
+            <View style={{flexDirection:'row', padding:"5%", borderBottomWidth:1, borderBottomColor:"#D3D3D3"}}>
+            <View style={{height:30 , width:30 , borderWidth:1, borderRadius: 30, marginTop:"2%"}}></View>
+            <Text style={{marginLeft:"5%", marginTop:"3%", fontSize:16}}>{'leonard'}</Text>
+            <IconCheck name='checkbox-passive' />
+
+            </View>
         )
     }
+
+    const disini = ({item}) => {
+        console.log(item.profileImg)
+        return(
+            <TouchableOpacity onPress={()=>{setClick(!isClick)}} style={{flexDirection:'row', padding:"5%", borderBottomWidth:1, borderBottomColor:"#D3D3D3"}}>
+            {
+                !item.profileImg ? (
+                    <View style={{height:30 , width:30 , borderWidth:1, borderRadius: 30, marginTop:"2%"}}></View>
+                ) : (
+                    <Image source={{uri:item.profileImg}}  style={{height:30 , width:30 , borderWidth:1, borderRadius: 30, marginTop:"2%"}} />
+                )
+                
+                
+            }
+            <Text style={{marginLeft:"5%", marginTop:"3%", fontSize:16}}>{item.data.friend}</Text>
+            <View style={{marginLeft:"5%", marginTop:"3%", fontSize:16, position:'absolute', right:0,top:'60%'}}></View>
+            {isClick ? <IconCheck name='checkbox-active' color={'green'}/> : (
+                    <IconCheck name='checkbox-passive' />
+                )
+            }
+            </TouchableOpacity>
+            
+        )
+    }
+
     return(
         <View>
             <View style={{flexDirection:'row', backgroundColor: '#DCDCDC'}}>
@@ -53,21 +118,16 @@ const InviteChat = () =>{
             <TextInput placeholder={"Search by Display Name"}/>
                 <IconSearch name="search" size={22} color="grey" style={{position: "absolute", right:0, padding:5}}/>   
             </View>
-
-            {
-                isSelected ? (
-                    <FlatList 
-                    renderItem={renderItem}
-                    data={groupState.memberGroup}
-                    key={item => item.id}
-                    />
-                ) : <FlatList 
-                    renderItem={renderItem}
-                    data={groupState.pendingGroup}
-                    key={item => item.id}
-                    />
-            }
-
+            
+           {
+               globalState.friendlist === undefined ? null : (
+                <FlatList 
+                renderItem={disini}
+                data={globalState.friendlist}
+                key={item => item.id}
+                />
+               )
+           }
             <View style={{flexDirection:'row' , padding:5, margin:0 , height:'auto'}}>
                 <TouchableOpacity style={[styles.Footer, {backgroundColor:"white"}]}>
                     <Text style={{fontWeight:"bold", textAlign: "center", color:"black"}}>Cancel</Text>
