@@ -421,7 +421,7 @@ export const getMemberGroup = async (groupid) => {
   return data
 }
 
-export const getPendingGroup = async (groupid) => {
+export const getPendingGroup = (groupid) => {
   const data = database().ref('group/' + groupid +'/pendingMember').once('value').then(async function(snapshot){
     const data = []
     if(snapshot.val() === null || snapshot.val() === undefined){
@@ -437,6 +437,57 @@ export const getPendingGroup = async (groupid) => {
     return data
   })
   return data
+}
+
+export const newPost = (username, text) => {
+  database().ref('post').push({
+    value: text,
+    username : username,
+    timestamp : new Date().getHours()+':'+ new Date().getMinutes()
+  })
+}
+
+
+export const getTimelinePost = () => {
+    const res = database().ref('post').once('value').then(function(snapshot){
+      const data = []
+      if(snapshot.val() === null || snapshot.val() === undefined){
+
+      } else {
+        const value = Object.keys(snapshot.val()).map(key => {
+          data.push({
+            id : key,
+            data : snapshot.val()[key],
+            profileImg : ''
+          })
+        })
+      }
+        // console.log(data)
+        return data
+    })
+    return res
+  // const res = database.ref('Post').once('value').then(async function(snapshot){
+  //     const data = []
+  //     if(snapshot.val() === null || snapshot.val() === undefined){
+
+  //     } else {
+  //         Object.keys(snapshot.val()).map(key => {
+  //             data.push({
+  //                 id: key, 
+  //                 data: snapshot.val()[key], 
+  //                 profileImg : ''
+  //             })
+  //         })
+  //     for(let i=0; i< data.length; i++){
+  //         data[i] = {
+  //             ...data[i], 
+  //             profileImg : await getProfilePicture(data[i].timeline)
+  //         }
+  //     }
+  //     }
+  //     return data
+  // })
+  // return res
 }
 
 

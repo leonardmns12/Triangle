@@ -156,6 +156,8 @@ const Home = ({navigation}) => {
         })
         return pendingData
     }
+
+
     const _retrieveUsername = async () => {
             try{
                 const async_friendlist = await AsyncStorage.getItem('friendlist');

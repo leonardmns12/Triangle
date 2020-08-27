@@ -1,4 +1,5 @@
 import { combineReducers } from "redux";
+import { inviteGroupMember } from "./restApi";
 
 const loginState = {
     email : '',
@@ -70,6 +71,34 @@ const chatMenuState = {
 const resultFriendState = {
     displayname : '',
     profileimg : false
+}
+
+const inviteChatState = {
+    friendlist : []
+}
+
+const postTimelineState = {
+    postList : []
+}
+
+const postTimelineReducer = (state = postTimelineState, action) => {
+    if(action.type === 'SET_TIMELINEPOST'){
+        return{
+            ...state,
+            postList : action.value
+        }
+    }
+    return state
+}
+
+const inviteChatReducer = (state = inviteChatState , action) => {
+    if(action.type === 'SET_FRIENDINVITE'){
+        return{
+            ...state,
+            friendlist : action.value
+        }
+    }
+    return state
 }
 
 const groupInfoReducer = (state = groupInfoState , action) => {
@@ -304,7 +333,9 @@ const reducer = combineReducers({
     editprofileReducer,
     chatMenuReducer,
     resultFriendReducer,
-    groupInfoReducer
+    groupInfoReducer,
+    inviteChatReducer,
+    postTimelineReducer
 })
 
 export default reducer;

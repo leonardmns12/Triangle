@@ -1,9 +1,14 @@
-import React , { useState } from 'react';
-import { View , Text, TouchableOpacity , StyleSheet ,ScrollView} from 'react-native';
+import React , { useState, useEffect } from 'react';
+import { View , Text, TouchableOpacity , StyleSheet ,ScrollView, FlatList, AsyncStorage } from 'react-native';
 import NavigationMenu from '../../../Component/Molekuls/NavigationMenu/';
 import LeftLogo from '../../../../assets/chatWindow/left.svg';
 import Contents from '../../../Component/Molekuls/Timeline';
 import {ContentPicture} from '../../../Component/Atoms'
+import {getTimelinePost} from '../../../Config/Redux/restApi';
+import {useSelector , useDispatch} from 'react-redux';
+// import database from '@react-native-firebase/database'
+// import storage from '@react-native-firebase/storage';
+
 
 const Timeline = ({navigation}) => {
 const gtchat = (screen) => {
@@ -14,6 +19,28 @@ const gotoPostReply = () => {
     navigation.navigate('PostReply')
 }
 
+const [post, setPost] = useState([])
+const dispatch = useDispatch()
+const globalState = useSelector(state => state.postTimelineReducer)
+
+const displayPost = async()=>{
+    const res = await getTimelinePost()
+    dispatch({type: 'SET_TIMELINEPOST' , value: res})
+}
+
+useEffect(()=>{
+    displayPost()
+},[])
+
+const RenderItem = ({item}) => {
+    return(
+        <View> 
+            {/* <Contents onpress={gotoPostReply} visible = {'none'} /> */}
+                <Contents visible = {'none'} profilename={item.data.username} commentcount={'2'} time={item.data.timestamp} content={item.data.value}/>
+                {/* <Contents visible = {'none'} profilename={'Leonard'} commentcount={'2'} time={'17:20'} content={'12312312312'}/> */}
+        </View>
+    )
+}
 
 return(
     <View style={{flex:1}}>
@@ -28,19 +55,24 @@ return(
             <Text style={[styles.timelinetext,{}]}>Friend With Something News</Text>
         <View style={{width:'90%', borderWidth:1 , marginHorizontal: 18 }}>
         </View>
-        <ScrollView>
+        {/* <ScrollView>
             <View> 
-            <Contents onpress={gotoPostReply} visible = {'block'} />
-            <Contents visible = {'block'} />
-            <Contents visible = {'block'} />
-            <Contents visible = {'block'} />
-            <Contents visible = {'block'} />
-                <Contents visible = {'block'} />
+            <Contents onpress={gotoPostReply} visible = {'none'} />
                 <Contents visible = {'none'} profilename={'Leonard'} commentcount={'2'} time={'17:20'} content={'111'}/>
-                <Contents visible = {'block'} profilename={'Leonard'} commentcount={'2'} time={'17:20'} content={'12312312312'}/>
+                <Contents visible = {'none'} profilename={'Leonard'} commentcount={'2'} time={'17:20'} content={'12312312312'}/>
             </View>
-        </ScrollView>
+        </ScrollView> */}
         </View>
+        {
+            globalState.postList === undefined ? null : (
+                <FlatList 
+                renderItem={RenderItem}
+                data={globalState.postList}
+                key={item => item.id}
+                />
+            )
+        }
+
         <View>
         </View>
             </View> 
