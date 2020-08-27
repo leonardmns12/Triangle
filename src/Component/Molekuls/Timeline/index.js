@@ -3,6 +3,9 @@ import { View, Text, StyleSheet } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import ChatIcon from '../../../../assets/navigation/comment-active.svg';
 import {ContentPicture} from '../../../Component/Atoms'
+import { useDispatch , useSelector } from 'react-redux';
+import database from '@react-native-firebase/database'
+import storage from '@react-native-firebase/storage';
 
 
 const Timeline = ({navigation,profilename,content,commentcount,time,visible,onpress}) => {
@@ -15,8 +18,51 @@ const Timeline = ({navigation,profilename,content,commentcount,time,visible,onpr
         return <View style={[style.picture],{display:'none'}}></View>
       }
   }
+/*
+    const getProfilePicture = async (user) => {
+        const res = await storage().ref('images/' + user).getDownloadURL().catch(e =>{
+            return false
+        })
+        return res
+    }
+    const getTimelinePost = async() => {
+        const res = database.ref('Post').once('value').then(async function(snapshot){
+            const data = []
+            if(snapshot.val() === null || snapshot.val() === undefined){
 
+            } else {
+                Object.keys(snapshot.val()).map(key => {
+                    data.push({
+                        id: key, 
+                        data: snapshot.val()[key], 
+                        profileImg : ''
+                    })
+                })
+            for(let i=0; i< data.length; i++){
+                data[i] = {
+                    ...data[i], 
+                    profileImg : await getProfilePicture(data[i].timeline)
+                }
+            }
+            }
+            return data
+        })
+        return res
+    }
 
+    const dispatch = useDispatch()
+    const globalState = useSelector(state => state.timelinePostReducer)
+    const DisplayTimelinepost = async () => {
+        const username = await AsyncStorage.getItem('username')
+        //const res = await getTimelinePost()
+        dispatch({type:'SET_TIMELEINEPOST', value:res})
+    }
+
+    useEffect(() =>{
+        DisplayTimelinepost() 
+        getProfilePicture(user)
+    }, [])
+*/
     return (
         <TouchableOpacity onPress={onpress} style = {[style.border]}> 
             <View style = {{flexDirection : 'row'}}>
