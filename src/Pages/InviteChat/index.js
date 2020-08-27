@@ -2,40 +2,163 @@ import React, {useState, useEffect} from 'react'
 import {View , Text, StyleSheet, FlatList, AsyncStorage} from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { TextInput } from 'react-native-gesture-handler'
-import Icon from 'react-native-vector-icons/AntDesign'
 import IconIon from 'react-native-vector-icons/Ionicons'
 import IconSearch from 'react-native-vector-icons/FontAwesome5'
 import { useDispatch , useSelector } from 'react-redux';
 import GroupMember from '../../Component/Molekuls/GroupMember/'
 import { getMemberGroup , getPendingGroup } from '../../Config/Redux/restApi';
-import { color } from 'react-native-reanimated'
+import Checked from '../../../assets/Home/tick.svg';
+import storage from '@react-native-firebase/storage';
+import Camera from '../../../assets/editprofile/ar-camera.svg'
+import Icon from 'react-native-vector-icons/FontAwesome';
+import database from '@react-native-firebase/database';
+import Icon1 from 'react-native-vector-icons/Fontisto';
 
 
-const InviteChat = () =>{
+const InviteChat = ({navigation}) =>{
     useEffect(()=>{
-        getGroupMember()
-    },[]) 
-    const getGroupMember = async () => {
-        const res1 = await AsyncStorage.getItem('pending')
-        if(res1!==null){
-            dispatch({type:'SET_GROUPPENDING' , value:JSON.parse(res1)})
+        getallfriend();
+      },[])
+        const [image , setimage] = useState('null')
+        const [filterFriend , setFilterFriend] = useState([])
+        const [friend , setfriend] = useState([])
+        const [groupname , setgroupname] = useState('')
+        const [loading , setloading] = useState(false)
+        const chooseFile = () => {
+            var options = {
+              title: 'Select Images',
+              storageOptions: {
+                skipBackup: true,
+                path: 'images',
+              },
+            };
+            ImagePicker.showImagePicker(options, response => {
+              console.log('Response = ', response);
+        
+              if (response.didCancel) {
+                console.log('User cancelled image picker');
+              } else if (response.error) {
+                console.log('ImagePicker Error: ', response.error)
+              } else {
+                let source = response;
+                setimage(source)
+                console.log(source)
+              }
+            });
+          };
+    
+          const getallfriend = async () => {
+            const username = await AsyncStorage.getItem('username')
+            const arr = await GetFriend(username)
+            const arr1 = arr.map((item , index) => {
+                item.isSelected = false
+                console.log(item.data.friend)
+                return {...item}
+            })
+            setfriend(arr1)
+            setFilterFriend(arr1)
+          }
+    
+          const getProfileUri = async (friend) => {
+            const res = await storage().ref('images/' + friend).getDownloadURL()
+            .catch(e => {
+              console.log(e)
+              return false
+            })
+            if(res){
+              return res
+            }else{
+              return false
+            }
+          }
+    
+          const GetFriend = (username) => {
+            const friendData = database().ref('users/' +username + '/friend').once('value').then(async function(snapshot){
+              const data = []
+              if(snapshot.val() === null || snapshot.val() === undefined){
+                console.log('data kosong')
+              }else{
+                Object.keys(snapshot.val()).map(key => {
+                  data.push({
+                      id: key,
+                      data: snapshot.val()[key],
+                      })
+                    })    
+                    for(let i = 0; i < data.length; i++){
+                      const imageuri = await getProfileUri(data[i].data.friend)
+                      const displayName = await getDisplayName(data[i].data.friend, "displayname")
+                      data[i] = {
+                        ...data[i],
+                        imageUri : imageuri,
+                        displayName : displayName
+                      }
+                    }
+              }
+              console.log(data)
+              return data
+            })
+             return friendData
+          }
+    
+          const searchUser = (findtext) => {
+            const data = friend.filter(i => {
+                const itemData = i.displayName.toUpperCase();
+                
+                 const textData = findtext.toUpperCase();
+                  
+                 return itemData.indexOf(textData) > -1;  
+            })
+            setFilterFriend(data)
         }
-        dispatch({type:'SET_GROUPPENDING' , value:await getPendingGroup(route.params.groupId)})
-        const res = await AsyncStorage.getItem('group')
-        if(res !== null){
-            dispatch({type:'SET_MEMBERGROUP' , value:JSON.parse(res)})  
+    
+          const handleSelected = (ind) => {
+            const arr = friend.map((item , index) => {
+              if(ind === index){
+                item.isSelected = !item.isSelected
+              }
+              return {...item}
+          
+            })
+            setfriend(arr)
+            setFilterFriend(arr)
+          }
+    
+          const renderItem = ({item,index} )  => {
+            return(
+              <TouchableOpacity onPress={() => {handleSelected(index)}}>
+              <View style={[style.borderlist,{}]}>
+              {
+                item.imageUri ? (
+                  <Image source={{uri:item.imageUri}} style={[style.profilepicutre]}  />
+                ) : (
+                  <View style={[style.profilepicutre]}></View>
+                )
+              }
+              <Text style={[style.profilename,{}]}>{item.displayName}</Text>
+                <View style = {[style.radiobutton]}>
+                  {
+                    item.isSelected ? (
+                      <Icon1 size={15} name={"checkbox-active"} color={'green'} /> 
+                    ) : (
+                      <Icon1 size={15} name={"checkbox-passive"} />
+                    )
+                  }
+                  
+                </View>
+              </View> 
+              </TouchableOpacity>
+            )
+          }
+
+          const createGroup = async () => {
+            
+            friend.map((item , index) => {
+              if(item.isSelected){
+                inviteGroupMember(item.data.friend , group)
+              }
+            })
         }
-        dispatch({type:'SET_MEMBERGROUP' , value:await getMemberGroup(route.params.groupId)})
-        await AsyncStorage.setItem('group',JSON.stringify(groupState.memberGroup))
-    }
-    const dispatch = useDispatch()
-    const groupState = useSelector(state => state.groupInfoReducer);
-    const [isSelected , setSelected] = useState(true);
-    const renderItem = ({item}) => {
-        return(
-            <GroupMember name={item.data.member}/>
-        )
-    }
+          
     return(
         <View>
             <View style={{flexDirection:'row', backgroundColor: '#DCDCDC'}}>
@@ -50,24 +173,16 @@ const InviteChat = () =>{
                 <Text style={{fontWeight: "bold", textAlign: "center", color: "rgba(112,112,112,3)"}}>Add Friends to Chat</Text>
             </View>
             <View style={[styles.Search]}>
-            <TextInput placeholder={"Search by Display Name"}/>
+            <TextInput onChangeText={(e)=>{searchUser(e)}} placeholder={"Search by Display Name"}/>
                 <IconSearch name="search" size={22} color="grey" style={{position: "absolute", right:0, padding:5}}/>   
             </View>
 
-            {
-                isSelected ? (
-                    <FlatList 
-                    renderItem={renderItem}
-                    data={groupState.memberGroup}
-                    key={item => item.id}
-                    />
-                ) : <FlatList 
-                    renderItem={renderItem}
-                    data={groupState.pendingGroup}
-                    key={item => item.id}
-                    />
-            }
-
+            <FlatList
+                        data = {filterFriend}
+                        renderItem = {renderItem}
+                        keyExtractor = {item => item.id}
+                        />
+        
             <View style={{flexDirection:'row' , padding:5, margin:0 , height:'auto'}}>
                 <TouchableOpacity style={[styles.Footer, {backgroundColor:"white"}]}>
                     <Text style={{fontWeight:"bold", textAlign: "center", color:"black"}}>Cancel</Text>
@@ -76,8 +191,6 @@ const InviteChat = () =>{
                     <Text style={{fontWeight:"bold", textAlign: "center", color:"white"}}>Invite</Text>
                 </TouchableOpacity>
             </View>
-
-
         </View>
     )
 }
@@ -155,6 +268,38 @@ const styles = StyleSheet.create({
         marginLeft:"15%", 
         marginTop:"60%",
         flex:0,
+    },
+    borderlist : {
+        height : 56,
+        borderRadius: 30,
+        flexDirection : 'row',
+        marginBottom : 6
+    },
+    profilepicutre : {
+        borderWidth : 1,
+        borderRadius: 20,
+        height : 40,
+        width : 40,
+        marginLeft : 18,
+        justifyContent: 'center',
+        alignItems : 'center',
+        marginTop : 6
+    },
+    profilename : {
+        fontSize : 18,
+        paddingLeft: 10,
+        alignItems : 'center',
+        marginTop : 14,
+        marginLeft : 5,
+        fontFamily: 'Google-Sans'
+    },
+    radiobutton : {
+        position : 'absolute',
+        right : '3%',
+        top:'35%'
+        
+        
+    
     }
 
 })

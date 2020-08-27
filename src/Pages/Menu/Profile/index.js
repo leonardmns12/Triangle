@@ -68,13 +68,16 @@ const Profile = ({navigation}) => {
                 </View>
                 {/* <View style={{width:220, marginBottom: 50}}>
                 </View> */}
-               <View style={{flexDirection:'row'}}>
+               <View>
                     <Text style={[style.bio , {width: '40%'}]}>{HomeState.statusmessage}</Text>
-                <TouchableOpacity onPress={onClickLogout} style={{backgroundColor:'#00C2FF',width:100, height:'32%', borderRadius:20 , borderColor:'rgb(0,191,166)', alignItems:'center', marginTop:'30%' }}>
-                    <Text style={{color:'white', fontSize:18, textAlign:'center', fontFamily:'ITCKRISTEN'}}>
-                        Logout
-                    </Text>
-                </TouchableOpacity>
+                </View>
+ 
+                <View style={{alignItems: "flex-end"}}>
+                    <TouchableOpacity onPress={onClickLogout} style={{backgroundColor:'#00C2FF',width:100, height:'40%', borderRadius:20 , borderColor:'rgb(0,191,166)', marginTop:'10%', marginRight:'10%' }}>
+                        <Text style={{color:'white', fontSize:18, textAlign:'center', fontFamily:'ITCKRISTEN'}}>
+                            Logout
+                        </Text>
+                    </TouchableOpacity>
                </View>
                </View>
             </View>
