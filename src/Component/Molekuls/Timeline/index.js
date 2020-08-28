@@ -4,6 +4,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import ChatIcon from '../../../../assets/navigation/comment-active.svg';
 import {ContentPicture} from '../../../Component/Atoms'
 
+
 const Timeline = ({navigation,profileImage, profilename,content,commentcount,time,visible,onpress}) => {
   const isPicture = (visible) => {
       if(visible == 'block'){
