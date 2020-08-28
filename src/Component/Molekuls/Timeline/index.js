@@ -1,14 +1,10 @@
 import React , { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image} from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import ChatIcon from '../../../../assets/navigation/comment-active.svg';
 import {ContentPicture} from '../../../Component/Atoms'
-import { useDispatch , useSelector } from 'react-redux';
-import database from '@react-native-firebase/database'
-import storage from '@react-native-firebase/storage';
 
-
-const Timeline = ({navigation,profilename,content,commentcount,time,visible,onpress}) => {
+const Timeline = ({navigation,profileImage, profilename,content,commentcount,time,visible,onpress}) => {
   const isPicture = (visible) => {
       if(visible == 'block'){
         
@@ -18,34 +14,19 @@ const Timeline = ({navigation,profilename,content,commentcount,time,visible,onpr
         return <View style={[style.picture],{display:'none'}}></View>
       }
   }
-/*
-    const getProfilePicture = async (user) => {
-        const res = await storage().ref('images/' + user).getDownloadURL().catch(e =>{
-            return false
-        })
-        return res
-    }
 
-    const dispatch = useDispatch()
-    const globalState = useSelector(state => state.timelinePostReducer)
-    const DisplayTimelinepost = async () => {
-        const username = await AsyncStorage.getItem('username')
-        //const res = await getTimelinePost()
-        dispatch({type:'SET_TIMELEINEPOST', value:res})
-    }
-
-    useEffect(() =>{
-        DisplayTimelinepost() 
-        getProfilePicture(user)
-    }, [])
-*/
     return (
         <TouchableOpacity onPress={onpress} style = {[style.border]}> 
             <View style = {{flexDirection : 'row'}}>
-                {
-                    <View style = {[style.borderimage]}></View>
-                }
-                  <Text style = {{marginVertical : 25}}>{profilename}</Text>
+            {
+                !profileImage ? (
+                    <View style={[style.borderimage]}></View>
+                ) : (
+                    <Image source={{uri:profileImage}}  style={[style.borderimage]} />
+                )
+                
+            }
+                <Text style = {{marginVertical : 25}}>{profilename}</Text>
                 <View style = {[style.commentbar]}>
                 <ChatIcon width = {20} height = {20}/>
                   <Text style = {{marginLeft : 5 ,marginTop : '-8%'}}>{commentcount}</Text>
@@ -70,7 +51,6 @@ const style = StyleSheet.create({
      borderimage: {
         borderWidth : 1,
         borderColor : '#000000',
-        backgroundColor: '#FFFFFF',
         borderRadius: 100,
         width : 46,
         height : 46,

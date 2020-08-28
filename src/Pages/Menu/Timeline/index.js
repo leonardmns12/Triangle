@@ -4,13 +4,46 @@ import NavigationMenu from '../../../Component/Molekuls/NavigationMenu/';
 import LeftLogo from '../../../../assets/chatWindow/left.svg';
 import Contents from '../../../Component/Molekuls/Timeline';
 import {ContentPicture} from '../../../Component/Atoms'
-import {getTimelinePost} from '../../../Config/Redux/restApi';
 import {useSelector , useDispatch} from 'react-redux';
-// import database from '@react-native-firebase/database'
-// import storage from '@react-native-firebase/storage';
+import database from '@react-native-firebase/database'
+import storage from '@react-native-firebase/storage';
 
 
 const Timeline = ({navigation}) => {
+    const getProfilePicture = async (user) => {
+        const res = await storage().ref('images/' + user).getDownloadURL().catch(e =>{
+            return false
+        })
+    
+        return res
+    }
+    
+    const getTimelinePost = () => {
+        const res = database().ref('post').once('value').then(async function(snapshot){
+          const data = []
+          if(snapshot.val() === null || snapshot.val() === undefined){
+    
+          } else {
+            const value = Object.keys(snapshot.val()).map(key => {
+              data.push({
+                id : key,
+                data : snapshot.val()[key],
+                profileImg : ''
+              })
+            })
+            for(let i=0; i<globalState.postList.length; i++){
+                data[i] = {
+                    ...data[i], 
+                    profileImg : await getProfilePicture(data[i].data.username)
+                }
+            }
+          }
+            console.log(data)
+            return data
+        })
+        return res
+    }
+
 const gtchat = (screen) => {
     navigation.replace(screen);
 }
@@ -36,8 +69,7 @@ const RenderItem = ({item}) => {
     return(
         <View> 
             {/* <Contents onpress={gotoPostReply} visible = {'none'} /> */}
-                <Contents visible = {'none'} profilename={item.data.username} commentcount={'2'} time={item.data.timestamp} content={item.data.value}/>
-                {/* <Contents visible = {'none'} profilename={'Leonard'} commentcount={'2'} time={'17:20'} content={'12312312312'}/> */}
+                <Contents visible = {'none'} profileImage={item.profileImg} profilename={item.data.username} commentcount={'2'} time={item.data.timestamp} content={item.data.value}/>  
         </View>
     )
 }
@@ -45,37 +77,25 @@ const RenderItem = ({item}) => {
 return(
     <View style={{flex:1}}>
         <View style={{flex:1, backgroundColor:'white'}}>
-        <View style={[styles.header,{}]}>
-                <TouchableOpacity style={{paddingLeft:18, paddingTop:11}}> 
-                <LeftLogo height={33} width={33}></LeftLogo>
-                </TouchableOpacity>      
-                <Text style={[styles.headerText,{}]}>Timeline</Text>
-        </View>
-        <View style={{flex:1}}>
-            <Text style={[styles.timelinetext,{}]}>Friend With Something News</Text>
-        <View style={{width:'90%', borderWidth:1 , marginHorizontal: 18 }}>
-        </View>
-        {/* <ScrollView>
-            <View> 
-            <Contents onpress={gotoPostReply} visible = {'none'} />
-                <Contents visible = {'none'} profilename={'Leonard'} commentcount={'2'} time={'17:20'} content={'111'}/>
-                <Contents visible = {'none'} profilename={'Leonard'} commentcount={'2'} time={'17:20'} content={'12312312312'}/>
+            <View style={[styles.header,{}]}>
+                    <TouchableOpacity style={{paddingLeft:18, paddingTop:11}}> 
+                    <LeftLogo height={33} width={33}></LeftLogo>
+                    </TouchableOpacity>      
+                    <Text style={[styles.headerText,{}]}>Timeline</Text>
             </View>
-        </ScrollView> */}
-        </View>
-        {
-            globalState.postList === undefined ? null : (
-                <FlatList 
-                renderItem={RenderItem}
-                data={globalState.postList}
-                key={item => item.id}
-                />
-            )
-        }
-
-        <View>
-        </View>
-            </View> 
+            <View style={{flex:1}}>
+                <Text style={[styles.timelinetext,{}]}>Friend With Something News</Text>
+                {
+                globalState.postList === undefined ? null : (
+                    <FlatList 
+                    renderItem={RenderItem}
+                    data={globalState.postList}
+                    key={item => item.id}
+                    />
+                )
+            }
+            </View>
+        </View> 
         <View style={{}}>
         {/* <NavigationMenu timeline="active" gotoHome={()=>{gtchat('Home')}}
             gotoChat={()=>{gtchat('Chat')}}

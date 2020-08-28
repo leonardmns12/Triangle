@@ -37,12 +37,12 @@ const InviteChat = () =>{
             })
             for(let i = 0; i < data.length; i++){
                 data[i] = {
-                    ...data[i],
+                    ...data[i], 
                     profileImg : await getProfilePicture(data[i].data.friend)
                 }
             }
           }
-          
+          console.log(data)
           return data
         })
         return res
