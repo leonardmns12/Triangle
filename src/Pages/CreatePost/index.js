@@ -9,8 +9,13 @@ const CreatePost = () => {
     const [text , setText] = useState('')
 
     const submitPost = async () => {
+        if(text.length > 0){
         const username = await AsyncStorage.getItem('username')
         await newPost(username,text)
+        setText('')
+        alert('Post submited!')
+        }
+        
     }
     return(
         <View style={{flex: 1}}>

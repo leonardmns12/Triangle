@@ -1,5 +1,5 @@
 import React , { useState, useEffect } from 'react';
-import { View , Text, TouchableOpacity , StyleSheet ,ScrollView, FlatList, AsyncStorage } from 'react-native';
+import { View , Text, TouchableOpacity , StyleSheet ,ScrollView, FlatList, AsyncStorage, RefreshControl } from 'react-native';
 import NavigationMenu from '../../../Component/Molekuls/NavigationMenu/';
 import LeftLogo from '../../../../assets/chatWindow/left.svg';
 import Contents from '../../../Component/Molekuls/Timeline';
@@ -19,12 +19,12 @@ const Timeline = ({navigation}) => {
     }
     
     const getTimelinePost = () => {
-        const res = database().ref('post').once('value').then(async function(snapshot){
-          const data = []
+        database().ref('post').on('value',async function(snapshot){
+            const data = []
           if(snapshot.val() === null || snapshot.val() === undefined){
     
           } else {
-            const value = Object.keys(snapshot.val()).map(key => {
+            Object.keys(snapshot.val()).map(key => {
               data.push({
                 id : key,
                 data : snapshot.val()[key],
@@ -38,40 +38,43 @@ const Timeline = ({navigation}) => {
                 }
             }
           }
-            console.log(data)
-            return data
+            dispatch({type: 'SET_TIMELINEPOST' , value: data})
         })
-        return res
     }
 
 const gtchat = (screen) => {
     navigation.replace(screen);
 }
 
-const gotoPostReply = () => {
-    navigation.navigate('PostReply')
+const gotoPostReply = (id) => {
+    navigation.navigate('PostReply' , {id:id})
 }
 
 const [post, setPost] = useState([])
+const [refreshing , isRefresing] = useState(true)
 const dispatch = useDispatch()
 const globalState = useSelector(state => state.postTimelineReducer)
 
 const displayPost = async()=>{
-    const res = await getTimelinePost()
-    dispatch({type: 'SET_TIMELINEPOST' , value: res})
+    getTimelinePost()
 }
 
 useEffect(()=>{
     displayPost()
-},[])
+})
 
 const RenderItem = ({item}) => {
     return(
         <View> 
             {/* <Contents onpress={gotoPostReply} visible = {'none'} /> */}
-                <Contents visible = {'none'} profileImage={item.profileImg} profilename={item.data.username} commentcount={'2'} time={item.data.timestamp} content={item.data.value}/>  
+                <Contents onpress={()=>{gotoPostReply(item.id)}} visible = {'none'} profileImage={item.profileImg} profilename={item.data.username} commentcount={'2'} time={item.data.timestamp} content={item.data.value}/>  
         </View>
     )
+}
+
+const onRefresh = async () => {
+    isRefresing(true)
+    await getTimelinePost()
 }
 
 return(
@@ -91,6 +94,12 @@ return(
                     renderItem={RenderItem}
                     data={globalState.postList}
                     key={item => item.id}
+                    RefreshControl = {
+                        <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        />
+                    }
                     />
                 )
             }

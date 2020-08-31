@@ -14,6 +14,7 @@ const Sender = ({navigation, chatMessage , timestamp , photo , isGroup}) => {
             mounted = false
         }
     },[])
+    
     function leadingzero(num) {
         var s = num+"";
         while (s.length < 2) s = "0" + s;

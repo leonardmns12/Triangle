@@ -1,11 +1,47 @@
-import React from 'react';
-import {View , Text , StyleSheet , TouchableOpacity , ScrollView } from 'react-native'
+import React, { useEffect, useState } from 'react';
+import {View , Text , StyleSheet , TouchableOpacity , ScrollView , AsyncStorage } from 'react-native'
 import PostComment from '../../Component/Molekuls/PostReplyComment/';
 import { TextInput } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import OptionIcon from 'react-native-vector-icons/SimpleLineIcons'
 import BackIcon from 'react-native-vector-icons/Ionicons'
-const PostReply = () => {
+import { getPostName , getPostTimestamp , getPostValue , sendReply } from '../../Config/Redux/restApi/'
+const PostReply = ({navigation,route}) => {
+    useEffect(()=>{
+        getpostreply()
+    },[])
+
+    const [name , setname] = useState('')
+    const [value , setvalue] = useState('')
+    const [time , settime] = useState('')
+    const [replyLength , setreplyLength] = useState('')
+    const [textinput , setinput] = useState('')
+
+    const getpostreply = async () => {
+        const res = await getPostName(route.params.id)
+        setname(res)
+        const res2 = await getPostValue(route.params.id)
+        setvalue(res2)
+        const res3 = await getPostTimestamp(route.params.id)
+        settime(res3)
+    }
+
+    const reply = async () => { 
+        if(textinput !== ''){
+        const sender = await AsyncStorage.getItem('username')
+        const data = {
+            sender : sender,
+            value : textinput,
+            timestamp : new Date().getTime()
+        }
+        await sendReply(route.params.id , data)
+        setinput('')
+        }
+        
+    }
+
+
+
     return(
         <View style={{backgroundColor:'white', flex:1}}>
             <View style={[styles.header,{}]}>
@@ -19,7 +55,7 @@ const PostReply = () => {
             <View style={{marginTop:"2%", backgroundColor:"white"}}>
                 <View style={{flexDirection:'row', paddingLeft:10}}>
                     <View style={[styles.profilePict]}></View>
-                    <Text style={[styles.profileName]}>Leonard Monosa</Text>
+                    <Text style={[styles.profileName]}>{name}</Text>
                     <View style={{position:'absolute', right:0, padding:"0%" , flexDirection:'row', marginLeft:"2%"}}>
                         <TouchableOpacity>
                             <OptionIcon name="options-vertical" size={22} style={{padding:0, paddingTop:4}}/>
@@ -27,13 +63,13 @@ const PostReply = () => {
                     </View>
                 </View>
                 <View>
-                    <Text style={{marginTop:"3%", marginBottom: "0%", padding:"8%", backgroundColor:"#E9EBEE"}}>Some friend being wise by adding more friend</Text>
+                    <Text style={{marginTop:"3%", marginBottom: "0%", padding:"8%", backgroundColor:"#E9EBEE"}}>{value}</Text>
                 </View>
                 <View style={{flexDirection:'row' , borderBottomWidth:1, padding:10, borderBottomColor:"black"}}>
-                    <Text style={{fontFamily:'ITCKRISTEN', color:"grey"}}>19:00</Text>
+                        <Text style={{fontFamily:'ITCKRISTEN', color:"grey"}}>{time}</Text>
                     <View style={{position:'absolute', right:0, padding:10 , flexDirection:'row'}}>
                     <Icon name="comment-text-multiple-outline" size={20} color="#1BB0DF" />
-                    <Text style={{marginLeft:5, color:"grey"}}>102</Text>
+                    <Text style={{marginLeft:5, color:"grey"}}>{replyLength}</Text>
                     </View>
                 </View>
                 <View style={{padding:"3%", flexDirection:"row", }}>
@@ -53,8 +89,10 @@ const PostReply = () => {
                 <PostComment name="Kent anderson" content="mantap" time="19.00"/> 
             </ScrollView>
             <View style={{flexDirection:'row' , backgroundColor:'transparent', padding:0, margin:0 , height:'auto'}}>
-                <TextInput placeholder="Reply here" style={[styles.inputComment]}/>
-                <TouchableOpacity>
+                <TextInput value={textinput} onChangeText={(e)=>{
+                    setinput(e)
+                }} placeholder="Reply here" style={[styles.inputComment]}/>
+                <TouchableOpacity onPress={reply} >
                     <Icon name="send-circle" size={38} color="#1BB0DF" style={{paddingTop:10}}/>
                 </TouchableOpacity>
             </View>

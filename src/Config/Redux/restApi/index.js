@@ -446,3 +446,55 @@ export const newPost = (username, text) => {
     timestamp : new Date().getHours()+':'+ new Date().getMinutes()
   })
 }
+
+export const getPostReply = (id) => {
+  const res = database().ref('post/' + id).once('value').then(function(snapshot){
+    const data = []
+
+    if(snapshot.val() === null || snapshot.val() === undefined){
+      console.log('data kosong')
+    }else{
+      Object.keys(snapshot.val()).map(key => {
+        data.push({
+            id: key,
+            data: snapshot.val()[key]
+        })
+      })
+    }
+
+    return data;
+  })
+  return res
+}
+
+export const getPostName = (id) => {
+  const res = database().ref('post/' + id + '/username').once('value').then(function(snapshot){
+    return snapshot.val()
+  })
+  console.log('waktu2 : ' + res)
+  return res
+  // return res;
+}
+
+export const getPostTimestamp = (id) => {
+  const res = database().ref('post/' + id + '/timestamp').once('value').then(function(snapshot){
+    return snapshot.val()
+  })
+  console.log('waktu : ' + res)
+  return res
+}
+
+export const getPostValue = (id) => {
+  const res = database().ref('post/' + id + '/value').once('value').then(function(snapshot){
+    return snapshot.val()
+  })
+  return res
+}
+ 
+export const sendReply = (id , data) => {
+  database().ref('post/' + id  + '/comment').push({
+    sender : data.sender,
+    value : data.value,
+    timestamp : data.timestamp
+  })
+}
