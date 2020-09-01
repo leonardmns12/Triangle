@@ -102,7 +102,7 @@ return(
                     }
                     />
                 )
-            }
+                }
             </View>
         </View> 
         <View style={{}}>

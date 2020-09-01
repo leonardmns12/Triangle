@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import {View , Text , StyleSheet , TouchableOpacity , ScrollView , AsyncStorage } from 'react-native'
+import {View , Text , StyleSheet , TouchableOpacity , ScrollView , AsyncStorage , FlatList , RefreshControl } from 'react-native'
 import PostComment from '../../Component/Molekuls/PostReplyComment/';
 import { TextInput } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import OptionIcon from 'react-native-vector-icons/SimpleLineIcons'
 import BackIcon from 'react-native-vector-icons/Ionicons'
-import { getPostName , getPostTimestamp , getPostValue , sendReply } from '../../Config/Redux/restApi/'
+import { getPostName , getPostTimestamp , getPostValue , sendReply , getReplyPost} from '../../Config/Redux/restApi/'
+
+
+
 const PostReply = ({navigation,route}) => {
     useEffect(()=>{
         getpostreply()
+        getreply()
     },[])
 
     const [name , setname] = useState('')
@@ -16,6 +20,9 @@ const PostReply = ({navigation,route}) => {
     const [time , settime] = useState('')
     const [replyLength , setreplyLength] = useState('')
     const [textinput , setinput] = useState('')
+    const [refreshing , isRefresing] = useState(true)
+    const [replies , setreplies] = useState([])
+
 
     const getpostreply = async () => {
         const res = await getPostName(route.params.id)
@@ -40,7 +47,24 @@ const PostReply = ({navigation,route}) => {
         
     }
 
+    const getreply = async() =>{
+        const res = await getReplyPost(route.params.id)
+        // console.log(res)
+        setreplies(res)
+    }
 
+    const RenderItem = ({item}) => {
+        return(
+            <View> 
+                <PostComment name={item.data.sender} content={item.data.value} time={item.data.timestamp}/> 
+            </View>
+        )
+    }
+
+    const onRefresh = async () => {
+        isRefresing(true)
+        await getTimelinePost()
+    }
 
     return(
         <View style={{backgroundColor:'white', flex:1}}>
@@ -80,14 +104,30 @@ const PostReply = ({navigation,route}) => {
                 </View>
             </View>
             
-            <ScrollView style={{backgroundColor:'white', padding:10}}>
+            {/* <ScrollView style={{backgroundColor:'white', padding:10}}>
                 <PostComment name="Kent anderson" content="mantap" time="19.00"/>   
                 <PostComment name="Nico Fernando" content="gile" time="19.00"/>   
                 <PostComment name="Kent anderson" content="mantap" time="19.00"/>   
                 <PostComment name="Nico Fernando" content="gile" time="19.00"/>   
                 <PostComment name="Kent anderson" content="mantap" time="19.00"/> 
                 <PostComment name="Kent anderson" content="mantap" time="19.00"/> 
-            </ScrollView>
+            </ScrollView> */}
+            {
+                    replies === undefined ? null : (
+                    <FlatList 
+                    renderItem={RenderItem}
+                    data={replies}
+                    key={item => item.id}
+                    RefreshControl = {
+                        <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        />
+                    }
+                    />
+                    )
+            }
+
             <View style={{flexDirection:'row' , backgroundColor:'transparent', padding:0, margin:0 , height:'auto'}}>
                 <TextInput value={textinput} onChangeText={(e)=>{
                     setinput(e)

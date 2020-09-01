@@ -81,6 +81,7 @@ const postTimelineState = {
     postList : []
 }
 
+
 const postTimelineReducer = (state = postTimelineState, action) => {
     if(action.type === 'SET_TIMELINEPOST'){
         return{
