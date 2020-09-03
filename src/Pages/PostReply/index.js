@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import {View , Text , StyleSheet , TouchableOpacity , ScrollView , AsyncStorage , FlatList , RefreshControl } from 'react-native'
+import {View , Text , StyleSheet , TouchableOpacity , ScrollView , AsyncStorage , FlatList , RefreshControl , Image } from 'react-native'
 import PostComment from '../../Component/Molekuls/PostReplyComment/';
 import { TextInput } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import OptionIcon from 'react-native-vector-icons/SimpleLineIcons'
 import BackIcon from 'react-native-vector-icons/Ionicons'
 import { getPostName , getPostTimestamp , getPostValue , sendReply , getReplyPost} from '../../Config/Redux/restApi/'
-
-
+import database from '@react-native-firebase/database'
+import storage from '@react-native-firebase/storage'
 
 const PostReply = ({navigation,route}) => {
     useEffect(()=>{
@@ -22,7 +22,40 @@ const PostReply = ({navigation,route}) => {
     const [textinput , setinput] = useState('')
     const [refreshing , isRefresing] = useState(true)
     const [replies , setreplies] = useState([])
+    const [pict, setpict] = useState('')
 
+    const getProfilePicture = async (user) => {
+        const res = await storage().ref('images/' + user).getDownloadURL().catch(e =>{
+            return false
+        })
+    
+        return res
+    }
+
+    const getReplyPost = (id) =>{
+        const res = database().ref('post/' + id + '/comment').once('value').then(async function(snapshot){
+          const data = []
+           if(snapshot.val() === null || snapshot.val() === undefined){
+              console.log('data kosong')
+           } else{
+            const value = Object.keys(snapshot.val()).map(key => {
+              data.push({
+                id : key,
+                data : snapshot.val()[key],
+                profileImg : ''
+              })
+            })
+            for(let i=0; i<data.length;i++){
+                data[i] = {
+                    ...data[i],
+                    profileImg : await getProfilePicture(data[i].data.sender)
+                }
+            }
+          }
+          return data
+        })
+        return res
+    }
 
     const getpostreply = async () => {
         const res = await getPostName(route.params.id)
@@ -31,6 +64,8 @@ const PostReply = ({navigation,route}) => {
         setvalue(res2)
         const res3 = await getPostTimestamp(route.params.id)
         settime(res3)
+        const res4 = await getProfilePicture(res)
+        setpict(res4)
     }
 
     const reply = async () => { 
@@ -49,14 +84,13 @@ const PostReply = ({navigation,route}) => {
 
     const getreply = async() =>{
         const res = await getReplyPost(route.params.id)
-        // console.log(res)
         setreplies(res)
     }
 
     const RenderItem = ({item}) => {
         return(
             <View> 
-                <PostComment name={item.data.sender} content={item.data.value} time={item.data.timestamp}/> 
+                <PostComment profileImage={item.profileImg} name={item.data.sender} content={item.data.value} time={item.data.timestamp}/> 
             </View>
         )
     }
@@ -78,7 +112,14 @@ const PostReply = ({navigation,route}) => {
             </View>
             <View style={{marginTop:"2%", backgroundColor:"white"}}>
                 <View style={{flexDirection:'row', paddingLeft:10}}>
-                    <View style={[styles.profilePict]}></View>
+                    {
+                        !pict ? (
+                            <View style={[styles.profilePict]}></View>
+                        ) : (
+                            <Image source={{uri:pict}} style={[styles.profilePict]}/>
+                        )
+                        
+                    }
                     <Text style={[styles.profileName]}>{name}</Text>
                     <View style={{position:'absolute', right:0, padding:"0%" , flexDirection:'row', marginLeft:"2%"}}>
                         <TouchableOpacity>

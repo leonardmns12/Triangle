@@ -498,21 +498,3 @@ export const sendReply = (id , data) => {
     timestamp : data.timestamp
   })
 }
-
-export const getReplyPost = (id) =>{
-    const res = database().ref('post/' + id + '/comment').once('value').then(function(snapshot){
-      const data = []
-       if(snapshot.val() === null || snapshot.val() === undefined){
-          console.log('data kosong')
-       } else{
-        const value = Object.keys(snapshot.val()).map(key => {
-          data.push({
-            id : key,
-            data : snapshot.val()[key]
-          })
-        })
-      }
-      return data
-    })
-    return res
-}
