@@ -443,7 +443,7 @@ export const newPost = (username, text) => {
   database().ref('post').push({
     value: text,
     username : username,
-    timestamp : new Date().getHours()+':'+ new Date().getMinutes()
+    timestamp : new Date().getTime()
   })
 }
 
@@ -497,4 +497,15 @@ export const sendReply = (id , data) => {
     value : data.value,
     timestamp : data.timestamp
   })
+}
+
+export const getCommentLength = (id) => {
+  const res = database().ref('post/' + id + '/comment').once('value').then(function(snapshot){
+    if(snapshot.val() === null || snapshot.val() === undefined){
+      return 0;
+    }else{
+      return Object.keys(snapshot.val()).length
+    }
+  })
+  return res
 }

@@ -7,6 +7,7 @@ import {ContentPicture} from '../../../Component/Atoms'
 import {useSelector , useDispatch} from 'react-redux';
 import database from '@react-native-firebase/database'
 import storage from '@react-native-firebase/storage';
+import { getCommentLength } from '../../../Config/Redux/restApi/'
 
 
 const Timeline = ({navigation}) => {
@@ -31,20 +32,18 @@ const Timeline = ({navigation}) => {
                 profileImg : ''
               })
             })
-            for(let i=0; i<globalState.postList.length; i++){
+            for(let i=0; i<data.length; i++){
                 data[i] = {
                     ...data[i], 
-                    profileImg : await getProfilePicture(data[i].data.username)
+                    profileImg : await getProfilePicture(data[i].data.username),
+                    commentLength : await getCommentLength(data[i].id)
                 }
             }
           }
+          console.log('out')
             dispatch({type: 'SET_TIMELINEPOST' , value: data})
         })
     }
-
-const gtchat = (screen) => {
-    navigation.replace(screen);
-}
 
 const gotoPostReply = (id) => {
     navigation.navigate('PostReply' , {id:id})
@@ -56,18 +55,18 @@ const dispatch = useDispatch()
 const globalState = useSelector(state => state.postTimelineReducer)
 
 const displayPost = async()=>{
-    getTimelinePost()
+    await getTimelinePost()
 }
 
 useEffect(()=>{
     displayPost()
-})
+},[])
 
 const RenderItem = ({item}) => {
     return(
         <View> 
             {/* <Contents onpress={gotoPostReply} visible = {'none'} /> */}
-                <Contents onpress={()=>{gotoPostReply(item.id)}} visible = {'none'} profileImage={item.profileImg} profilename={item.data.username} commentcount={'2'} time={item.data.timestamp} content={item.data.value}/>  
+                <Contents onpress={()=>{gotoPostReply(item.id)}} visible = {'none'} profileImage={item.profileImg} profilename={item.data.username} commentcount={item.commentLength} time={item.data.timestamp} content={item.data.value}/>  
         </View>
     )
 }

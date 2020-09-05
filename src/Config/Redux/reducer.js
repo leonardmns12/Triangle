@@ -81,6 +81,19 @@ const postTimelineState = {
     postList : []
 }
 
+const replyPost = {
+    replyList : []
+}
+
+const replyPostReducer = (state = replyPost, action) => {
+    if(action.type === 'SET_REPLYLIST'){
+        return{
+            ...state,
+            replyList : action.value
+        }
+    }
+    return state
+}
 
 const postTimelineReducer = (state = postTimelineState, action) => {
     if(action.type === 'SET_TIMELINEPOST'){
@@ -336,7 +349,8 @@ const reducer = combineReducers({
     resultFriendReducer,
     groupInfoReducer,
     inviteChatReducer,
-    postTimelineReducer
+    postTimelineReducer,
+    replyPostReducer
 })
 
 export default reducer;

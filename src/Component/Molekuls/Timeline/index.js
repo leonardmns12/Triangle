@@ -1,4 +1,4 @@
-import React , { useEffect } from 'react';
+import React , { useEffect , useState } from 'react';
 import { View, Text, StyleSheet, Image} from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import ChatIcon from '../../../../assets/navigation/comment-active.svg';
@@ -6,7 +6,33 @@ import {ContentPicture} from '../../../Component/Atoms'
 
 
 const Timeline = ({navigation,profileImage, profilename,content,commentcount,time,visible,onpress}) => {
-  const isPicture = (visible) => {
+    useEffect(()=>{
+        convertTime()
+    },[])
+    
+    function leadingzero(num) {
+        var s = num+"";
+        while (s.length < 2) s = "0" + s;
+        return s;
+    }
+    const convertTime = async () => {
+        var weekday = new Array(7);
+        weekday[0] = "sunday";
+        weekday[1] = "monday";
+        weekday[2] = "tuesday";
+        weekday[3] = "wednesday";
+        weekday[4] = "thursday";
+        weekday[5] = "friday";
+        weekday[6] = "saturday";
+        const date = new Date(time)
+        const day = weekday[date.getDay()]
+        const hours = date.getHours();
+        const minutes = leadingzero(date.getMinutes())
+        setTime(hours+':'+minutes+' '+day) 
+    }
+    const [times , setTime] = useState('')
+  
+    const isPicture = (visible) => {
       if(visible == 'block'){
         
         return <View style={[style.picture]}><ContentPicture /></View>
@@ -41,7 +67,7 @@ const Timeline = ({navigation,profileImage, profilename,content,commentcount,tim
 
             </View>
             <View style = {[style.FooterContent]}>
-                <Text style = {[style.Time]}>{time}</Text>
+                <Text style = {[style.Time]}>{times}</Text>
                 <View style = {[style.ReplyButton]} ><Text style = {[style.ReplyText]}> Reply</Text></View>
             </View>
         </TouchableOpacity>

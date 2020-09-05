@@ -8,13 +8,19 @@ import BackIcon from 'react-native-vector-icons/Ionicons'
 import { getPostName , getPostTimestamp , getPostValue , sendReply , getReplyPost} from '../../Config/Redux/restApi/'
 import database from '@react-native-firebase/database'
 import storage from '@react-native-firebase/storage'
+import { useDispatch , useSelector } from 'react-redux'
 
 const PostReply = ({navigation,route}) => {
     useEffect(()=>{
         getpostreply()
-        getreply()
-    },[])
+        getreply(limit)
 
+        return() => {
+            dispatch({type:'SET_REPLYLIST' , value:[]})
+        }
+    },[])
+    const dispatch = useDispatch()
+    const postReplyState = useSelector(state => state.replyPostReducer)
     const [name , setname] = useState('')
     const [value , setvalue] = useState('')
     const [time , settime] = useState('')
@@ -23,6 +29,8 @@ const PostReply = ({navigation,route}) => {
     const [refreshing , isRefresing] = useState(true)
     const [replies , setreplies] = useState([])
     const [pict, setpict] = useState('')
+    const [limit , setlimit] = useState(5)
+    const [dataLength , setDataLength] = useState(10)
 
     const getProfilePicture = async (user) => {
         const res = await storage().ref('images/' + user).getDownloadURL().catch(e =>{
@@ -32,13 +40,13 @@ const PostReply = ({navigation,route}) => {
         return res
     }
 
-    const getReplyPost = (id) =>{
-        const res = database().ref('post/' + id + '/comment').once('value').then(async function(snapshot){
+    const getReplyPost = (id,lmt) =>{
+        const res = database().ref('post/' + id + '/comment').limitToLast(lmt).once('value').then(async function(snapshot){
           const data = []
            if(snapshot.val() === null || snapshot.val() === undefined){
               console.log('data kosong')
            } else{
-            const value = Object.keys(snapshot.val()).map(key => {
+            Object.keys(snapshot.val()).map(key => {
               data.push({
                 id : key,
                 data : snapshot.val()[key],
@@ -52,6 +60,7 @@ const PostReply = ({navigation,route}) => {
                 }
             }
           }
+          dispatch({type:'SET_REPLYLIST' , value:data})
           return data
         })
         return res
@@ -79,17 +88,17 @@ const PostReply = ({navigation,route}) => {
         await sendReply(route.params.id , data)
         setinput('')
         }
-        
+        await getReplyPost(route.params.id,limit)
     }
 
     const getreply = async() =>{
-        const res = await getReplyPost(route.params.id)
+        const res = await getReplyPost(route.params.id,limit)
         setreplies(res)
     }
 
     const RenderItem = ({item}) => {
         return(
-            <View> 
+            <View style={{paddingLeft:10}}> 
                 <PostComment profileImage={item.profileImg} name={item.data.sender} content={item.data.value} time={item.data.timestamp}/> 
             </View>
         )
@@ -98,6 +107,26 @@ const PostReply = ({navigation,route}) => {
     const onRefresh = async () => {
         isRefresing(true)
         await getTimelinePost()
+    }
+
+    const loadMore = () => {
+        const getMore = async () => {
+            await getReplyPost(route.params.id,limit+3)
+            setlimit(limit+3)
+            setDataLength(dataLength-3)
+        }
+        return (
+            dataLength > 0 && postReplyState.replyList.length > 0 ? (
+                <View style={{padding:"3%", flexDirection:"row", }}>
+                <TouchableOpacity onPress={()=>{
+                    getMore()
+                }}>
+                    <Text style={{}}>Load more comments</Text>
+                </TouchableOpacity>
+                <Text style={{marginLeft:"3%", padding:"1%", fontSize:10, color:"grey"}}>{dataLength} more</Text>
+                </View>
+            ) : null
+        )
     }
 
     return(
@@ -137,27 +166,12 @@ const PostReply = ({navigation,route}) => {
                     <Text style={{marginLeft:5, color:"grey"}}>{replyLength}</Text>
                     </View>
                 </View>
-                <View style={{padding:"3%", flexDirection:"row", }}>
-                    <TouchableOpacity>
-                        <Text style={{}}>Load more comments</Text>
-                    </TouchableOpacity>
-                    <Text style={{marginLeft:"3%", padding:"1%", fontSize:10, color:"grey"}}>96 more</Text>
-                </View>
             </View>
-            
-            {/* <ScrollView style={{backgroundColor:'white', padding:10}}>
-                <PostComment name="Kent anderson" content="mantap" time="19.00"/>   
-                <PostComment name="Nico Fernando" content="gile" time="19.00"/>   
-                <PostComment name="Kent anderson" content="mantap" time="19.00"/>   
-                <PostComment name="Nico Fernando" content="gile" time="19.00"/>   
-                <PostComment name="Kent anderson" content="mantap" time="19.00"/> 
-                <PostComment name="Kent anderson" content="mantap" time="19.00"/> 
-            </ScrollView> */}
             {
-                    replies === undefined ? null : (
+                    postReplyState.replyList === undefined ? null : (
                     <FlatList 
                     renderItem={RenderItem}
-                    data={replies}
+                    data={postReplyState.replyList}
                     key={item => item.id}
                     RefreshControl = {
                         <RefreshControl
@@ -165,6 +179,8 @@ const PostReply = ({navigation,route}) => {
                         onRefresh={onRefresh}
                         />
                     }
+                    inverted
+                    ListFooterComponent={loadMore}
                     />
                     )
             }
