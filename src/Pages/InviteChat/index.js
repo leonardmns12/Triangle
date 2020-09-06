@@ -9,9 +9,10 @@ import { useDispatch , useSelector } from 'react-redux';
 import GroupMember from '../../Component/Molekuls/GroupMember/'
 import database from '@react-native-firebase/database'
 import storage from '@react-native-firebase/storage';
+import { getPendingGroup2 } from '../../Config/Redux/restApi/';
 
 
-const InviteChat = () =>{
+const InviteChat = ({navigation,route}) =>{
 
     const getProfilePicture = async (user) => {
         const res = await storage().ref('images/' + user).getDownloadURL().catch(e =>{
@@ -19,6 +20,20 @@ const InviteChat = () =>{
             return false
         })
 
+        return res
+    }
+
+    const [memberGroup , setMemberGroup] = useState('')
+
+    const getMember = (id) => {
+        const res = database().ref('group/' + id + '/member').once('value').then(async function(snapshot){
+            const data = []
+            if(snapshot.val() === null || snapshot.val() === undefined){
+                
+            }else{
+                return  Object.keys(snapshot.val())
+            }
+        })  
         return res
     }
 
@@ -42,7 +57,6 @@ const InviteChat = () =>{
                 }
             }
           }
-          console.log(data)
           return data
         })
         return res
@@ -51,36 +65,47 @@ const InviteChat = () =>{
 
     const dispatch = useDispatch()
     const globalState = useSelector(state => state.inviteChatReducer)
-    const [isClick , setClick] = useState(false);
-    const [friend , setfriend] = useState([])
 
     const displayMember = async () => {
         const username = await AsyncStorage.getItem('username')
         const res = await getFriend(username)
-        dispatch({type:'SET_FRIENDINVITE' , value:res})
-        
+        const arr = res.map((item , index) => {
+            item.isSelected = false
+            return {...item}
+        })
+        const pendingMember = await getPendingGroup2(route.params.groupId)
+        const currMember = await getMember(route.params.groupId)
+        if(!pendingMember){
+            const data = [...currMember]
+            const data2 = res.filter(x => !data.includes(x.data.friend))
+            dispatch({type:'SET_FRIENDINVITE' , value:data2})
+        }else{
+            const data = [...currMember,...pendingMember]
+            const data2 = res.filter(x => !data.includes(x.data.friend))
+            dispatch({type:'SET_FRIENDINVITE' , value:data2})
+        }
     }
-
     useEffect(()=>{
         displayMember()
         getProfilePicture('wenny')
+
+        return () => {
+            dispatch({type:'SET_FRIENDINVITE' , value:[]})
+        }
     },[])
+    const handleSelected = (ind) => {
+        const arr = globalState.friendlist.map((item , index) => {
+          if(ind === index){
+            item.isSelected = !item.isSelected
+          }
+          return {...item}
+        })
+        dispatch({type:'SET_FRIENDINVITE' , value:arr})
+      }
 
-    const renderItem = ({item}) => {
+    const disini = ({item,index}) => {
         return(
-            <View style={{flexDirection:'row', padding:"5%", borderBottomWidth:1, borderBottomColor:"#D3D3D3"}}>
-            <View style={{height:30 , width:30 , borderWidth:1, borderRadius: 30, marginTop:"2%"}}></View>
-            <Text style={{marginLeft:"5%", marginTop:"3%", fontSize:16}}>{'leonard'}</Text>
-            <IconCheck name='checkbox-passive' />
-
-            </View>
-        )
-    }
-
-    const disini = ({item}) => {
-        console.log(item.profileImg)
-        return(
-            <TouchableOpacity onPress={()=>{setClick(!isClick)}} style={{flexDirection:'row', padding:"5%", borderBottomWidth:1, borderBottomColor:"#D3D3D3"}}>
+            <TouchableOpacity onPress={()=>{handleSelected(index)}} style={{flexDirection:'row', padding:"5%", borderBottomWidth:1, borderBottomColor:"#D3D3D3"}}>
             {
                 !item.profileImg ? (
                     <View style={{height:30 , width:30 , borderWidth:1, borderRadius: 30, marginTop:"2%"}}></View>
@@ -91,11 +116,12 @@ const InviteChat = () =>{
                 
             }
             <Text style={{marginLeft:"5%", marginTop:"3%", fontSize:16}}>{item.data.friend}</Text>
-            <View style={{marginLeft:"5%", marginTop:"3%", fontSize:16, position:'absolute', right:0,top:'60%'}}></View>
-            {isClick ? <IconCheck name='checkbox-active' color={'green'}/> : (
+            <View style={{position:'absolute' , right:10, top:'90%'}}>
+            {item.isSelected ? <IconCheck name='checkbox-active' color={'green'}/> : (
                     <IconCheck name='checkbox-passive' />
                 )
             }
+            </View>
             </TouchableOpacity>
             
         )

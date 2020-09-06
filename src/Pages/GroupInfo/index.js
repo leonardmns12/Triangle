@@ -1,10 +1,10 @@
 import React, {useState, useEffect} from 'react'
-import { View , Text, StyleSheet, TouchableOpacity, ScrollView, Modal , AsyncStorage, FlatList } from 'react-native'
+import { View , Text, StyleSheet, TouchableOpacity, ScrollView, Modal , AsyncStorage, FlatList , Image } from 'react-native'
 import IconIon from 'react-native-vector-icons/Ionicons'
 import IconSearch from 'react-native-vector-icons/FontAwesome5'
 import { TextInput } from 'react-native-gesture-handler';
 import GroupMember from '../../Component/Molekuls/GroupMember/'
-import { getMemberGroup , getPendingGroup } from '../../Config/Redux/restApi';
+import { getMemberGroup , getPendingGroup , changeGroupName } from '../../Config/Redux/restApi';
 import { useDispatch , useSelector } from 'react-redux';
 const GroupInfo = ({route, navigation}) => {
     useEffect(()=>{
@@ -28,6 +28,7 @@ const GroupInfo = ({route, navigation}) => {
     const [ModalOpen, SetModalOpen] = useState(false); 
     const [ModalRename, SetModalRename] = useState(false); 
     const [isSelected , setSelected] = useState(true);
+    const [groupName , setGroupName] = useState(route.params.groupName)
     const gotochat = async () => {
         const username = await AsyncStorage.getItem('username')
         dispatch({type: 'SET_SENDER' , value:username})
@@ -36,32 +37,41 @@ const GroupInfo = ({route, navigation}) => {
     }
     const renderItem = ({item}) => {
         return(
-            <GroupMember name={item.data.member}/>
+            <GroupMember name={item.displayname} profileuri={item.profileuri}/>
         )
     }
     return(
         <View style={{backgroundColor:'white', flex:1}}>
             <View style={[styles.profile, {}]}>
-                <View style={[styles.GroupPict]}></View>
+                {
+                    route.params.groupUri.uri === 'https://firebasestorage.googleapis.com/v0/b/triang…=media&token=8e8f6b02-b104-4de1-8d04-d2887c764a6d' ? (
+                        <View style={[styles.GroupPict]}></View>
+                    ) : (
+                        <Image source={route.params.groupUri} style={[styles.GroupPict]} />
+                    )
+                }
                 <Modal visible={ModalRename} animationType="slide" transparent={true}>
-                    <View style={{flex: 1 , backgroundColor : 'rgba(112,112,112,0.5)'}}>
+                    <View style={{flex: 1 , backgroundColor : 'rgba(112,112,112,0.5)', justifyContent:'center', alignItems:'center'}}>
                     <View style={[styles.container]}>
-                        <Text style={{fontWeight:"bold", padding:50}}>Rename</Text>
-                        <View style={[styles.modalRename]}>
-                            <TextInput placeholder="Group 1"/>
+                        <Text style={{fontWeight:"bold" , textAlign:'center',marginTop:'3%'}}>Rename</Text>
+                        <View style={{flex:1,marginTop:'4%'}}>
+                            <TextInput onChangeText={(e)=>{setGroupName(e)}} maxLength={16} value={groupName} style={[styles.modalRename]} placeholder="Group 1"/>
                         </View>
-                        <View style={{flexDirection:'row' , padding:0, height:'auto', borderTopWidth:1, borderBottomLeftRadius:25, borderBottomRightRadius:25}}>
+                        <View style={{flexDirection:'row' , padding:0, borderTopWidth:1, borderBottomLeftRadius:25, borderBottomRightRadius:25}}>
                             <TouchableOpacity style={[styles.modalOption, {borderRightWidth:1,borderBottomLeftRadius:25}]}>
-                                <Text style={{fontWeight:"bold", textAlign: "center", color:"#1BB0DF"}} onPress={() => SetModalRename(false)}>Cancel</Text>
+                                <Text style={{fontWeight:"bold", textAlign: "center", color:"#1BB0DF"}} onPress={() => {SetModalRename(false) , setGroupName(route.params.groupName)}}>Cancel</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={[styles.modalOption, {borderBottomRightRadius:25}]}>
+                            <TouchableOpacity onPress={async()=>{
+                                await changeGroupName(route.params.groupId,groupName)
+                                SetModalRename(false)
+                            }} style={[styles.modalOption, {borderBottomRightRadius:25}]}>
                                 <Text style={{fontWeight:"bold", textAlign: "center", color:"#1BB0DF"}}>Confirm</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
                     </View>
                 </Modal>
-                <Text style={[styles.GroupName]} onPress={() => SetModalRename(true)}>Group 1</Text>
+                <Text style={[styles.GroupName]} onPress={() => SetModalRename(true)}>{groupName}</Text>
                 <View style={{position:'absolute', right:0, padding:25, flexDirection:"row", flex:1}}>
                     <IconIon onPress={()=>{dispatch({type:'SET_GROUPUNAME' , value:'ea'})}} name="image-outline" size={30}/>
                     <Modal visible={ModalOpen} animationType="slide" transparent={true}>
@@ -86,7 +96,7 @@ const GroupInfo = ({route, navigation}) => {
                 <Text style={{fontWeight:"bold", textAlign: "center" }}>Member ({groupState.memberGroup.length})</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={()=>{setSelected(false)}} style={[styles.Info, {}]}>
-                    <Text style={{fontWeight:"bold", textAlign: "center",}}>Pending (100)</Text>
+                    <Text style={{fontWeight:"bold", textAlign: "center",}}>Pending ({groupState.pendingGroup.length})</Text>
                 </TouchableOpacity>
             </View>
             <View style={[styles.Search]}>
@@ -123,7 +133,7 @@ const GroupInfo = ({route, navigation}) => {
                
 
             <View style={{flexDirection:'row' , padding:5, margin:0 , height:'auto'}}>
-                <TouchableOpacity onPress={()=>{navigation.navigate('InviteChat')}} style={[styles.Footer, {backgroundColor:"#30D5C8"}]}>
+                <TouchableOpacity onPress={()=>{navigation.navigate('InviteChat' , {groupId : route.params.groupId})}} style={[styles.Footer, {backgroundColor:"#30D5C8"}]}>
                     <Text style={{fontWeight:"bold", textAlign: "center",}}>Invite to chat</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={gotochat} style={[styles.Footer, {backgroundColor:"white"}]}>
@@ -202,12 +212,8 @@ const styles = StyleSheet.create({
     container : {
         borderRadius: 25, 
         backgroundColor: "white", 
-        alignItems:"center", 
         width: "70%", 
-        height: "auto",
-        marginLeft:"15%", 
-        marginTop:"60%",
-        flex:0,
+        height:150,
     }, 
 
     modalOption : {
@@ -219,9 +225,8 @@ const styles = StyleSheet.create({
 
     modalRename : {
         backgroundColor:"white", 
-        width:'90%', 
+        width:'80%', 
         borderRadius:10,
-        padding:10,  
         height:40, 
         margin:"2%",
         shadowColor: '#000',
@@ -229,6 +234,8 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.8,
         shadowRadius: 2,  
         elevation: 5,
+        padding:10,
+        marginHorizontal:20
     }, 
 
 })

@@ -5,6 +5,7 @@ import { useDispatch , useSelector } from 'react-redux';
 import { Receiver } from '../../../Component';
 import messaging from '@react-native-firebase/messaging';
 import auth from '@react-native-firebase/auth';
+import storage from '@react-native-firebase/storage'
 import { AsyncStorage } from 'react-native';
 
 export const createNewUser = (data) => {
@@ -372,7 +373,7 @@ export const deleteChatlist = (username , friend) => {
 export const createNewGroup = (data) => {
   const data1 = database().ref('group/').push({
     admin : data.username,
-    name : data.groupname,
+    name : {name : data.groupname},
     groupimg : null
   }).key
   return data1;
@@ -391,16 +392,29 @@ export const inviteGroupMember = (username, group) => {
   database().ref('users/' + username + '/incomingFriend/' + group.id).set({
     group : group.name
   })
-  database().ref('group/' + group.id + '/pendingMember').push({
+  database().ref('group/' + group.id + '/pendingMember/' + username).set({
     member : username
   })
 }
 
 export const getGroupName = (groupid) => {
-    const data = database().ref('group/' + groupid + '/name').once('value').then(async function(snapshot){
+    const data = database().ref('group/' + groupid + '/name/name').once('value').then(async function(snapshot){
       return snapshot.val()
     })  
     return data
+}
+
+const getProfileUri = async (friend) => {
+  const img = await storage()
+  .ref('images/' + friend)
+  .getDownloadURL()
+  .catch(e => {
+      return false
+  })
+  if(img !== undefined){
+      const url = { uri : img}
+      return url
+  }
 }
 
 export const getMemberGroup = async (groupid) => {
@@ -415,6 +429,15 @@ export const getMemberGroup = async (groupid) => {
             data: snapshot.val()[key]
         })
       })
+    }
+    for(let i = 0; i < data.length; i++){
+      const displayname = await getDisplayName(data[i].data.member,"displayname")
+      const profileUri = await getProfileUri(data[i].data.member)
+      data[i] = {
+        ...data[i],
+        displayname: displayname,
+        profileuri : profileUri
+      }
     }
     return data
   })
@@ -433,8 +456,28 @@ export const getPendingGroup = (groupid) => {
             data: snapshot.val()[key]
         })
       })
+      for(let i = 0; i < data.length; i++){
+        const displayname = await getDisplayName(data[i].data.member,"displayname")
+        const profileUri = await getProfileUri(data[i].data.member)
+        data[i] = {
+          ...data[i],
+          displayname: displayname,
+          profileuri : profileUri
+        }
+      }
     }
     return data
+  })
+  return data
+}
+
+export const getPendingGroup2 = (groupid) => {
+  const data = database().ref('group/' + groupid +'/pendingMember').once('value').then(async function(snapshot){
+    if(snapshot.val() === null || snapshot.val() === undefined){
+      return false
+    }else{
+      return Object.keys(snapshot.val())
+    }
   })
   return data
 }
@@ -509,3 +552,11 @@ export const getCommentLength = (id) => {
   })
   return res
 }
+
+export const changeGroupName = (id,name) => {
+  database().ref('group/' + id + '/name').set({
+    name: name
+  })
+}
+
+

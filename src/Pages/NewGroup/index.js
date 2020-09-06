@@ -51,7 +51,6 @@ const NewGroup= ({navigation}) => {
         const arr = await GetFriend(username)
         const arr1 = arr.map((item , index) => {
             item.isSelected = false
-            console.log(item.data.friend)
             return {...item}
         })
         setfriend(arr1)

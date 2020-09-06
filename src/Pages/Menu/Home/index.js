@@ -3,7 +3,7 @@ import { View , Text, ScrollView, StyleSheet, AsyncStorage , ActivityIndicator, 
 import NavigationMenu from '../../../Component/Molekuls/NavigationMenu/';
 import Friendlist from '../../../Component/Molekuls/Friendlist/';
 import { Button } from '../../../Component/';
-import { signOutUser , getUsername , checkPermission, getDisplayName , removeFriends , getId} from '../../../Config/Redux/restApi/';
+import { signOutUser , getUsername , checkPermission, getDisplayName , removeFriends , getId, getGroupName} from '../../../Config/Redux/restApi/';
 import AddFriend from '../../../../assets/Home/addfriend.svg';
 import Magnifier from '../../../../assets/Home/magnifier.svg';
 import database from '@react-native-firebase/database';
@@ -124,16 +124,18 @@ const Home = ({navigation}) => {
             })
             for(let i = 0; i < data.length; i++){
                 const uri = await getProfileUri(data[i].id)
+                const groupName = await getGroupName(data[i].id)
                 data[i] = {
                     ...data[i],
-                    profileImg : uri
+                    profileImg : uri,
+                    groupName : groupName
                 }
             }
-            const pg = await getPendingGroup(username)
-            if(pg) data.unshift({pendingGroup : true , id:'PendingGroup'})
-            await AsyncStorage.setItem('grouplist' , JSON.stringify(data))
-            dispatch({type:'SET_HOMEGROUP' , value : data})   
         }
+        const pg = await getPendingGroup(username)
+        if(pg) data.unshift({pendingGroup : true , id:'PendingGroup'})
+        await AsyncStorage.setItem('grouplist' , JSON.stringify(data))
+        dispatch({type:'SET_HOMEGROUP' , value : data})   
     })
     }
     const getPendingGroup = (username) => {
@@ -285,8 +287,8 @@ const Home = ({navigation}) => {
             )
         }
         return(
-            <Friendlist isgroup={true} url={item.profileImg} name={item.data.groupName} funct={()=>{
-                navigation.navigate('GroupInfo' , {groupId : item.id})
+            <Friendlist isgroup={true} url={item.profileImg} name={item.groupName} funct={()=>{
+                navigation.navigate('GroupInfo' , {groupId : item.id , groupUri : item.profileImg , groupName : item.groupName})
             }}/>
         )
     } 
