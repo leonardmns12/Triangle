@@ -13,6 +13,7 @@ import firebase from '../../Config/Firebase/';
 import database from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
 import ImagePicker from 'react-native-image-picker';
+import Icon from 'react-native-vector-icons/Ionicons';
 const ChatWindow = ({route,navigation}) => {
     useEffect(()=>{  
         getProfileImg()
@@ -240,11 +241,18 @@ const ChatWindow = ({route,navigation}) => {
           }
         });
       };
+
+      const gotoCall = async () => {
+        const res = await getmsgid()
+        navigation.navigate('CallScreen' , {msgid : res , isGroup : true})
+      }
+
     return(
         <View style={{flex:1}}>
             <View style={{flex:1}}>
             <View style={[styles.chatHeader,{}]}>
             <Text style={[styles.headerText,{}]}>{chatState.receiver}</Text>
+            <Icon style={{position:'absolute' , right:10}} onPress={gotoCall} name="call" color="white" size={24} />
             </View>
             <View style={{flex:1 , backgroundColor : '#FFFFFF',paddingTop: 10, paddingHorizontal:10}}> 
                 <FlatList

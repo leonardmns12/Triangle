@@ -32,9 +32,10 @@
     "react-native-svg": "^12.1.0",
     "react-native-svg-transformer": "^0.14.3",
     "react-native-vector-icons": "^7.0.0",
+    "react-native-webrtc": "^1.84.0",
     "react-redux": "^7.2.0",
     "redux": "^4.0.5",
-    "socket.io-client": "^2.1.1"
+    "socket.io-client": "^2.3.0"
   },
   "devDependencies": {
     "@babel/core": "7.9.0",
