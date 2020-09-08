@@ -247,6 +247,14 @@ export const addChatDatabase = (data) => {
     isRead : true,
     isGroup : data.isGroup
   })
+  database().ref('users/' + data.receiver + '/chat/' + data.sender).set({
+    friend : data.receiver,
+    message : data.message,
+    realtime : data.realtime,
+    timestamp : data.timestamp,
+    isRead : false,
+    isGroup : data.isGroup
+  })
 }
 
 export const checkPermission = () => {

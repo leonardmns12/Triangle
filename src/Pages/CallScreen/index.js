@@ -54,8 +54,13 @@ class App extends React.Component {
       pc_config: {
         "iceServers": [
           {
-            "url" : 'stun:stun.l.google.com:19302'
+            urls : 'stun:stun.l.google.com:19302'
           },
+          {
+            "url" : 'turn:numb.viagenie.ca',
+            "username" : 'leonardmanoza@gmail.com',
+            "credential" : 'abelcantik12'
+          }
         ]
       },
 

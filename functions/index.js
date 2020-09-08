@@ -20,23 +20,31 @@ exports.sendPushNotification = functions.database
         body: data.message,
       },
     };
-    if(data.isGroup){
-      //kirim multiple
-      const token = data.token.split(",")
-      admin.messaging().sendToDevice(token, payload)
+    const token = data.token.split(",")
+    admin.messaging().sendToDevice(token, payload)
       .then(function(response) {
         console.log("Notification sent successfully:", response);
       })
       .catch(function(error) {
         console.log("Notification sent failed:", error);
       });
-    }else{
-      admin.messaging().sendToDevice(data.token, payload)
-      .then(function(response) {
-        console.log("Notification sent successfully:", response);
-      })
-      .catch(function(error) {
-        console.log("Notification sent failed:", error);
-      });
-    }
+    // if(data.isGroup){
+    //   //kirim multiple
+    //   const token = data.token.split(",")
+    //   admin.messaging().sendToDevice(token, payload)
+    //   .then(function(response) {
+    //     console.log("Notification sent successfully:", response);
+    //   })
+    //   .catch(function(error) {
+    //     console.log("Notification sent failed:", error);
+    //   });
+    // }else{
+    //   admin.messaging().sendToDevice(data.token, payload)
+    //   .then(function(response) {
+    //     console.log("Notification sent successfully:", response);
+    //   })
+    //   .catch(function(error) {
+    //     console.log("Notification sent failed:", error);
+    //   });
+    // }
     });
