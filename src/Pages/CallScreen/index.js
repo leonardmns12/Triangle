@@ -76,7 +76,7 @@ class App extends React.Component {
     }
 
     // DONT FORGET TO CHANGE TO YOUR URL
-    this.serviceIP = 'http://localhost:8082/webrtcPeer'
+    this.serviceIP = 'http://88.214.58.197:8082/webrtcPeer'
 
     // this.sdp
     this.socket = null
@@ -277,7 +277,6 @@ class App extends React.Component {
     })
 
     const room = this.props.route.params.msgid || ''
-
     this.socket = io.connect(
       this.serviceIP,
       {
@@ -492,7 +491,7 @@ debugger
     // debugger
     const remoteVideos = remoteStreams.map(rStream => {
       return (
-      this.props.route.params.isGroup ?  <TouchableOpacity key={rStream} onPress={() => this.switchVideo(rStream)}>
+      this.props.route.params.isGroup ?  <TouchableOpacity key={rStream.id} onPress={() => this.switchVideo(rStream)}>
           <View
             style={{
             flex: 1,

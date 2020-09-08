@@ -186,7 +186,6 @@ export const createNewUser = (data) => {
          }else{
            resolve(false)
          }
-          
         }
     })
     })
@@ -208,7 +207,8 @@ export const createNewUser = (data) => {
           timestamp : data.timestamp,
           token : data.token,
           image : data.image,
-          downloaduri : data.downloaduri
+          downloaduri : data.downloaduri,
+          isGroup : data.isGroup
         });
   }
 
@@ -389,8 +389,8 @@ export const addGroupMember = (username,group) => {
 }
 
 export const inviteGroupMember = (username, group) => {
-  database().ref('users/' + username + '/incomingFriend/' + group.id).set({
-    group : group.name
+  database().ref('users/' + username + '/groupPending/' + group.id).set({
+    group : group.id
   })
   database().ref('group/' + group.id + '/pendingMember/' + username).set({
     member : username
@@ -557,6 +557,24 @@ export const changeGroupName = (id,name) => {
   database().ref('group/' + id + '/name').set({
     name: name
   })
+}
+
+export const getGroupMember2 = (id) => {
+  const res = database().ref('group/' + id + '/member').once('value').then(function(snapshot){
+    if(snapshot.val() === null || snapshot.val() === undefined){
+      
+    }else{
+      return Object.keys(snapshot.val())
+    }
+  })
+  return res
+}
+
+export const getMemberToken = (username) => {
+  const res = database().ref('users/' + username + '/token/key').once('value').then(function(snapshot){
+    return snapshot.val()
+  })
+  return res
 }
 
 

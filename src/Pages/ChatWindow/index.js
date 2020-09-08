@@ -8,16 +8,19 @@ import LeftLogo from '../../../assets/chatWindow/left.svg';
 import { Sender, Receiver } from '../../Component';
 import { useDispatch, useSelector } from 'react-redux';
 import { onChange } from 'react-native-reanimated';
-import { sendMessage , checkMessage , addChatDatabase , updateRead} from '../../Config/Redux/restApi/';
+import { sendMessage , checkMessage , addChatDatabase , updateRead , getGroupMember2 , getMemberToken } from '../../Config/Redux/restApi/';
 import firebase from '../../Config/Firebase/';
 import database from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
 import ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/Ionicons';
+
+
 const ChatWindow = ({route,navigation}) => {
     useEffect(()=>{  
         getProfileImg()
         starter() 
+        combineToken()
         return () => {
             unmounting()
         }
@@ -26,6 +29,23 @@ const ChatWindow = ({route,navigation}) => {
             const res = await getmsgid() 
             database().ref('messages/' + res).off()
         }
+
+    const combineToken = async () => {
+        if(!route.params.groupId){
+
+        }else{  
+            const res = await getGroupMember2(route.params.groupId)
+            const data = []
+            console.log(res)
+            for(let i = 0 ; i < res.length; i++){
+                const token = await getMemberToken(res[i])
+                console.log(token)
+                data.push(token)
+            }
+            setToken(data) 
+    }
+}
+    const [listToken , setToken] = useState([])
     const chatState = useSelector(state => state.chatReducer);
     const dispatch = useDispatch();
     const getReceiverToken = (username) => {
@@ -75,8 +95,9 @@ const ChatWindow = ({route,navigation}) => {
                     receiver : !route.params.groupId ? chatState.receiver : route.params.groupId,
                     timestamp : new Date().getTime(),
                     image : imagelink,
-                    token : !route.params.groupId ? await getReceiverToken(chatState.receiver) : 'abcd',
-                    downloaduri : {uri : downloaduri}
+                    token : !route.params.groupId ? await getReceiverToken(chatState.receiver) : listToken.toString(),
+                    downloaduri : {uri : downloaduri},
+                    isGroup : !route.params.groupId ? false : true
                 }
                 const data1 = {
                     message : chatState.sender + ' Sent an image',
@@ -85,7 +106,7 @@ const ChatWindow = ({route,navigation}) => {
                     timestamp : new Date().getTime(),
                     realtime : convertTime(new Date().getTime()),
                     isRead : false,
-                    token : !route.params.groupId ? await getReceiverToken(chatState.receiver) : 'abcd',
+                    token : !route.params.groupId ? await getReceiverToken(chatState.receiver) : listToken.toString(),
                     isGroup : !route.params.groupId ? false : route.params.groupId
                 }
                 sendMessage(data,res);
@@ -104,7 +125,8 @@ const ChatWindow = ({route,navigation}) => {
                 receiver : chatState.receiver,
                 timestamp : new Date().getTime(),
                 image : 'none',
-                token : !route.params.groupId ? await getReceiverToken(chatState.receiver) : 'abcd'
+                token : !route.params.groupId ? await getReceiverToken(chatState.receiver) : listToken.toString(),
+                isGroup : !route.params.groupId ? false : true
             }
 
             const data3 = {
@@ -114,7 +136,7 @@ const ChatWindow = ({route,navigation}) => {
                 timestamp : new Date().getTime(),
                 realtime : convertTime(new Date().getTime()),
                 isRead : false,
-                token : 'abcd',
+                token : listToken.toString(),
                 isGroup : !route.params.groupId ? false : true
             }
             dispatch({type:'SET_MESSAGE', inputType: 'sender', inputValue: chatState.sender});
@@ -243,8 +265,7 @@ const ChatWindow = ({route,navigation}) => {
       };
 
       const gotoCall = async () => {
-        const res = await getmsgid()
-        navigation.navigate('CallScreen' , {msgid : res , isGroup : true})
+        navigation.navigate('CallScreen' , {msgid : !route.params.groupId ? await getmsgid() : route.params.groupId , isGroup : route.params.groupId})
       }
 
     return(
