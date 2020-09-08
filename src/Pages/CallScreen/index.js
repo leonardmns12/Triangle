@@ -524,7 +524,7 @@ debugger
         <Video
 
           mirror={true}
-          style={{ width: dimensions.width, height: dimensions.height / 2, }}
+          style={{ width: dimensions.width, height: dimensions.height, }}
           objectFit='cover'
           streamURL={this.state.selectedVideo && this.state.selectedVideo.stream}
           type='remote'
@@ -588,18 +588,18 @@ debugger
             title={`camera ${ this.state.camera && '(on)' || '(off)'}`}
             color={`${ this.state.camera && 'black' || 'red'}`}
           />
-          {/* <Button
+          <Button
             onPress={() => {
               debugger
               const audioTrack = localStream.getTracks().filter(track => track.kind === 'audio')
-              audioTrack[1].enabled = !audioTrack[1].enabled
+              audioTrack[0].enabled = !audioTrack[0].enabled
               this.setState({
-                mic: audioTrack[1].enabled
+                mic: audioTrack[0].enabled
               })
             }}
             title={`mic ${ this.state.mic && '(on)' || '(off)'}`}
             color={`${ this.state.mic && 'black' || 'red'}`}
-          /> */}
+          />
           <Button
             onPress={() => {
               // disconnect socket
@@ -645,16 +645,20 @@ debugger
             backgroundColor: 'black', //width: '100%', height: '100%'
           }}>
               <View style={{flex: 1 }}>
-                <TouchableOpacity onPress={() => localStream._tracks[0]._switchCamera()}>
+                <TouchableOpacity onPress={() => localStream._tracks[1]._switchCamera()}>
                   <View>
-                    <Video
+                    {
+                      this.state.camera ? (
+                        <Video
 
-                      zOrder={0}
-                      objectFit='cover'
-                      style={{ ...styles.rtcView }}
-                      streamURL={localStream}
-                      type='local'
-                    />
+                        zOrder={1}
+                        objectFit='cover'
+                        style={{ ...styles.rtcView }}
+                        streamURL={localStream}
+                        type='local'
+                      />
+                      ) : null
+                    }
                   </View>
                 </TouchableOpacity>
               </View>
@@ -737,4 +741,3 @@ const styles = StyleSheet.create({
 });
 
 export default App;
-
