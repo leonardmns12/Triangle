@@ -397,7 +397,7 @@ export const addGroupMember = (username,group) => {
 }
 
 export const inviteGroupMember = (username, group) => {
-  database().ref('users/' + username + '/groupPending/' + group.id).set({
+  database().ref('users/' + username + '/pendingGroup/' + group.id).set({
     group : group.id
   })
   database().ref('group/' + group.id + '/pendingMember/' + username).set({

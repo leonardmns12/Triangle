@@ -282,7 +282,7 @@ const Home = ({navigation}) => {
         if(item.pendingGroup){
             return(
                 <Friendlist isgroup={true} url={{uri:'https://firebasestorage.googleapis.com/v0/b/triang…=media&token=8e8f6b02-b104-4de1-8d04-d2887c764a6d'}} name={'Group Invitations (' + HomeState.pendinggroup.length + ')' } funct={()=>{
-                    // navigation.navigate('GroupInfo')
+                    navigation.navigate('GroupInvitation', {groupId : item.id , groupUri : item.profileImg , groupName : item.groupName})
                 }}/>
             )
         }
