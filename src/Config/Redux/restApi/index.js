@@ -208,7 +208,8 @@ export const createNewUser = (data) => {
           token : data.token,
           image : data.image,
           downloaduri : data.downloaduri,
-          isGroup : data.isGroup
+          isGroup : data.isGroup,
+          missed : data.missed
         });
   }
 
