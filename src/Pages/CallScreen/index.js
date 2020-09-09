@@ -18,6 +18,7 @@ import {
   StatusBar,
   TouchableOpacity,
   Dimensions,
+  AsyncStorage
 } from 'react-native';
 
 import {
@@ -35,12 +36,14 @@ import io from 'socket.io-client'
 
 import Video from '../WebRtc/components/video'
 
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { sendMessage } from '../../Config/Redux/restApi/';
+
 const dimensions = Dimensions.get('window')
 
 class App extends React.Component {
   constructor(props) {
     super(props)
-
     this.state = {
       localStream: null,    // used to hold local stream object to avoid recreating the stream everytime a new offer comes
       remoteStream: null,    // used to hold remote stream object that is displayed in the main screen
@@ -57,9 +60,9 @@ class App extends React.Component {
             urls : 'stun:stun.l.google.com:19302'
           },
           {
-            "url" : 'turn:numb.viagenie.ca',
-            "username" : 'leonardmanoza@gmail.com',
-            "credential" : 'abelcantik12'
+            "url" : 'turn:turn.indofolks.com',
+            "username" : 'shodaimekaze',
+            "credential" : 'gurame442'
           }
         ]
       },
@@ -71,6 +74,7 @@ class App extends React.Component {
         }
       },
 
+      connected : false,
       messages: [],
       sendChannels: [],
       disconnected: false,
@@ -91,9 +95,11 @@ class App extends React.Component {
   getLocalStream = () => {
     const success = (stream) => {
       console.log('localStream... ', stream.toURL())
-      this.setState({
-        localStream: stream
-      })
+      if(this.mount){
+        this.setState({
+          localStream: stream
+        })
+      }
 
       this.whoisOnline()
     }
@@ -257,7 +263,7 @@ class App extends React.Component {
         // alert('GONE')
       }
 
-      if (this.state.localStream) {
+      if (this.state.localStream && this.mount) {
         pc.addStream(this.state.localStream)
 
       //   // this.state.localStream.getTracks().forEach(track => {
@@ -276,10 +282,49 @@ class App extends React.Component {
 
   componentDidMount = () => {this.joinRoom() }
 
+  convertTime = (val) => {
+    const date = new Date(val)
+    const hours = date.getHours();
+    const minutes = this.leadingzero(date.getMinutes());
+    return hours+':'+minutes 
+  }
+
+  leadingzero(num) {
+    var s = num+"";
+    while (s.length < 2) s = "0" + s;
+    return s;
+  }
+
+  sendMissedCall = async () => {
+    if(!this.state.connected && !this.props.route.params.isGroup){
+      const data = {
+        message : 'Missed call',
+        sender : await AsyncStorage.getItem('username'),
+        receiver : this.props.route.params.receiver,
+        timestamp : new Date().getTime(),
+        realtime : this.convertTime(new Date().getTime()),
+        isRead : false,
+        token : this.props.route.params.token,
+        isGroup : false,
+        missed : true,
+        image : 'none'
+      }
+      await sendMessage(data,this.props.route.params.msgid)
+    }
+  }
+
+  componentWillUnmount = () => { this.mount = false
+    this.sendMissedCall()
+  }
+
   joinRoom = () => {
-    this.setState({
-      connect: true,
-    })
+    this.mount = true
+
+    if(this.mount){
+      this.setState({
+        connect: true,
+      })
+    }
 
     const room = this.props.route.params.msgid || ''
     this.socket = io.connect(
@@ -301,8 +346,15 @@ class App extends React.Component {
 
       this.setState({
         status,
-        messages: data.messages
+        messages: data.messages,
       })
+
+      if(data.peerCount > 1){
+        this.setState({
+          connected : true
+        })
+      }
+
     })
 
     this.socket.on('joined-peers', data => {
@@ -532,7 +584,7 @@ debugger
       ) :
       (
         <View style={{ padding: 15, }}>
-          <Text style={{ fontSize:22, textAlign: 'center', color: 'white' }}>Waiting for Peer connection ...</Text>
+          <Text style={{ fontSize:22, textAlign: 'center', color: 'white' }}>Waiting for the connection ...</Text>
         </View>
       )
 
@@ -573,10 +625,12 @@ debugger
       const videoActionButtons = (
         <View style={{
           ...styles.buttonsContainer,
-          justifyContent: 'center', alignItems: 'center',
-          paddingHorizontal: 15
+          marginBottom:'5%',
+          justifyContent: 'space-between', alignItems: 'center',
+          paddingHorizontal: 40
         }}>
-          <Button
+          <TouchableOpacity
+          style={{backgroundColor:'#FFFFFF' , height:50, width:50, borderRadius:60 , justifyContent:'center',alignItems:'center'}}
             onPress={() => {
               debugger
               const videoTrack = localStream.getTracks().filter(track => track.kind === 'video')
@@ -585,22 +639,11 @@ debugger
                 camera: videoTrack[0].enabled
               })
             }}
-            title={`camera ${ this.state.camera && '(on)' || '(off)'}`}
+            // title={`camera ${ this.state.camera && '(on)' || '(off)'}`}
             color={`${ this.state.camera && 'black' || 'red'}`}
-          />
-          <Button
-            onPress={() => {
-              debugger
-              const audioTrack = localStream.getTracks().filter(track => track.kind === 'audio')
-              audioTrack[0].enabled = !audioTrack[0].enabled
-              this.setState({
-                mic: audioTrack[0].enabled
-              })
-            }}
-            title={`mic ${ this.state.mic && '(on)' || '(off)'}`}
-            color={`${ this.state.mic && 'black' || 'red'}`}
-          />
-          <Button
+          ><Icon name={this.state.camera ? 'camera' : 'camera-off'} size={25} color={'black'}/></TouchableOpacity>
+          <TouchableOpacity
+            style={{backgroundColor:'#FF0000' , height:50, width:50, borderRadius:60 , justifyContent:'center',alignItems:'center'}}
             onPress={() => {
               // disconnect socket
               this.socket.close()
@@ -614,25 +657,40 @@ debugger
               // stop all remote peerconnections
               peerConnections && Object.values(peerConnections).forEach(pc => pc.close())
 
-              this.setState({
-                peerConnections: {},
-                remoteStreams: [],
-                localStream: null,
-                remoteStream: null,
-                selectedVideo: null,
-              })
+              if(this.mount){
+                this.setState({
+                  peerConnections: {},
+                  remoteStreams: [],
+                  localStream: null,
+                  remoteStream: null,
+                  selectedVideo: null,
+                })
+              }
               this.props.navigation.goBack(null)
             }}
-            title='X DISCONNECT'
+            // title='X DISCONNECT'
             color='red'
-          />
+          ><Icon name="phone-hangup" size={25} color={'white'} /></TouchableOpacity>
+          <TouchableOpacity
+            style={{backgroundColor:'#FFFFFF' , height:50, width:50, borderRadius:60 , justifyContent:'center',alignItems:'center'}}
+            onPress={() => {
+              debugger
+              const audioTrack = localStream.getTracks().filter(track => track.kind === 'audio')
+              audioTrack[0].enabled = !audioTrack[0].enabled
+              this.setState({
+                mic: audioTrack[0].enabled
+              })
+            }}
+            // title={`mic ${ this.state.mic && '(on)' || '(off)'}`}
+            color={`${ this.state.mic && 'black' || 'red'}`}
+          ><Icon name={this.state.mic ? 'microphone' : 'microphone-off'} size={25} color={'black'} /></TouchableOpacity>
         </View>
       )
 
     return (
 
-      <View style={{ flex: 1, }}>
-        <StatusBar backgroundColor="blue" barStyle={'dark-content'}/>
+      <View style={{ flex: 1,backgroundColor:'black' }}>
+        <StatusBar backgroundColor="black" barStyle={'dark-content'}/>
 
         <View style={{ ...styles.videosContainer, }}>
           <View style={{

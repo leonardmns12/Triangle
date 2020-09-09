@@ -126,7 +126,8 @@ const ChatWindow = ({route,navigation}) => {
                 timestamp : new Date().getTime(),
                 image : 'none',
                 token : !route.params.groupId ? await getReceiverToken(chatState.receiver) : listToken.toString(),
-                isGroup : !route.params.groupId ? false : true
+                isGroup : !route.params.groupId ? false : true,
+                missed : false
             }
 
             const data3 = {
@@ -137,7 +138,8 @@ const ChatWindow = ({route,navigation}) => {
                 realtime : convertTime(new Date().getTime()),
                 isRead : false,
                 token : listToken.toString(),
-                isGroup : !route.params.groupId ? false : true
+                isGroup : !route.params.groupId ? false : true,
+                missed : false
             }
             dispatch({type:'SET_MESSAGE', inputType: 'sender', inputValue: chatState.sender});
             dispatch({type:'SET_MESSAGE', inputType: 'receiver', inputValue: chatState.receiver});
@@ -219,14 +221,18 @@ const ChatWindow = ({route,navigation}) => {
         item.data.sender === chatState.sender ? (
 
             item.data.image === 'none' || item.data.image === undefined ? (
-                <Receiver img={'null'} chatMessage={item.data.message} timestamp={item.data.timestamp}/>
+                <Receiver img={'null'} chatMessage={item.data.message} timestamp={item.data.timestamp}
+                missed={item.data.missed}
+                />
             ) : (
-                <Receiver img={item.data.downloaduri}  chatMessage={item.data.message} timestamp={item.data.timestamp}/>
+                <Receiver img={item.data.downloaduri}  chatMessage={item.data.message} timestamp={item.data.timestamp} />
             )
             
         ): (
             item.data.image === 'none' || item.data.image === undefined ? (
-                !route.params.groupId ? <Sender isGroup={false} photo={'null'} img={chatState.profileImg} chatMessage={item} timestamp={item.data.timestamp}/> : 
+                !route.params.groupId ? <Sender isGroup={false} photo={'null'} img={chatState.profileImg} chatMessage={item} timestamp={item.data.timestamp}
+                missed={item.data.missed}
+                /> : 
                 <Sender photo={'null'} isGroup={true} img={chatState.profileImg} chatMessage={item} timestamp={item.data.timestamp}/>
             ) : (
                 !route.params.groupId ? <Sender photo={item.data.downloaduri} chatMessage={item} timestamp={item.data.timestamp}/> :
@@ -265,7 +271,9 @@ const ChatWindow = ({route,navigation}) => {
       };
 
       const gotoCall = async () => {
-        navigation.navigate('CallScreen' , {msgid : !route.params.groupId ? await getmsgid() : route.params.groupId , isGroup : route.params.groupId})
+        navigation.navigate('CallScreen' , {msgid : !route.params.groupId ? await getmsgid() : route.params.groupId , isGroup : route.params.groupId
+        , token : !route.params.groupId ? await getReceiverToken(chatState.receiver) : listToken.toString(), receiver : !route.params.groupId ? chatState.receiver : null
+        })
       }
 
     return(

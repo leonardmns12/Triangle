@@ -1,9 +1,11 @@
 import React , { Fragment , useEffect, useState } from 'react';
 import { StyleSheet, Text, View , Image , TouchableOpacity , Modal} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CloseButton from '../../../../assets/chatWindow/close.svg';
-const Receiver = ({navigation,chatMessage,timestamp,img}) => {
+const Receiver = ({navigation,chatMessage,timestamp,img,missed}) => {
     useEffect(()=>{
         convertTime()
+
     },[])
     
     function leadingzero(num) {
@@ -25,10 +27,11 @@ const Receiver = ({navigation,chatMessage,timestamp,img}) => {
         const hours = date.getHours();
         const minutes = leadingzero(date.getMinutes());
         setTime(hours+':'+minutes + ' ' +day)
-        
+        setTimeOnly(hours+':'+minutes)
     }
     const [time , setTime] = useState('')
     const [modal , setmodal] = useState(false)
+    const [timeonly , setTimeOnly] = useState(false)
     return(
     <Fragment>
         {
@@ -39,9 +42,19 @@ const Receiver = ({navigation,chatMessage,timestamp,img}) => {
                 </TouchableOpacity> 
                 </View>
             ) : (
+
+                !missed ? (
+
                 <View style={{ alignItems:'flex-end', marginBottom:'4%'}}>
                     <Text style={[styles.receiverText,{}]}>{chatMessage}</Text>
                     <Text style={{fontSize:12,marginRight:5}}>{time}</Text>
+                </View> ) : 
+                <View style={{ alignItems:'center', marginBottom:'4%' ,}}>
+                    <View style={[styles.missedtext,{}]}>
+                    <Icon name="phone-missed" size={16} color={'red'}/>
+                    <Text style={{color:'black',marginLeft:'2%'}}>{chatMessage+' at '+timeonly}</Text>
+                    </View>
+                    {/* <Text style={{fontSize:12,marginRight:5}}>{time}</Text> */}
                 </View>
             )
         }
@@ -77,6 +90,19 @@ const styles = StyleSheet.create({
         paddingBottom:'3%',
         minHeight:30,
         fontFamily : 'HelveticaMedium',
+    },
+    missedtext : {
+        backgroundColor:'rgba(115,116,118,0.45)', 
+        maxWidth: 200,
+        color: '#FFFFFF',
+        borderRadius:8,
+        paddingHorizontal: 15,
+        paddingTop: '2%',
+        paddingBottom:'3%',
+        minHeight:30,
+        fontFamily : 'HelveticaMedium',
+        flexDirection:'row',
+        marginTop:10
     }
 })
 export default Receiver;

@@ -5,7 +5,8 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import CloseButton from '../../../../assets/chatWindow/close.svg';
 import { PinchGestureHandler } from 'react-native-gesture-handler';
 import storage from '@react-native-firebase/storage';
-const Sender = ({navigation, chatMessage , timestamp , photo , isGroup}) => {
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+const Sender = ({navigation, chatMessage , timestamp , photo , isGroup , missed}) => {
     let mounted = true
     useEffect(()=>{
         convertTime()
@@ -35,10 +36,12 @@ const Sender = ({navigation, chatMessage , timestamp , photo , isGroup}) => {
         const minutes = leadingzero(date.getMinutes())
         if(mounted)setTime(hours+':'+minutes+' '+day)
         await getProfileImg()
+        setTimeOnly(hours+':'+minutes)
         
     }
     const [time , setTime] = useState('')
     const [modal , setmodal] = useState(false)
+    const [timeonly , setTimeOnly] = useState(false)
     const [image , setimg] = useState('null')
     const scale = React.useRef(new Animated.Value(1)).current;
     const handlePinch = Animated.event([{nativeEvent: {scale}}],{ useNativeDriver: true });
@@ -55,20 +58,24 @@ const Sender = ({navigation, chatMessage , timestamp , photo , isGroup}) => {
     }
     return(
     <Fragment>
-        <Text style={{marginLeft:45,color:'black', fontSize:12}}>{time}</Text>
+        {
+            !missed ? <Text style={{marginLeft:45,color:'black', fontSize:12}}>{time}</Text> : null
+        }
         
-        <View style={{flexDirection:'row', marginTop:10}}>
+        
+        <View style={[styles.container,{marginTop:10,marginBottom:'4%', alignItems:`${!missed ? 'flex-start' : 'center'}`}]}>
 
                     {
-                        image === 'null' ? (
-                         <Avatar height={30} width={30} />
-                        ) : (
-                        <Image source={image} style = {{width: 30, height: 30 , borderRadius: 20}}/>
-                        )
-                    }
-                    {
                         photo !== 'null' ? (
-                            <View>
+                            <View style={{flexDirection:'row'}}>
+                            {
+                                image === 'null' ? (
+                                <Avatar height={30} width={30} />
+                                ) : (
+                                !missed ?
+                                <Image source={image} style = {{width: 30, height: 30 , borderRadius: 20}}/> : null
+                                )
+                            }
                             {
                                 isGroup ? <Text style={{marginLeft:10,marginBottom:'2%'}}>{chatMessage.data.sender}</Text> : null
                             }        
@@ -77,14 +84,35 @@ const Sender = ({navigation, chatMessage , timestamp , photo , isGroup}) => {
                             </TouchableOpacity>
                             </View>
                         ) : (
-                            <View>
-                            {
-                                isGroup ? <Text style={{marginLeft:10,marginBottom:'2%'}}>{chatMessage.data.sender}</Text> : null
-                            }        
-                            <View style={[styles.chatText,{position:'relative'}]}>
-                            <Text style={{fontFamily : 'HelveticaMedium'}}>{chatMessage.data.message}</Text>
-                            </View> 
-                            </View> 
+                            !missed ? ( 
+                                <View style={{flexDirection:'row'}}>
+                                {
+                                    image === 'null' ? (
+                                    <Avatar height={30} width={30} />
+                                    ) : (
+                                    !missed ?
+                                    <Image source={image} style = {{width: 30, height: 30 , borderRadius: 20}}/> : null
+                                    )
+                                }
+                                {
+                                    isGroup ? <Text style={{marginLeft:10,marginBottom:'2%'}}>{chatMessage.data.sender}</Text> : null
+                                }        
+                                <View style={[styles.chatText,{position:'relative'}]}>
+                                <Text style={{fontFamily : 'HelveticaMedium'}}>{chatMessage.data.message}</Text>
+                                </View> 
+                                </View> 
+                            ) : (
+                                <View style={{justifyContent:'center' , alignItems:'center'}}>
+                                {
+                                    isGroup ? <Text style={{marginLeft:10,marginBottom:'2%'}}>{chatMessage.data.sender}</Text> : null
+                                }        
+                                <View style={[styles.missedtext,{}]}>
+                                <Icon name="phone-missed" size={16} color={'red'}/>
+                                <Text style={{ marginLeft:'2%'}}>{chatMessage.data.message + ' at ' + timeonly}</Text>
+                                </View> 
+                                </View> 
+                            )
+                         
                         )
                     }
                          
@@ -125,6 +153,21 @@ const styles = StyleSheet.create({
         paddingTop: '2%',
         paddingBottom: '2%',
         minHeight:25
+    },
+    missedtext : {
+        backgroundColor:'rgba(115,116,118,0.45)', 
+        maxWidth: 200,
+        color: '#FFFFFF',
+        borderRadius:8,
+        paddingHorizontal: 15,
+        paddingTop: '2%',
+        paddingBottom:'3%',
+        minHeight:30,
+        fontFamily : 'HelveticaMedium',
+        flexDirection:'row',
+    },
+    container : {
+        
     }
 })
 
