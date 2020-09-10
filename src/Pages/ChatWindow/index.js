@@ -245,10 +245,12 @@ const ChatWindow = ({route,navigation}) => {
                     <Sender isGroup={false} photo={'null'} img={chatState.profileImg} chatMessage={item} timestamp={item.data.timestamp}
                     missed={item.data.missed}
                     />
-                )     
-                : 
-                <Sender photo={'null'} isGroup={true} img={chatState.profileImg} chatMessage={item} timestamp={item.data.timestamp}/>
-            ) : (
+                ): item.data.call ? (
+                    <CallComponent funct={()=>{gotoCall()}} sender={item.data.sender} photo={'null'} message={item.data.message} isSender={false} image={item.data.downloaduri} /> 
+                ): (
+                    <Sender photo={'null'} isGroup={true} img={chatState.profileImg} chatMessage={item} timestamp={item.data.timestamp}/>
+                )
+                ) : (
                 !route.params.groupId ? <Sender photo={item.data.downloaduri} chatMessage={item} timestamp={item.data.timestamp}/> :
                 <Sender photo={item.data.downloaduri} isGroup={true} chatMessage={item} timestamp={item.data.timestamp}/>
             )
