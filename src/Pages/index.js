@@ -16,6 +16,7 @@ import CreatePost from './CreatePost';
 import GroupInfo from './GroupInfo';
 import InviteChat from './InviteChat';
 import CallScreen from './CallScreen';
+import GroupInvitation from './GroupInvitation';
 
 export {ChatWindow};
 export {Home};
@@ -35,3 +36,4 @@ export {CreatePost};
 export {GroupInfo};
 export {InviteChat};
 export {CallScreen};
+export {GroupInvitation};
