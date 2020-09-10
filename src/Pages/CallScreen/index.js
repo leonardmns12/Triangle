@@ -73,7 +73,7 @@ class App extends React.Component {
             'OfferToReceiveVideo': true
         }
       },
-
+      peerCount : null,
       connected : false,
       messages: [],
       sendChannels: [],
@@ -82,6 +82,7 @@ class App extends React.Component {
       connect: false,
       camera: true,
       mic: true,
+      isSended : false
     }
 
     // DONT FORGET TO CHANGE TO YOUR URL
@@ -298,7 +299,7 @@ class App extends React.Component {
   sendMissedCall = async () => {
     if(!this.state.connected && !this.props.route.params.isGroup){
       const data = {
-        message : 'Missed call',
+        message : 'Missed call at ' + this.convertTime(new Date().getTime()),
         sender : await AsyncStorage.getItem('username'),
         receiver : this.props.route.params.receiver,
         timestamp : new Date().getTime(),
@@ -307,7 +308,8 @@ class App extends React.Component {
         token : this.props.route.params.token,
         isGroup : false,
         missed : true,
-        image : 'none'
+        image : 'none',
+        call:false
       }
       await sendMessage(data,this.props.route.params.msgid)
     }
@@ -317,12 +319,13 @@ class App extends React.Component {
     this.sendMissedCall()
   }
 
-  joinRoom = () => {
+  joinRoom = async () => {
     this.mount = true
 
     if(this.mount){
       this.setState({
         connect: true,
+        username : await AsyncStorage.getItem('username')
       })
     }
 
@@ -340,14 +343,33 @@ class App extends React.Component {
     this.socket.on('connection-success', data => {
 
       this.getLocalStream()
-
       console.log(data.success)
       const status = data.peerCount > 1 ? `Total Connected Peers to room ${this.state.room}: ${data.peerCount}` : this.state.status
 
       this.setState({
         status,
         messages: data.messages,
+        peerCount : data.peerCount,
+        isSended : true
       })
+
+      if(data.peerCount === 1 && this.state.isSended){
+        const data = {
+          message :'Has started a call',
+          sender : this.state.username,
+          receiver : this.props.route.params.receiver,
+          timestamp : new Date().getTime(),
+          realtime : this.convertTime(new Date().getTime()),
+          isRead : false,
+          token : this.props.route.params.token,
+          isGroup : false,
+          missed : true,
+          image : 'none',
+          call : true
+        }
+        sendMessage(data,this.props.route.params.msgid)
+      }
+
 
       if(data.peerCount > 1){
         this.setState({
@@ -358,7 +380,7 @@ class App extends React.Component {
     })
 
     this.socket.on('joined-peers', data => {
-
+      console.log(data.peerCount)
       this.setState({
         status: data.peerCount > 1 ? `Total Connected Peers to room ${this.state.room}: ${data.peerCount}` : 'Waiting for other peers to connect'
       })
@@ -625,9 +647,9 @@ debugger
       const videoActionButtons = (
         <View style={{
           ...styles.buttonsContainer,
-          marginBottom:'5%',
           justifyContent: 'space-between', alignItems: 'center',
-          paddingHorizontal: 40
+          paddingHorizontal: 40,
+          height:'auto'
         }}>
           <TouchableOpacity
           style={{backgroundColor:'#FFFFFF' , height:50, width:50, borderRadius:60 , justifyContent:'center',alignItems:'center'}}
@@ -690,7 +712,7 @@ debugger
     return (
 
       <View style={{ flex: 1,backgroundColor:'black' }}>
-        <StatusBar backgroundColor="black" barStyle={'dark-content'}/>
+        {/* <StatusBar backgroundColor="transparent" barStyle={'dark-content'}/> */}
 
         <View style={{ ...styles.videosContainer, }}>
           <View style={{
@@ -753,7 +775,7 @@ debugger
 const styles = StyleSheet.create({
   buttonsContainer: {
     flexDirection: 'row',
-    backgroundColor: "black" 
+    backgroundColor: "transparent",
   },
   button: {
     margin: 5,

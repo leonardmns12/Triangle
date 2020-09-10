@@ -36,12 +36,10 @@ const Sender = ({navigation, chatMessage , timestamp , photo , isGroup , missed}
         const minutes = leadingzero(date.getMinutes())
         if(mounted)setTime(hours+':'+minutes+' '+day)
         await getProfileImg()
-        setTimeOnly(hours+':'+minutes)
         
     }
     const [time , setTime] = useState('')
     const [modal , setmodal] = useState(false)
-    const [timeonly , setTimeOnly] = useState(false)
     const [image , setimg] = useState('null')
     const scale = React.useRef(new Animated.Value(1)).current;
     const handlePinch = Animated.event([{nativeEvent: {scale}}],{ useNativeDriver: true });
@@ -61,9 +59,7 @@ const Sender = ({navigation, chatMessage , timestamp , photo , isGroup , missed}
         {
             !missed ? <Text style={{marginLeft:45,color:'black', fontSize:12}}>{time}</Text> : null
         }
-        
-        
-        <View style={[styles.container,{marginTop:10,marginBottom:'4%', alignItems:`${!missed ? 'flex-start' : 'center'}`}]}>
+        <View style={[styles.container,{marginTop:'4%', alignItems:`${!missed ? 'flex-start' : 'center'}`}]}>
 
                     {
                         photo !== 'null' ? (
@@ -95,11 +91,16 @@ const Sender = ({navigation, chatMessage , timestamp , photo , isGroup , missed}
                                     )
                                 }
                                 {
-                                    isGroup ? <Text style={{marginLeft:10,marginBottom:'2%'}}>{chatMessage.data.sender}</Text> : null
-                                }        
-                                <View style={[styles.chatText,{position:'relative'}]}>
+                                    isGroup ? 
+                                    <View style={{}}>
+                                    <Text style={{marginLeft:10,marginBottom:'2%'}}>{chatMessage.data.sender}</Text> 
+                                    <View style={[styles.chatText,{position:'relative'}]}>
+                                    <Text style={{fontFamily : 'HelveticaMedium'}}>{chatMessage.data.message}</Text>
+                                    </View> 
+                                    </View>:   <View style={[styles.chatText,{position:'relative'}]}>
                                 <Text style={{fontFamily : 'HelveticaMedium'}}>{chatMessage.data.message}</Text>
                                 </View> 
+                                }        
                                 </View> 
                             ) : (
                                 <View style={{justifyContent:'center' , alignItems:'center'}}>
@@ -108,14 +109,13 @@ const Sender = ({navigation, chatMessage , timestamp , photo , isGroup , missed}
                                 }        
                                 <View style={[styles.missedtext,{}]}>
                                 <Icon name="phone-missed" size={16} color={'red'}/>
-                                <Text style={{ marginLeft:'2%'}}>{chatMessage.data.message + ' at ' + timeonly}</Text>
+                                        <Text style={{ marginLeft:'2%'}}>{chatMessage.data.message}</Text>
                                 </View> 
                                 </View> 
                             )
                          
                         )
-                    }
-                         
+                    }        
          </View>
          <Modal visible={modal} 
          onRequestClose={() => { setmodal(false) }}>

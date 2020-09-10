@@ -209,7 +209,8 @@ export const createNewUser = (data) => {
           image : data.image,
           downloaduri : data.downloaduri,
           isGroup : data.isGroup,
-          missed : data.missed
+          missed : data.missed,
+          call : data.call
         });
   }
 

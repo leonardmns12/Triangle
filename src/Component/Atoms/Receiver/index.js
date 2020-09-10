@@ -27,16 +27,14 @@ const Receiver = ({navigation,chatMessage,timestamp,img,missed}) => {
         const hours = date.getHours();
         const minutes = leadingzero(date.getMinutes());
         setTime(hours+':'+minutes + ' ' +day)
-        setTimeOnly(hours+':'+minutes)
     }
     const [time , setTime] = useState('')
     const [modal , setmodal] = useState(false)
-    const [timeonly , setTimeOnly] = useState(false)
     return(
     <Fragment>
         {
             img !== 'null' ? (
-                <View style={{alignItems:'flex-end'}}>
+                <View style={{alignItems:'flex-end',marginTop:10}}>
                 <TouchableOpacity onPress={()=>{setmodal(true)}}  style={{marginBottom:'4%'}}>
                    <Image  source={img} style = {{width: 128 , height:128, borderRadius:20}}/>
                 </TouchableOpacity> 
@@ -45,14 +43,14 @@ const Receiver = ({navigation,chatMessage,timestamp,img,missed}) => {
 
                 !missed ? (
 
-                <View style={{ alignItems:'flex-end', marginBottom:'4%'}}>
+                <View style={{ alignItems:'flex-end',marginTop:10}}>
                     <Text style={[styles.receiverText,{}]}>{chatMessage}</Text>
                     <Text style={{fontSize:12,marginRight:5}}>{time}</Text>
                 </View> ) : 
-                <View style={{ alignItems:'center', marginBottom:'4%' ,}}>
+                <View style={{ alignItems:'center'}}>
                     <View style={[styles.missedtext,{}]}>
                     <Icon name="phone-missed" size={16} color={'red'}/>
-                    <Text style={{color:'black',marginLeft:'2%'}}>{chatMessage+' at '+timeonly}</Text>
+                    <Text style={{color:'black',marginLeft:'2%'}}>{chatMessage}</Text>
                     </View>
                     {/* <Text style={{fontSize:12,marginRight:5}}>{time}</Text> */}
                 </View>

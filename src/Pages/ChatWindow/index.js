@@ -14,6 +14,7 @@ import database from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
 import ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/Ionicons';
+import CallComponent from '../../Component/Molekuls/CallComponent/';
 
 
 const ChatWindow = ({route,navigation}) => {
@@ -127,7 +128,8 @@ const ChatWindow = ({route,navigation}) => {
                 image : 'none',
                 token : !route.params.groupId ? await getReceiverToken(chatState.receiver) : listToken.toString(),
                 isGroup : !route.params.groupId ? false : true,
-                missed : false
+                missed : false,
+                call : false
             }
 
             const data3 = {
@@ -139,7 +141,8 @@ const ChatWindow = ({route,navigation}) => {
                 isRead : false,
                 token : listToken.toString(),
                 isGroup : !route.params.groupId ? false : true,
-                missed : false
+                missed : false,
+                call : false
             }
             dispatch({type:'SET_MESSAGE', inputType: 'sender', inputValue: chatState.sender});
             dispatch({type:'SET_MESSAGE', inputType: 'receiver', inputValue: chatState.receiver});
@@ -220,19 +223,30 @@ const ChatWindow = ({route,navigation}) => {
     const renderItem = ({ item }) => (
         item.data.sender === chatState.sender ? (
 
-            item.data.image === 'none' || item.data.image === undefined ? (
-                <Receiver img={'null'} chatMessage={item.data.message} timestamp={item.data.timestamp}
-                missed={item.data.missed}
-                />
+            item.data.call ? (
+                <CallComponent funct={()=>{gotoCall()}} message={item.data.message} isSender={true} /> 
             ) : (
-                <Receiver img={item.data.downloaduri}  chatMessage={item.data.message} timestamp={item.data.timestamp} />
+                item.data.image === 'none' || item.data.image === undefined ? (
+                    <Receiver img={'null'} chatMessage={item.data.message} timestamp={item.data.timestamp}
+                    missed={item.data.missed}
+                    />
+                ) : (
+                    <Receiver img={item.data.downloaduri}  chatMessage={item.data.message} timestamp={item.data.timestamp} />
+                )
             )
+
             
         ): (
             item.data.image === 'none' || item.data.image === undefined ? (
-                !route.params.groupId ? <Sender isGroup={false} photo={'null'} img={chatState.profileImg} chatMessage={item} timestamp={item.data.timestamp}
-                missed={item.data.missed}
-                /> : 
+                !route.params.groupId ?       
+                item.data.call ? (
+                    <CallComponent funct={()=>{gotoCall()}} sender={item.data.sender} photo={'null'} message={item.data.message} isSender={false} image={item.data.downloaduri} /> 
+                ) : (
+                    <Sender isGroup={false} photo={'null'} img={chatState.profileImg} chatMessage={item} timestamp={item.data.timestamp}
+                    missed={item.data.missed}
+                    />
+                )     
+                : 
                 <Sender photo={'null'} isGroup={true} img={chatState.profileImg} chatMessage={item} timestamp={item.data.timestamp}/>
             ) : (
                 !route.params.groupId ? <Sender photo={item.data.downloaduri} chatMessage={item} timestamp={item.data.timestamp}/> :
