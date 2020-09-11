@@ -233,9 +233,7 @@ const ChatWindow = ({route,navigation}) => {
                 ) : (
                     <Receiver img={item.data.downloaduri}  chatMessage={item.data.message} timestamp={item.data.timestamp} />
                 )
-            )
-
-            
+            )      
         ): (
             item.data.image === 'none' || item.data.image === undefined ? (
                 !route.params.groupId ?       
@@ -288,7 +286,8 @@ const ChatWindow = ({route,navigation}) => {
 
       const gotoCall = async () => {
         navigation.navigate('CallScreen' , {msgid : !route.params.groupId ? await getmsgid() : route.params.groupId , isGroup : route.params.groupId
-        , token : !route.params.groupId ? await getReceiverToken(chatState.receiver) : listToken.toString(), receiver : !route.params.groupId ? chatState.receiver : null
+        , token : !route.params.groupId ? await getReceiverToken(chatState.receiver) : listToken.toString(), receiver : !route.params.groupId ? chatState.receiver : null ,
+        videoCall : false, profileImg : chatState.profileImg
         })
       }
 

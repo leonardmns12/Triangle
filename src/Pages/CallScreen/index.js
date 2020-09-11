@@ -18,7 +18,8 @@ import {
   StatusBar,
   TouchableOpacity,
   Dimensions,
-  AsyncStorage
+  AsyncStorage,
+  Image
 } from 'react-native';
 
 import {
@@ -38,6 +39,7 @@ import Video from '../WebRtc/components/video'
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { sendMessage } from '../../Config/Redux/restApi/';
+import InCallManager from 'react-native-incall-manager';
 
 const dimensions = Dimensions.get('window')
 
@@ -70,7 +72,7 @@ class App extends React.Component {
       sdpConstraints: {
         'mandatory': {
             'OfferToReceiveAudio': true,
-            'OfferToReceiveVideo': true
+            'OfferToReceiveVideo': this.props.route.params.videoCall ? true : false
         }
       },
       peerCount : null,
@@ -82,7 +84,12 @@ class App extends React.Component {
       connect: false,
       camera: true,
       mic: true,
-      isSended : false
+      isSended : false,
+      speaker : false,
+      second : 0,
+      minute : 0,
+      hours : 0,
+      days : 0,
     }
 
     // DONT FORGET TO CHANGE TO YOUR URL
@@ -122,7 +129,7 @@ class App extends React.Component {
 
       const constraints = {
         audio: true,
-        video: {
+        video: this.props.route.params.videoCall ?  {
           mandatory: {
             minWidth: 500, // Provide your own width, height and frame rate here
             minHeight: 300,
@@ -130,7 +137,7 @@ class App extends React.Component {
           },
           facingMode: (isFront ? "user" : "environment"),
           optional: (videoSourceId ? [{ sourceId: videoSourceId }] : [])
-        }
+        } : false
       }
 
       mediaDevices.getUserMedia(constraints)
@@ -281,7 +288,8 @@ class App extends React.Component {
     }
   }
 
-  componentDidMount = () => {this.joinRoom() }
+  componentDidMount = () => {this.joinRoom()
+  }
 
   convertTime = (val) => {
     const date = new Date(val)
@@ -319,9 +327,25 @@ class App extends React.Component {
     this.sendMissedCall()
   }
 
+  minTwoDigits(n) {
+    return (n < 10 ? '0' : '') + n;
+  }
+
+
   joinRoom = async () => {
     this.mount = true
+    setInterval(()=>{
 
+      this.setState({
+        second : this.state.second+1
+      })
+      if(this.state.second > 59){
+        this.setState({
+          second : 0,
+          minute : this.state.minute+1
+        })
+      }
+    },1000)
     if(this.mount){
       this.setState({
         connect: true,
@@ -345,7 +369,9 @@ class App extends React.Component {
       this.getLocalStream()
       console.log(data.success)
       const status = data.peerCount > 1 ? `Total Connected Peers to room ${this.state.room}: ${data.peerCount}` : this.state.status
-
+      InCallManager.start({media: 'audio'});
+      InCallManager.setSpeakerphoneOn(true)
+      // InCallManager.startRingtone()
       this.setState({
         status,
         messages: data.messages,
@@ -354,6 +380,7 @@ class App extends React.Component {
       })
 
       if(data.peerCount === 1 && this.state.isSended){
+        InCallManager.startRingtone()
         const data = {
           message :'Has started a call',
           sender : this.state.username,
@@ -370,20 +397,21 @@ class App extends React.Component {
         sendMessage(data,this.props.route.params.msgid)
       }
 
+    })
 
+    this.socket.on('joined-peers', data => {
+      console.log(data.peerCount)
       if(data.peerCount > 1){
         this.setState({
           connected : true
         })
       }
-
-    })
-
-    this.socket.on('joined-peers', data => {
-      console.log(data.peerCount)
       this.setState({
         status: data.peerCount > 1 ? `Total Connected Peers to room ${this.state.room}: ${data.peerCount}` : 'Waiting for other peers to connect'
       })
+      if(this.state.connected && data.peerCount > 1){
+        InCallManager.stopRingtone()
+      }
     })
 
     this.socket.on('peer-disconnected', data => {
@@ -669,7 +697,7 @@ debugger
             onPress={() => {
               // disconnect socket
               this.socket.close()
-
+              InCallManager.stopRingtone()
               // localStream.stop()
               this.stopTracks(localStream)
 
@@ -709,64 +737,148 @@ debugger
         </View>
       )
 
+      const videoActionButtons2 = (
+        <View style={{
+          ...styles.buttonsContainer,
+          justifyContent: 'space-between', alignItems: 'center',
+          paddingHorizontal: 40,
+          height:'auto',
+          marginTop:'10%',
+        }}>
+          <TouchableOpacity
+            style={[styles.input,{backgroundColor:'#FFFFFF' , height:50, width:50, borderRadius:60 , justifyContent:'center',alignItems:'center'}]}
+            onPress={() => {
+              this.setState({
+                speaker : !this.state.speaker
+              })
+              InCallManager.setSpeakerphoneOn(this.state.speaker)
+            }}
+            // title='X DISCONNECT'
+          ><Icon name="volume-high" size={25} color={`${this.state.speaker ? 'green' : 'black' }`} /></TouchableOpacity>
+          <TouchableOpacity
+            style={{backgroundColor:'#FF0000' , height:50, width:50, borderRadius:60 , justifyContent:'center',alignItems:'center'}}
+            onPress={() => {
+              // disconnect socket
+              this.socket.close()
+              InCallManager.stopRingtone()
+              // localStream.stop()
+              this.stopTracks(localStream)
+
+              // stop all remote audio & video tracks
+              remoteStreams.forEach(rVideo => this.stopTracks(rVideo.stream))
+
+              // stop all remote peerconnections
+              peerConnections && Object.values(peerConnections).forEach(pc => pc.close())
+
+              if(this.mount){
+                this.setState({
+                  peerConnections: {},
+                  remoteStreams: [],
+                  localStream: null,
+                  remoteStream: null,
+                  selectedVideo: null,
+                })
+              }
+              this.props.navigation.goBack(null)
+            }}
+            // title='X DISCONNECT'
+            color='red'
+          ><Icon name="phone-hangup" size={25} color={'white'} /></TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.input,{backgroundColor:'#FFFFFF' , height:50, width:50, borderRadius:60 , justifyContent:'center',alignItems:'center'}]}
+            onPress={() => {
+              debugger
+              const audioTrack = localStream.getTracks().filter(track => track.kind === 'audio')
+              audioTrack[0].enabled = !audioTrack[0].enabled
+              this.setState({
+                mic: audioTrack[0].enabled
+              })
+            }}
+            // title={`mic ${ this.state.mic && '(on)' || '(off)'}`}
+            color={`${ this.state.mic && 'black' || 'red'}`}
+          ><Icon name={this.state.mic ? 'microphone' : 'microphone-off'} size={25} color={'black'} /></TouchableOpacity>
+        </View>
+      )
+
     return (
 
       <View style={{ flex: 1,backgroundColor:'black' }}>
         {/* <StatusBar backgroundColor="transparent" barStyle={'dark-content'}/> */}
 
-        <View style={{ ...styles.videosContainer, }}>
-          <View style={{
-            position: 'absolute',
-            zIndex: 1,
-            bottom: 10,
-            left: 10,
-            width: 100,
-            // height: 150,
-            backgroundColor: 'black', //width: '100%', height: '100%'
-          }}>
-              <View style={{flex: 1 }}>
-                <TouchableOpacity onPress={() => localStream._tracks[1]._switchCamera()}>
-                  <View>
+        {
+          this.props.route.params.videoCall ? (
+            <View style={{ ...styles.videosContainer, }}>
+            <View style={{
+              position: 'absolute',
+              zIndex: 1,
+              bottom: 10,
+              left: 10,
+              width: 100,
+              // height: 150,
+              backgroundColor: 'black', //width: '100%', height: '100%'
+            }}>
+                <View style={{flex: 1 }}>
+                  <TouchableOpacity onPress={() => localStream._tracks[1]._switchCamera()}>
+                    <View>
+                      {
+                        this.state.camera ? (
+                          <Video
+  
+                          zOrder={1}
+                          objectFit='cover'
+                          style={{ ...styles.rtcView }}
+                          streamURL={localStream}
+                          type='local'
+                        />
+                        ) : null
+                      }
+                    </View>
+                  </TouchableOpacity>
+                </View>
+            </View>
+              <View
+                onPress={() => alert('hello')}
+                style={{
+                  flex: 1,
+                  width: '100%',
+                  backgroundColor: 'black',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                { remoteVideo }
+              </View>
+            <ScrollView horizontal={true} style={{ ...styles.scrollView }}>
+              { remoteVideos }
+            </ScrollView>
+            
+            </View>
+          ) : (
+            <View style={{flex:1}}>
+                <View style={{flex:1 , backgroundColor:'gray'}}>
                     {
-                      this.state.camera ? (
-                        <Video
-
-                        zOrder={1}
-                        objectFit='cover'
-                        style={{ ...styles.rtcView }}
-                        streamURL={localStream}
-                        type='local'
-                      />
+                      this.props.route.params.profileImg !== 'null' ? (
+                        <Image source={this.props.route.params.profileImg} style={{flex:1}} />
                       ) : null
                     }
-                  </View>
-                </TouchableOpacity>
-              </View>
-          </View>
-          {/* <ScrollView horizontal={true} style={{ 
-            flex: 1,
-            backgroundColor: 'black',
-            padding: 15,
-           }}> */}
-            <View
-              onPress={() => alert('hello')}
-              style={{
-                flex: 1,
-                width: '100%',
-                backgroundColor: 'black',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              { remoteVideo }
+                  
+                </View>
+                <View style={{flex:1 , backgroundColor:'#FFFFFF'}}>
+                    <View style={{flex: 1,justifyContent:'center' , alignItems:'center'}}>
+                        <Text>Leonard</Text>
+                  <Text>{
+                      this.state.minute
+                    } : {this.state.second < 10 ? '0' + this.state.second : '' + this.state.second}</Text>
+                    </View>
+                    <View style={{flex: 1}}>
+                    { videoActionButtons2 }
+                    </View>
+                   
+                </View>
             </View>
-          {/* </ScrollView> */}
-          <ScrollView horizontal={true} style={{ ...styles.scrollView }}>
-            { remoteVideos }
-          </ScrollView>
-          
-          </View>
-          { videoActionButtons }
+          )
+        }
+          { this.props.route.params.videoCall ? videoActionButtons : null }
         </View>
       );
   }
@@ -817,7 +929,18 @@ const styles = StyleSheet.create({
     height: 110, //dimensions.height / 2,
     // backgroundColor: 'black',
     borderRadius: 5,
-  }
+  },
+  input : {
+    shadowColor: "black",
+    shadowOpacity: 1,
+    shadowRadius: 1,
+    shadowOffset: {
+      height: 1,
+      width: 0,
+    },
+    backgroundColor: 'white',
+    elevation:8,
+},
 });
 
 export default App;
