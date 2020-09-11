@@ -85,6 +85,20 @@ const replyPost = {
     replyList : []
 }
 
+const listPendingGroup = {
+    pendingGroupList : []
+}
+
+const pendingGroupReducer = (state = listPendingGroup, action) => {
+    if(action.type === 'SET_PENDINGGROUP'){
+        return{
+            ...state,
+            pendingGroupList : action.value
+        }
+    }
+    return state
+}
+
 const replyPostReducer = (state = replyPost, action) => {
     if(action.type === 'SET_REPLYLIST'){
         return{
@@ -350,7 +364,8 @@ const reducer = combineReducers({
     groupInfoReducer,
     inviteChatReducer,
     postTimelineReducer,
-    replyPostReducer
+    replyPostReducer,
+    pendingGroupReducer
 })
 
 export default reducer;

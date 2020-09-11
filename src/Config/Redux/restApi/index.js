@@ -587,4 +587,21 @@ export const getMemberToken = (username) => {
   return res
 }
 
-
+// export const getUserPendingGroup = (username) => {
+//   const res = database().ref('users/' + username + '/pendingGroup').once('value').then(function(snapshot){
+//     const data = []
+    
+//     if(snapshot.val() === null || snapshot.val() === undefined){
+//       console.log('data kosong')
+//     }else{
+//       Object.keys(snapshot.val()).map(key => {
+//         data.push({
+//             id: key,
+//             data: snapshot.val()[key]
+//         })
+//       })
+//     }
+//     return data
+//   })
+//   return res
+// }
