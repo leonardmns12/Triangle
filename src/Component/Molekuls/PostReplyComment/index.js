@@ -4,27 +4,34 @@ const PostReplyComment = ({name , time , content , profileImage}) => {
     useEffect(()=>{
         convertTime()
     },[])
-    function leadingzero(num) {
-        var s = num+"";
-        while (s.length < 2) s = "0" + s;
-        return s;
-    }
-    const convertTime = async () => {
-        var weekday = new Array(7);
-        weekday[0] = "Sunday";
-        weekday[1] = "Monday";
-        weekday[2] = "Tuesday";
-        weekday[3] = "Wednesday";
-        weekday[4] = "Thursday";
-        weekday[5] = "Friday";
-        weekday[6] = "Saturday";
-        const date = new Date(time)
-        const day = weekday[date.getDay()]
-        const hours = date.getHours();
-        const minutes = leadingzero(date.getMinutes())
-        setTime(hours+':'+minutes+' '+day)
-    }
-    const [times , setTime] = useState('')
+    var periods = {
+        month: 30 * 24 * 60 * 60 * 1000,
+        week: 7 * 24 * 60 * 60 * 1000,
+        day: 24 * 60 * 60 * 1000,
+        hour: 60 * 60 * 1000,
+        minute: 60 * 1000
+      };
+      function formatTime(timeCreated) {
+        var diff = Date.now() - timeCreated;
+      
+        if (diff > periods.month) {
+          // it was at least a month ago
+          return Math.floor(diff / periods.month) + " month ago";
+        } else if (diff > periods.week) {
+          return Math.floor(diff / periods.week) + " week ago";
+        } else if (diff > periods.day) {
+          return Math.floor(diff / periods.day) + " day ago";
+        } else if (diff > periods.hour) {
+          return Math.floor(diff / periods.hour) + " hours ago";
+        } else if (diff > periods.minute) {
+          return Math.floor(diff / periods.minute) + " minute ago";
+        }
+        return "Just now";
+      }
+        const convertTime = async () => {
+            setTime(formatTime(time)) 
+        }
+        const [times , setTime] = useState('')
     return(
         <View style={{flexDirection:'row'}}>
             {

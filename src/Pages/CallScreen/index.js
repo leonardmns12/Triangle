@@ -325,6 +325,7 @@ class App extends React.Component {
 
   componentWillUnmount = () => { this.mount = false
     this.sendMissedCall()
+    clearInterval(this.intervalId)
   }
 
   minTwoDigits(n) {
@@ -334,18 +335,6 @@ class App extends React.Component {
 
   joinRoom = async () => {
     this.mount = true
-    setInterval(()=>{
-
-      this.setState({
-        second : this.state.second+1
-      })
-      if(this.state.second > 59){
-        this.setState({
-          second : 0,
-          minute : this.state.minute+1
-        })
-      }
-    },1000)
     if(this.mount){
       this.setState({
         connect: true,
@@ -411,6 +400,18 @@ class App extends React.Component {
       })
       if(this.state.connected && data.peerCount > 1){
         InCallManager.stopRingtone()
+        this.intervalId = setInterval(()=>{
+
+          this.setState({
+            second : this.state.second+1
+          })
+          if(this.state.second > 59){
+            this.setState({
+              second : 0,
+              minute : this.state.minute+1
+            })
+          }
+        },1000)
       }
     })
 
@@ -866,9 +867,16 @@ debugger
                 <View style={{flex:1 , backgroundColor:'#FFFFFF'}}>
                     <View style={{flex: 1,justifyContent:'center' , alignItems:'center'}}>
                         <Text>Leonard</Text>
-                  <Text>{
-                      this.state.minute
-                    } : {this.state.second < 10 ? '0' + this.state.second : '' + this.state.second}</Text>
+                        {
+                          this.state.connected ? (
+                            <Text>{
+                              this.state.minute
+                            } : {this.state.second < 10 ? '0' + this.state.second : '' + this.state.second}
+                            </Text>
+                          ) : (
+                            <Text>Connecting...</Text>
+                          )
+                        }  
                     </View>
                     <View style={{flex: 1}}>
                     { videoActionButtons2 }

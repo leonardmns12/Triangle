@@ -112,11 +112,15 @@ const Chat = ({navigation}) => {
     const renderItem = ({item}) => {
         if(item.data.isGroup){
             return(
+                <View style={{borderBottomWidth:1.3, borderColor:'#EFF3F5'}}>
                 <Friendchat onPress={()=>{deletechatlist(item.id)}} profileuri={item.profilepicture} funct={()=>{gotochatroom(item.id,true)}} name={item.displayname} isRead={item.data.isRead} realtime={item.data.realtime} textmsg={item.data.message} />
+                </View>
             )
         }else{
             return(  
+                <View style={{borderBottomWidth:1.3, borderColor:'#EFF3F5'}}>
                 <Friendchat onPress={()=>{deletechatlist(item.id)}} profileuri={item.profilepicture} funct={()=>{gotochatroom(item.id,false)}} name={item.displayname} isRead={item.data.isRead} realtime={item.data.realtime} textmsg={item.data.message} />
+                </View>
             )
         }
     }
@@ -195,7 +199,7 @@ const styles = StyleSheet.create({
           height: 1,
           width: 0,
         },
-        backgroundColor: 'white',
+        backgroundColor: '#FFFFFF',
         borderColor : '#707070',
         height:40,
         width:'95%',

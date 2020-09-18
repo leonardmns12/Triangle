@@ -40,8 +40,8 @@ const Timeline = ({navigation}) => {
                 }
             }
           }
-          console.log('out')
             dispatch({type: 'SET_TIMELINEPOST' , value: data})
+            isRefresing(false)
         })
     }
 
@@ -50,7 +50,7 @@ const gotoPostReply = (id) => {
 }
 
 const [post, setPost] = useState([])
-const [refreshing , isRefresing] = useState(true)
+const [refreshing , isRefresing] = useState(false)
 const dispatch = useDispatch()
 const globalState = useSelector(state => state.postTimelineReducer)
 
@@ -71,7 +71,7 @@ const RenderItem = ({item}) => {
     )
 }
 
-const onRefresh = async () => {
+const onRefresh1 = async () => {
     isRefresing(true)
     await getTimelinePost()
 }
@@ -86,19 +86,15 @@ return(
                     <Text style={[styles.headerText,{}]}>Timeline</Text>
             </View>
             <View style={{flex:1}}>
-                <Text style={[styles.timelinetext,{}]}>Friend With Something News</Text>
+                <Text style={[styles.timelinetext,{}]}>Explore Triangle</Text>
                 {
                 globalState.postList === undefined ? null : (
                     <FlatList 
+                    onRefresh={onRefresh1}
+                    refreshing={refreshing}
                     renderItem={RenderItem}
                     data={globalState.postList}
                     key={item => item.id}
-                    RefreshControl = {
-                        <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={onRefresh}
-                        />
-                    }
                     />
                 )
                 }

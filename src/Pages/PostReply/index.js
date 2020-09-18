@@ -14,11 +14,39 @@ const PostReply = ({navigation,route}) => {
     useEffect(()=>{
         getpostreply()
         getreply(limit)
-
+        convertTime()
         return() => {
             dispatch({type:'SET_REPLYLIST' , value:[]})
         }
     },[])
+    var periods = {
+        month: 30 * 24 * 60 * 60 * 1000,
+        week: 7 * 24 * 60 * 60 * 1000,
+        day: 24 * 60 * 60 * 1000,
+        hour: 60 * 60 * 1000,
+        minute: 60 * 1000
+      };
+function formatTime(timeCreated) {
+    var diff = Date.now() - timeCreated;
+  
+    if (diff > periods.month) {
+      // it was at least a month ago
+      return Math.floor(diff / periods.month) + " month ago";
+    } else if (diff > periods.week) {
+      return Math.floor(diff / periods.week) + " week ago";
+    } else if (diff > periods.day) {
+      return Math.floor(diff / periods.day) + " day ago";
+    } else if (diff > periods.hour) {
+      return Math.floor(diff / periods.hour) + " hours ago";
+    } else if (diff > periods.minute) {
+      return Math.floor(diff / periods.minute) + " minute ago";
+    }
+    return "Just now";
+  }
+    const convertTime = async () => {
+        settimes(formatTime(await getPostTimestamp(route.params.id))) 
+    }
+    const [times, settimes] = useState('')
     const dispatch = useDispatch()
     const postReplyState = useSelector(state => state.replyPostReducer)
     const [name , setname] = useState('')
@@ -60,7 +88,7 @@ const PostReply = ({navigation,route}) => {
                 }
             }
           }
-          dispatch({type:'SET_REPLYLIST' , value:data})
+          dispatch({type:'SET_REPLYLIST' , value:data.sort((a, b) => parseFloat(a.data.timestamp) - parseFloat(b.data.timestamp))})
           return data
         })
         return res
@@ -160,7 +188,7 @@ const PostReply = ({navigation,route}) => {
                     <Text style={{marginTop:"3%", marginBottom: "0%", padding:"8%", backgroundColor:"#E9EBEE"}}>{value}</Text>
                 </View>
                 <View style={{flexDirection:'row' , borderBottomWidth:1, padding:10, borderBottomColor:"black"}}>
-                        <Text style={{fontFamily:'ITCKRISTEN', color:"grey"}}>{time}</Text>
+                        <Text style={{fontFamily:'ITCKRISTEN', color:"grey"}}>{times}</Text>
                     <View style={{position:'absolute', right:0, padding:10 , flexDirection:'row'}}>
                     <Icon name="comment-text-multiple-outline" size={20} color="#1BB0DF" />
                     <Text style={{marginLeft:5, color:"grey"}}>{replyLength}</Text>
@@ -179,8 +207,7 @@ const PostReply = ({navigation,route}) => {
                         onRefresh={onRefresh}
                         />
                     }
-                    inverted
-                    ListFooterComponent={loadMore}
+                    ListHeaderComponent={loadMore}
                     />
                     )
             }
